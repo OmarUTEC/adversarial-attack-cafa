@@ -1,0 +1,14 @@
+model_type: 'lstm_attention'
+
+model_artifact_path: 'trained-models/${data.name}-${ml_model.model_type}.ckpt'
+
+perform_training: ${perform_training}
+perform_grid_search_hparams: ${perform_training_grid_search_hparams}
+
+default_hparams:
+  sequence_length: 1
+  hidden_dim: 64
+  n_lstm_layers: 2
+  dropout: 0.3
+  lr: 1e-3
+  weight_decay: 1e-5

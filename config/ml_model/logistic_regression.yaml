@@ -1,0 +1,10 @@
+model_type: 'logistic_regression'
+
+model_artifact_path: 'trained-models/${data.name}-${ml_model.model_type}.ckpt'
+
+perform_training: ${perform_training}
+perform_grid_search_hparams: ${perform_training_grid_search_hparams}
+
+default_hparams:
+  lr: 1e-3
+  weight_decay: 1e-5
