@@ -7,4 +7,5 @@ outputs/
 
 # ignorar datasets grandes
 data/creditcard/raw-data/
+data/creditcard/raw-data/creditcard_2023.csv
 creditcard_2023.csv
