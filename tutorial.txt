@@ -1,0 +1,7 @@
+
+Entrenar solo el modelo 
+python attack.py data=creditcard perform_attack=False ml_model.perform_training=True ml_model.perform_grid_search_hparams=False
+
+Ejecutar el ataque al modelo recien entrenado
+python attack.py data=creditcard perform_projection=False perform_constraints_soundness_evaluation=False
+
