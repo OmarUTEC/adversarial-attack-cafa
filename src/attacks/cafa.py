@@ -372,6 +372,8 @@ class CaFA(EvasionAttack):
         perturb_cat = np.zeros_like(x_adv)
 
         if self.cat_encoding_method == 'one_hot_encoding':
+            if len(self.one_hot_groups) == 0:
+                return perturb_cat
 
             # get the max value of each OH group
             score_grads_per_group = np.zeros((x_adv.shape[0], len(self.one_hot_groups)))
@@ -404,6 +406,8 @@ class CaFA(EvasionAttack):
         """
 
         perturb_cat = np.zeros_like(x_adv)
+        if len(self.one_hot_groups) == 0:
+            return perturb_cat
         # 1. choose random feature to perturb, per sample
         chosen_oh_groups = np.random.randint(0, len(self.one_hot_groups), size=x_adv.shape[0])
 

@@ -10,6 +10,7 @@ from sklearn.model_selection import train_test_split
 from src.datasets.preprocess.adult import get_adult_dataset
 from src.datasets.preprocess.bank import get_bank_dataset
 from src.datasets.preprocess.phishing import get_phishing_dataset
+from src.datasets.preprocess.creditcard import get_creditcard_dataset
 
 logger = logging.getLogger(__name__)
 
@@ -17,6 +18,7 @@ dataset_name_to_preprocess_func = {
     'adult': get_adult_dataset,
     'bank': get_bank_dataset,
     'phishing': get_phishing_dataset,
+    'creditcard': get_creditcard_dataset,
 }
 
 

@@ -1,13 +1,13 @@
 defaults:
   - _self_
-  - data: bank  # dataset to run on
+  - data: creditcard  # dataset to run on
   - ml_model: lstm_attention  # model to attack
   - attack: cafa  # attack to run
   - constraints: dcs  # constraints to use; if not shown we don't integrate constraints, which also means we skip projection.
 
 
 # General config:
-n_samples_to_attack: 20  # number of samples to attack
+n_samples_to_attack: 1000  # number of samples to attack
 data_split_to_attack: test  # data split to attack
 save_attack_artifacts: True  # whether to save the attack artifacts or not.  # TODO
 
@@ -18,4 +18,4 @@ perform_constraints_mining: False  # whether to re-execute the constraints minin
 perform_constraints_ranking: False  # whether to re-execute the evaluation and ranking of the constraints or not.
 perform_constraints_soundness_evaluation: False  # TODO here?  # whether to re-execute the soundness evaluation of the constraints or not.
 perform_attack: True  # whether to execute the attack or not. debugging purposes only. TODO DISCARD ME?
-perform_projection: True  # if False, we skips projection.
+perform_projection: False  # skip projection; useful when constraints are not mined/available.

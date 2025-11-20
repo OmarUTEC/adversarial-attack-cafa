@@ -5,3 +5,4 @@ env/
 *.egg-info/
 cafa/
 outputs/
+data/creditcard/creditcard_2023.csv

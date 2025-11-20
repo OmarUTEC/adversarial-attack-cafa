@@ -72,7 +72,11 @@ def main(cfg: DictConfig) -> None:
     eval_params = dict(classifier=classifier, tab_dataset=tab_dataset)
 
     # 4. Load constraints; Optionally, mine them before:
-    if 'constraints' in cfg and cfg.constraints:
+    should_use_constraints = (
+        'constraints' in cfg and cfg.constraints and
+        (cfg.perform_projection or cfg.perform_constraints_soundness_evaluation)
+    )
+    if should_use_constraints:
         mining_source_params = cfg.data.params.copy()
         mining_source_params['encoding_method'] = None  # we set default (label-) encoding for constraint mining
         tab_dcs_dataset = TabularDataset(**mining_source_params)
@@ -136,7 +140,7 @@ def main(cfg: DictConfig) -> None:
         logger.info(f"after-cafa: {evaluations['after-cafa']}")
 
     # 5. Project
-    if 'constraints' in cfg and cfg.constraints and cfg.perform_projection and X_adv is not None:
+    if should_use_constraints and cfg.perform_projection and X_adv is not None:
         logger.info("Executing projection of the crafted samples onto the constrained space.")
         # collect sample projected to numpy array
         X_adv_proj = []

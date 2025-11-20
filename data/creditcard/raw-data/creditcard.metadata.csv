@@ -1,0 +1,32 @@
+feature_name,type,range,dc-mining-type
+id,ordinal,"[0, 1000000]",integer
+V1,continuous,"[-1000, 1000]",float
+V2,continuous,"[-1000, 1000]",float
+V3,continuous,"[-1000, 1000]",float
+V4,continuous,"[-1000, 1000]",float
+V5,continuous,"[-1000, 1000]",float
+V6,continuous,"[-1000, 1000]",float
+V7,continuous,"[-1000, 1000]",float
+V8,continuous,"[-1000, 1000]",float
+V9,continuous,"[-1000, 1000]",float
+V10,continuous,"[-1000, 1000]",float
+V11,continuous,"[-1000, 1000]",float
+V12,continuous,"[-1000, 1000]",float
+V13,continuous,"[-1000, 1000]",float
+V14,continuous,"[-1000, 1000]",float
+V15,continuous,"[-1000, 1000]",float
+V16,continuous,"[-1000, 1000]",float
+V17,continuous,"[-1000, 1000]",float
+V18,continuous,"[-1000, 1000]",float
+V19,continuous,"[-1000, 1000]",float
+V20,continuous,"[-1000, 1000]",float
+V21,continuous,"[-1000, 1000]",float
+V22,continuous,"[-1000, 1000]",float
+V23,continuous,"[-1000, 1000]",float
+V24,continuous,"[-1000, 1000]",float
+V25,continuous,"[-1000, 1000]",float
+V26,continuous,"[-1000, 1000]",float
+V27,continuous,"[-1000, 1000]",float
+V28,continuous,"[-1000, 1000]",float
+Amount,continuous,"[0, 100000]",float
+Class,label,,

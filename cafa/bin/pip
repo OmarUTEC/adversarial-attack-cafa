@@ -1,4 +1,4 @@
-#!/home/omarch/Escritorio/TESIS/CaFa/attack-tabular/cafa/bin/python3
+#!/home/omarch/Escritorio/adversarial-attack-cafa/cafa/bin/python
 # -*- coding: utf-8 -*-
 import re
 import sys

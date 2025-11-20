@@ -39,10 +39,10 @@ deactivate nondestructive
 if [ "${OSTYPE:-}" = "cygwin" ] || [ "${OSTYPE:-}" = "msys" ] ; then
     # transform D:\path\to\venv to /d/path/to/venv on MSYS
     # and to /cygdrive/d/path/to/venv on Cygwin
-    export VIRTUAL_ENV=$(cygpath /home/omarch/Escritorio/TESIS/CaFa/attack-tabular/cafa)
+    export VIRTUAL_ENV=$(cygpath /home/omarch/Escritorio/adversarial-attack-cafa/cafa)
 else
     # use the path as-is
-    export VIRTUAL_ENV=/home/omarch/Escritorio/TESIS/CaFa/attack-tabular/cafa
+    export VIRTUAL_ENV=/home/omarch/Escritorio/adversarial-attack-cafa/cafa
 fi
 
 _OLD_VIRTUAL_PATH="$PATH"
