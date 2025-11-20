@@ -1,9 +1,10 @@
-
-#ignirar entornos virtuales
+# ignorar entornos virtuales
 venv/
 env/
 *.egg-info/
 cafa/
 outputs/
-data/creditcard/creditcard_2023.csv
+
+# ignorar datasets grandes
+data/creditcard/raw-data/
 creditcard_2023.csv
