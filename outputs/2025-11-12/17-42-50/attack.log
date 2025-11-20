@@ -1,0 +1,79 @@
+[2025-11-12 17:42:50,685][__main__][INFO] - Used config: n_samples_to_attack: 20
+data_split_to_attack: test
+save_attack_artifacts: true
+perform_training: true
+perform_training_grid_search_hparams: false
+perform_constraints_mining: false
+perform_constraints_ranking: false
+perform_constraints_soundness_evaluation: false
+perform_attack: true
+perform_projection: true
+data:
+  name: bank
+  params:
+    dataset_name: ${data.name}
+    data_file_path: ${data.paths.data_file_path}
+    metadata_file_path: ${data.paths.metadata_file_path}
+    encoding_method: one_hot_encoding
+    random_seed: 42
+    train_proportion: 0.87
+  paths:
+    data_dir_path: data/${data.name}/raw-data
+    data_file_path: ${data.paths.data_dir_path}/bank-full.csv
+    metadata_file_path: ${data.paths.data_dir_path}/bank.metadata.csv
+    constraints_dir_path: data/${data.name}/mined-constraints
+    raw_dcs_out_path: ${data.paths.constraints_dir_path}/bank-11cols__DC_threshold=0.01__fastadc_dcs.txt
+    evaluated_dcs_out_path: ${data.paths.constraints_dir_path}/bank-11cols__DC_threshold=0.01__fastadc_dcs__eval.csv
+ml_model:
+  model_type: lstm_attention
+  model_artifact_path: trained-models/${data.name}-${ml_model.model_type}.ckpt
+  perform_training: ${perform_training}
+  perform_grid_search_hparams: ${perform_training_grid_search_hparams}
+  default_hparams:
+    sequence_length: 1
+    hidden_dim: 64
+    n_lstm_layers: 2
+    dropout: 0.3
+    lr: 0.001
+    weight_decay: 1.0e-05
+attack:
+  attack_name: cafa
+  random_init: true
+  random_seed: null
+  max_iter: 250
+  max_iter_tabpgd: 100
+  eps: 0.03333333333333333
+  step_size: 0.0003333333333333333
+  perturb_categorical_each_steps: 10
+constraints:
+  constrainer_params:
+    evaluated_dcs_out_path: ${data.paths.evaluated_dcs_out_path}
+    n_dcs: 5000
+    n_tuples: 1
+    limit_cost_ball: true
+    cost_ball_eps: 0.03333333333333333
+  projector_params:
+    upper_projection_budget_bound: 0.5
+  mining_params:
+    perform_constraints_mining: ${perform_constraints_mining}
+    perform_constraints_ranking: ${perform_constraints_ranking}
+    raw_dcs_out_path: ${data.paths.raw_dcs_out_path}
+    evaluated_dcs_out_path: ${data.paths.evaluated_dcs_out_path}
+    approx_violation_threshold: 0.01
+    path_to_fastadc_miner_jar: src/constraints/mining/resources/FastADC-1.0-SNAPSHOT.jar
+    n_dcs_to_eval: 10000
+    n_tuples_to_eval: 1000
+    n_other_tuples_to_eval: 8000
+
+[2025-11-12 17:44:11,263][src.models.lstm_attention][INFO] - Saved model's artifact to trained-models/bank-lstm_attention.ckpt
+[2025-11-12 17:44:11,264][src.models.lstm_attention][INFO] - Finished LSTM-Attention training. Results: {'best_val_loss': 0.22743014991283417, 'best_val_acc': 0.9089676141738892, 'best_val_hp_metric': 0.6359977722167969, 'best_model_path': 'outputs/training/lstm_attention/bank/lightning_logs/version_0/checkpoints/epoch=98-val_hp_metric=0.693.ckpt', 'best_model_val_hp_metric': tensor(0.6932)}
+[2025-11-12 17:44:11,265][src.models.utils][INFO] - Loading model from trained-models/bank-lstm_attention.ckpt
+[2025-11-12 17:44:11,372][art.estimators.classification.pytorch][INFO] - Inferred 2 hidden layers on PyTorch classifier.
+[2025-11-12 17:44:11,495][__main__][INFO] - Initializing constraint set and projector for the attack.
+[2025-11-12 17:44:32,579][__main__][INFO] - before-attack: {'is_misclassified_rate': 0.15, 'is_comp_rate': 0.9, 'is_mis_and_comp_rate': 0.1, 'l0_costs_mean': 0.0, 'l0_costs_on_mis_mean': 0.0, 'l0_costs_on_mis_and_comp_mean': 0.0, 'stand_linf_costs_mean': 0.0, 'stand_linf_costs_on_mis_mean': 0.0, 'stand_linfcosts_costs_on_mis_and_comp_mean': 0.0}
+[2025-11-12 17:44:32,579][__main__][INFO] - Executing CaFA attack.
+[2025-11-12 17:45:50,081][__main__][INFO] - after-cafa: {'is_misclassified_rate': 0.3, 'is_comp_rate': 0.8, 'is_mis_and_comp_rate': 0.1, 'l0_costs_mean': 1.2, 'l0_costs_on_mis_mean': 4.0, 'l0_costs_on_mis_and_comp_mean': 3.0, 'stand_linf_costs_mean': 0.00856558078546778, 'stand_linf_costs_on_mis_mean': 0.028551935951559266, 'stand_linfcosts_costs_on_mis_and_comp_mean': 0.032802476747694445}
+[2025-11-12 17:45:50,081][__main__][INFO] - Executing projection of the crafted samples onto the constrained space.
+[2025-11-12 17:46:12,542][__main__][INFO] - after-projection: {'is_misclassified_rate': 0.25, 'is_comp_rate': 1.0, 'is_mis_and_comp_rate': 0.25, 'l0_costs_mean': 1.3, 'l0_costs_on_mis_mean': 4.0, 'l0_costs_on_mis_and_comp_mean': 4.0, 'stand_linf_costs_mean': 0.008835796621697955, 'stand_linf_costs_on_mis_mean': 0.02977181601098865, 'stand_linfcosts_costs_on_mis_and_comp_mean': 0.02977181601098865}
+[2025-11-12 17:46:12,543][__main__][INFO] - Evaluations: {'before-attack': {'is_misclassified_rate': 0.15, 'is_comp_rate': 0.9, 'is_mis_and_comp_rate': 0.1, 'l0_costs_mean': 0.0, 'l0_costs_on_mis_mean': 0.0, 'l0_costs_on_mis_and_comp_mean': 0.0, 'stand_linf_costs_mean': 0.0, 'stand_linf_costs_on_mis_mean': 0.0, 'stand_linfcosts_costs_on_mis_and_comp_mean': 0.0}, 'after-cafa': {'is_misclassified_rate': 0.3, 'is_comp_rate': 0.8, 'is_mis_and_comp_rate': 0.1, 'l0_costs_mean': 1.2, 'l0_costs_on_mis_mean': 4.0, 'l0_costs_on_mis_and_comp_mean': 3.0, 'stand_linf_costs_mean': 0.00856558078546778, 'stand_linf_costs_on_mis_mean': 0.028551935951559266, 'stand_linfcosts_costs_on_mis_and_comp_mean': 0.032802476747694445}, 'after-cafa-projection': {'is_misclassified_rate': 0.25, 'is_comp_rate': 1.0, 'is_mis_and_comp_rate': 0.25, 'l0_costs_mean': 1.3, 'l0_costs_on_mis_mean': 4.0, 'l0_costs_on_mis_and_comp_mean': 4.0, 'stand_linf_costs_mean': 0.008835796621697955, 'stand_linf_costs_on_mis_mean': 0.02977181601098865, 'stand_linfcosts_costs_on_mis_and_comp_mean': 0.02977181601098865}}
+[2025-11-12 17:46:12,543][__main__][INFO] - Finished run. results saved in /home/omarch/Escritorio/TESIS/CaFa/attack-tabular/outputs/2025-11-12/17-42-50

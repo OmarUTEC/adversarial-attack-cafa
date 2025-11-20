@@ -1,0 +1,9 @@
+sequence_length: 1
+hidden_dim: 64
+n_lstm_layers: 2
+dropout: 0.3
+lr: 0.001
+weight_decay: 1.0e-05
+input_dim: 89
+output_dim: 2
+n_layers: 3

@@ -1,0 +1,6 @@
+
+#ignirar entornos virtuales
+venv/
+env/
+*.egg-info/
+cafa/

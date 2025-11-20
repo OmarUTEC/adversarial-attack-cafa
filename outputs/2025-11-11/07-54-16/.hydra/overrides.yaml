@@ -1,0 +1,3 @@
+- data=adult
+- attack=cafa
+- ml_model=mlp
