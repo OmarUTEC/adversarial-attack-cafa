@@ -3,5 +3,11 @@ Entrenar solo el modelo
 python attack.py data=creditcard perform_attack=False ml_model.perform_training=True ml_model.perform_grid_search_hparams=False
 
 Ejecutar el ataque al modelo recien entrenado
-python attack.py data=creditcard perform_projection=False perform_constraints_soundness_evaluation=False
+python attack.py data=creditcard
+
+Ejecutar SquareAttack tabular
+python attack.py data=creditcard attack=square_attack
+
+Ejecutar SimBA tabular
+python attack.py data=creditcard attack=simba
 

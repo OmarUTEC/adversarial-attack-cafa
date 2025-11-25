@@ -1,7 +1,6 @@
 pandas~=2.2.3
 scikit-learn~=1.5.2
 datasets~=2.14.5
-z3-solver==4.12.4.0
 plotly
 tqdm
 torch~=2.4.1

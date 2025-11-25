@@ -16,7 +16,3 @@ paths:
   data_dir_path: 'data/${data.name}/raw-data'
   data_file_path: '${data.paths.data_dir_path}/bank-full.csv'
   metadata_file_path: '${data.paths.data_dir_path}/bank.metadata.csv'
-  # Constraints paths:
-  constraints_dir_path: 'data/${data.name}/mined-constraints'
-  raw_dcs_out_path: '${data.paths.constraints_dir_path}/bank-11cols__DC_threshold=0.01__fastadc_dcs.txt'
-  evaluated_dcs_out_path: '${data.paths.constraints_dir_path}/bank-11cols__DC_threshold=0.01__fastadc_dcs__eval.csv'
