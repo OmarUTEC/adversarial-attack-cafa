@@ -1,9 +1,10 @@
 attack_name: simba
 
-max_iter: 200
-epsilon: 0.3
+max_iter: 400
+epsilon: 1.8
 order: random  # {random, diag}
 targeted: false
 batch_size: 1
 verbose: true
-norm: inf  # {inf, 2}
+norm: "2"  # {inf, 2}
+

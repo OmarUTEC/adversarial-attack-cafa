@@ -64,7 +64,11 @@ def main(cfg: DictConfig) -> None:
     trainset, devset = tab_dataset.get_train_dev_sets(dev_set_proportion=0.15)
 
     # 2. Load model; optionally, re-train before:
-    surrogate_model_type = cfg.transfer.surrogate_model if "transfer" in cfg and cfg.transfer else cfg.ml_model.model_type
+    surrogate_model_type = (
+        cfg.transfer.surrogate_model
+        if "transfer" in cfg and cfg.transfer and cfg.transfer.surrogate_model is not None
+        else cfg.ml_model.model_type
+    )
     surrogate_model_path = (
         cfg.ml_model.model_artifact_path
         if surrogate_model_type == cfg.ml_model.model_type

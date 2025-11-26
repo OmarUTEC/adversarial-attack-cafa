@@ -6,7 +6,7 @@ defaults:
 
 
 # General config:
-n_samples_to_attack: 1000  # number of samples to attack
+n_samples_to_attack: 20  # number of samples to attack
 data_split_to_attack: test  # data split to attack
 save_attack_artifacts: True  # whether to save the attack artifacts or not.  # TODO
 

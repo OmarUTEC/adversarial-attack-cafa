@@ -7,7 +7,7 @@ params:
   metadata_file_path: '${data.paths.metadata_file_path}'
   encoding_method: 'one_hot_encoding'
   random_seed: 42
-  train_proportion: 0.87
+  train_proportion: 0.8
 
 # Paths:
 paths:
