@@ -12,6 +12,7 @@ from art.estimators.classification import PyTorchClassifier
 from src.attacks.cafa import CaFA
 from src.attacks.square_attack_tabular import SquareAttackTabular
 from src.attacks.simba_tabular import SimBATabular
+from src.attacks.hop_skip_jump_tabular import HopSkipJumpTabular
 from src.models.utils import load_trained_model
 from src.utils import evaluate_crafted_samples
 from src.datasets.load_tabular_data import TabularDataset
@@ -148,6 +149,20 @@ def main(cfg: DictConfig) -> None:
             X_adv = attack.generate(x=X, y=y)
             evaluations['after-square-attack'] = evaluate_crafted_samples(X_adv=X_adv, X_orig=X, y=y, **eval_params)
             logger.info(f"after-square-attack: {evaluations['after-square-attack']}")
+        elif attack_name == "hop_skip_jump":
+            logger.info("Executing HopSkipJump (tabular) attack.")
+            attack_params = dict(cfg.attack)
+            for key in ["feature_clip_min", "feature_clip_max", "integer_indices", "categorical_groups",
+                        "editable_mask", "decision_threshold", "attack_name"]:
+                attack_params.pop(key, None)
+            attack = HopSkipJumpTabular(
+                estimator=classifier,
+                tab_dataset=tab_dataset,
+                **attack_params,
+            )
+            X_adv = attack.generate(x=X, y=y)
+            evaluations['after-hop-skip-jump'] = evaluate_crafted_samples(X_adv=X_adv, X_orig=X, y=y, **eval_params)
+            logger.info(f"after-hop-skip-jump: {evaluations['after-hop-skip-jump']}")
         elif attack_name == "simba":
             logger.info("Executing SimBA (tabular) attack.")
             attack_params = dict(cfg.attack)
