@@ -1,15 +1,3 @@
-﻿feature_name,type,range,dc-mining-type
-age,ordinal,"[0,120]",integer
-fnlwgt,ordinal,"[0,'inf']",integer
-education_num,ordinal,"[1,16]",integer
-capital-gain,ordinal,"[0,100_000]",integer
-capital-loss,ordinal,"[0,5000]",integer
-hours-per-week,ordinal,"[0,100]",integer
-workclass,categorical,,string
-marital-status,categorical,,string
-occupation,categorical,,string
-relationship,categorical,,string
-race,categorical,,string
-sex,categorical,,string
-native-country,categorical,,string
-income,label,,
+version https://git-lfs.github.com/spec/v1
+oid sha256:1a571f97cfe68453012f29a500ec84d4e8ab1e9478da396abac4cb81f082de49
+size 498
