@@ -1,0 +1,18 @@
+attack_name: boundary_attack
+
+# Hyperparameters for low queries
+max_iter: 20          # Reduced for faster execution in tabular
+num_trial: 10         # Fewer trials to save queries
+sample_size: 10       # Smaller sample size per step
+init_size: 50         # Reduced initial search size
+epsilon: 0.1          # Step size
+delta: 0.1            # Initial perturbation size
+targeted: false
+verbose: true
+
+# Tabular parameters (will be injected)
+feature_clip_min:
+feature_clip_max:
+integer_indices:
+categorical_groups:
+editable_mask:

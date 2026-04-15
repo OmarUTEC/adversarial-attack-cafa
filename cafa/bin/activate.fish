@@ -33,7 +33,7 @@ end
 # Unset irrelevant variables.
 deactivate nondestructive
 
-set -gx VIRTUAL_ENV /home/omarch/Escritorio/adversarial-attack-cafa/cafa
+set -gx VIRTUAL_ENV /home/omar/Desktop/TESIS1/adversarial-attack-cafa/cafa
 
 set -gx _OLD_VIRTUAL_PATH $PATH
 set -gx PATH "$VIRTUAL_ENV/"bin $PATH

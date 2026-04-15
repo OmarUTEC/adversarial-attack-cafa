@@ -1,0 +1,10 @@
+model_type: xgboost
+model_artifact_path: trained-models/${data.name}-${ml_model.model_type}.pkl
+perform_training: ${perform_training}
+perform_grid_search_hparams: ${perform_training_grid_search_hparams}
+default_hparams:
+  max_depth: 6
+  learning_rate: 0.1
+  n_estimators: 100
+  verbosity: 1
+  random_state: 42

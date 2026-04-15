@@ -1,15 +1,15 @@
 attack_name: hop_skip_jump
 
-# Core hyperparameters
-max_iter: 50
-max_eval: 10000
-init_eval: 100
-init_size: 100
+# Core hyperparameters (Tuned for lower queries)
+max_iter: 20       # Reduced from 50
+max_eval: 1000     # Reduced from 10000
+init_eval: 50      # Reduced from 100
+init_size: 50      # Reduced from 100
 norm: 2        # {2, inf}
 targeted: false
 batch_size: 64
 verbose: true
-max_eval_per_iter: 512
+max_eval_per_iter: 128 # Reduced from 512
 
 # Optional thresholds/masks
 decision_threshold:
