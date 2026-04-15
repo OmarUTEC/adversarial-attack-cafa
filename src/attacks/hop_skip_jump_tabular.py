@@ -567,7 +567,7 @@ class HopSkipJump(EvasionAttack):
             return self.feature_clip_max.astype(ART_NUMPY_DTYPE)
         return np.ones(self.estimator.input_shape, dtype=ART_NUMPY_DTYPE) * clip_value
 
-    def _project_tabular(
+    def s_project_tabular(
         self, sample: np.ndarray, clip_min: np.ndarray, clip_max: np.ndarray, mask: np.ndarray | None
     ) -> np.ndarray:
         if mask is not None:
