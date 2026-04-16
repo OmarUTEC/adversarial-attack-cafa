@@ -7,18 +7,22 @@ from omegaconf import DictConfig, OmegaConf
 import hydra
 import torch
 import numpy as np
-from art.estimators.classification import PyTorchClassifier
+from art.estimators.classification import PyTorchClassifier, XGBoostClassifier
 
 from src.attacks.cafa import CaFA
 from src.attacks.square_attack_tabular import SquareAttackTabular
 from src.attacks.simba_tabular import SimBATabular
 from src.attacks.hop_skip_jump_tabular import HopSkipJumpTabular
+from src.attacks.zoo_attack_tabular import ZooAttackTabularFromDataset
+from src.attacks.sign_opt_tabular import SignOPTAttackTabularFromDataset
+from src.attacks.boundary_attack_tabular import BoundaryAttackTabularFromDataset
 from src.models.utils import load_trained_model
 from src.utils import evaluate_crafted_samples
 from src.datasets.load_tabular_data import TabularDataset
 from src.models import mlp as mlp_models
 from src.models import lstm_attention as lstm_models
 from src.models import logistic_regression as logreg_models
+from src.models import xgboost_model as xgboost_models
 
 MODEL_TRAINERS = {
     'mlp': {
@@ -32,10 +36,18 @@ MODEL_TRAINERS = {
     'logistic_regression': {
         'train': logreg_models.train,
         'grid_search': logreg_models.grid_search_hyperparameters,
-    }
+    },
+    'xgboost': {
+        'train': xgboost_models.train,
+        'grid_search': xgboost_models.grid_search_hyperparameters,
+    },
 }
 
 logger = logging.getLogger(__name__)
+
+
+def _art_input_shape(tab_dataset: TabularDataset) -> tuple[int]:
+    return (tab_dataset.n_features,)
 
 
 def _get_model_module(model_type: str):
@@ -48,11 +60,32 @@ def _get_model_module(model_type: str):
         return logreg_models
     if model_type == "lstm_attention":
         return lstm_models
+    if model_type == "xgboost":
+        return xgboost_models
     raise NotImplementedError(f"Unknown model type: {model_type}")
 
 
 def _default_model_path(model_type: str, dataset_name: str) -> str:
+    if model_type == "xgboost":
+        return f"trained-models/{dataset_name}-{model_type}.pkl"
     return f"trained-models/{dataset_name}-{model_type}.ckpt"
+
+
+def _build_art_classifier(model, model_type: str, tab_dataset: TabularDataset):
+    if model_type == "xgboost":
+        classifier = XGBoostClassifier(
+            model=model.model,
+            nb_classes=tab_dataset.n_classes,
+        )
+        classifier._input_shape = _art_input_shape(tab_dataset)
+        return classifier
+
+    return PyTorchClassifier(
+        model=model,
+        loss=lambda output, target: torch.functional.F.cross_entropy(output, target.long()),
+        input_shape=_art_input_shape(tab_dataset),
+        nb_classes=tab_dataset.n_classes,
+    )
 
 
 @hydra.main(config_path="config", config_name="config", version_base=None)
@@ -87,12 +120,7 @@ def main(cfg: DictConfig) -> None:
     model = load_trained_model(surrogate_model_path, model_type=surrogate_model_type)
 
     # 3. Wrap the model to ART classifier, for executing the attack:
-    classifier = PyTorchClassifier(
-        model=model,
-        loss=lambda output, target: torch.functional.F.cross_entropy(output, target.long()),
-        input_shape=tab_dataset.n_features,
-        nb_classes=tab_dataset.n_classes,
-    )
+    classifier = _build_art_classifier(model, surrogate_model_type, tab_dataset)
     eval_params = dict(classifier=classifier, tab_dataset=tab_dataset)
 
     # 4. Evaluate before the attack:
@@ -106,12 +134,7 @@ def main(cfg: DictConfig) -> None:
         for target_model_type in cfg.transfer.target_models:
             target_path = _default_model_path(target_model_type, cfg.data.name)
             target_model = load_trained_model(target_path, model_type=target_model_type)
-            target_clf = PyTorchClassifier(
-                model=target_model,
-                loss=lambda output, target: torch.functional.F.cross_entropy(output, target.long()),
-                input_shape=tab_dataset.n_features,
-                nb_classes=tab_dataset.n_classes,
-            )
+            target_clf = _build_art_classifier(target_model, target_model_type, tab_dataset)
             eval_params_target = dict(eval_params)
             eval_params_target["classifier"] = target_clf
             eval_key = f"before-attack-transfer-{target_model_type}"
@@ -179,6 +202,75 @@ def main(cfg: DictConfig) -> None:
             X_adv = attack.generate(x=X, y=y)
             evaluations['after-simba'] = evaluate_crafted_samples(X_adv=X_adv, X_orig=X, y=y, **eval_params)
             logger.info(f"after-simba: {evaluations['after-simba']}")
+        elif attack_name == "zoo_attack":
+            logger.info("Executing ZOO (tabular) attack.")
+            attack_params = dict(cfg.attack)
+            for key in [
+                "feature_clip_min",
+                "feature_clip_max",
+                "integer_indices",
+                "categorical_groups",
+                "editable_mask",
+                "only_increase_mask",
+                "only_decrease_mask",
+                "max_abs_step",
+                "attack_name",
+            ]:
+                attack_params.pop(key, None)
+            attack = ZooAttackTabularFromDataset(
+                classifier=classifier,
+                tab_dataset=tab_dataset,
+                **attack_params,
+            )
+            X_adv = attack.generate(x=X, y=y)
+            evaluations['after-zoo-attack'] = evaluate_crafted_samples(X_adv=X_adv, X_orig=X, y=y, **eval_params)
+            logger.info(f"after-zoo-attack: {evaluations['after-zoo-attack']}")
+        elif attack_name == "sign_opt":
+            logger.info("Executing SignOPT (tabular) attack.")
+            attack_params = dict(cfg.attack)
+            for key in [
+                "feature_clip_min",
+                "feature_clip_max",
+                "integer_indices",
+                "categorical_groups",
+                "editable_mask",
+                "only_increase_mask",
+                "only_decrease_mask",
+                "max_abs_step",
+                "attack_name",
+            ]:
+                attack_params.pop(key, None)
+            attack = SignOPTAttackTabularFromDataset(
+                estimator=classifier,
+                tab_dataset=tab_dataset,
+                **attack_params,
+            )
+            X_adv = attack.generate(x=X, y=y)
+            evaluations['after-sign-opt'] = evaluate_crafted_samples(X_adv=X_adv, X_orig=X, y=y, **eval_params)
+            logger.info(f"after-sign-opt: {evaluations['after-sign-opt']}")
+        elif attack_name == "boundary_attack":
+            logger.info("Executing BoundaryAttack (tabular) attack.")
+            attack_params = dict(cfg.attack)
+            for key in [
+                "feature_clip_min",
+                "feature_clip_max",
+                "integer_indices",
+                "categorical_groups",
+                "editable_mask",
+                "only_increase_mask",
+                "only_decrease_mask",
+                "max_abs_step",
+                "attack_name",
+            ]:
+                attack_params.pop(key, None)
+            attack = BoundaryAttackTabularFromDataset(
+                estimator=classifier,
+                tab_dataset=tab_dataset,
+                **attack_params,
+            )
+            X_adv = attack.generate(x=X, y=y)
+            evaluations['after-boundary-attack'] = evaluate_crafted_samples(X_adv=X_adv, X_orig=X, y=y, **eval_params)
+            logger.info(f"after-boundary-attack: {evaluations['after-boundary-attack']}")
         else:
             raise ValueError(f"Unsupported attack type: {attack_name}")
 
@@ -187,12 +279,7 @@ def main(cfg: DictConfig) -> None:
             for target_model_type in cfg.transfer.target_models:
                 target_path = _default_model_path(target_model_type, cfg.data.name)
                 target_model = load_trained_model(target_path, model_type=target_model_type)
-                target_clf = PyTorchClassifier(
-                    model=target_model,
-                    loss=lambda output, target: torch.functional.F.cross_entropy(output, target.long()),
-                    input_shape=tab_dataset.n_features,
-                    nb_classes=tab_dataset.n_classes,
-                )
+                target_clf = _build_art_classifier(target_model, target_model_type, tab_dataset)
                 eval_params_target = dict(eval_params)
                 eval_params_target["classifier"] = target_clf
                 eval_key = f"after-{attack_name}-transfer-{target_model_type}"

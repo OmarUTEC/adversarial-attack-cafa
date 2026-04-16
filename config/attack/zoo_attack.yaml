@@ -1,0 +1,16 @@
+attack_name: zoo_attack
+
+# Core hyperparameters
+confidence: 0.0
+targeted: false
+learning_rate: 0.01
+max_iter: 20
+binary_search_steps: 1
+initial_const: 0.001
+abort_early: true
+use_resize: false
+use_importance: false
+nb_parallel: 64
+batch_size: 1
+variable_h: 0.0001
+verbose: true

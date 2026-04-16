@@ -1,0 +1,14 @@
+attack_name: boundary_attack
+
+# Core hyperparameters
+targeted: false
+delta: 0.01
+epsilon: 0.01
+step_adapt: 0.667
+max_iter: 200
+num_trial: 25
+sample_size: 20
+init_size: 100
+min_epsilon: 0.0
+batch_size: 64
+verbose: true

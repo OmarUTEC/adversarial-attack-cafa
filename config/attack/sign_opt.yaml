@@ -1,0 +1,14 @@
+attack_name: sign_opt
+
+# Core hyperparameters
+targeted: false
+epsilon: 0.001
+num_trial: 100
+max_iter: 100
+query_limit: 20000
+k: 200
+alpha: 0.2
+beta: 0.001
+eval_perform: false
+batch_size: 64
+verbose: false

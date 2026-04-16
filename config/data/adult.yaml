@@ -15,4 +15,4 @@ paths:
   # Dataset paths:
   data_dir_path: 'data/${data.name}/raw-data'
   data_file_path: '${data.paths.data_dir_path}/adult.data'
-  metadata_file_path: '${data.paths.metadata_file_path}/adult.metadata.csv'
+  metadata_file_path: '${data.paths.data_dir_path}/adult.metadata.csv'

@@ -4,6 +4,7 @@ import torch
 from src.models.mlp import LitMLP
 from src.models.lstm_attention import LitLSTMAttention
 from src.models.logistic_regression import LitLogisticRegression
+from src.models.xgboost_model import XGBoostModel
 
 logger = logging.getLogger(__name__)
 
@@ -24,6 +25,8 @@ def load_trained_model(saved_model_path, model_type='mlp',
     elif model_type == 'logistic_regression':
         map_location = None if torch.cuda.is_available() else 'cpu'
         model = LitLogisticRegression.load_from_checkpoint(saved_model_path, map_location=map_location)
+    elif model_type == 'xgboost':
+        return XGBoostModel.load(saved_model_path)
     # elif model_type == 'tabnet':  # TODO [ADD-FEATURE] support tabnet
     #     assert dataset is not None, "dataset properties must be provided for TabNet model"
     #     model_wrapper = TabNetModelWrapper.load_model(model_ref_zip=saved_model_path,

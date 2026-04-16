@@ -15,6 +15,8 @@ from art.estimators.classification.classifier import ClassifierMixin
 from art.estimators.estimator import BaseEstimator, NeuralNetworkMixin
 from art.utils import is_probability
 
+from src.attacks.projection import project_tabular_constraints
+
 if TYPE_CHECKING:
     from art.utils import CLASSIFIER_TYPE
 
@@ -40,6 +42,9 @@ class SimBATabular(EvasionAttack):
         "categorical_groups",
         "editable_mask",
         "norm",
+        "only_increase_mask",
+        "only_decrease_mask",
+        "max_abs_step",
     ]
 
     _estimator_requirements = (BaseEstimator, ClassifierMixin, NeuralNetworkMixin)
@@ -59,6 +64,9 @@ class SimBATabular(EvasionAttack):
         categorical_groups: list[list[int]] | None = None,
         editable_mask: np.ndarray | None = None,
         norm: str = "inf",
+        only_increase_mask: np.ndarray | None = None,
+        only_decrease_mask: np.ndarray | None = None,
+        max_abs_step: np.ndarray | None = None,
     ):
         super().__init__(estimator=classifier)
         self.max_iter = max_iter
@@ -73,6 +81,9 @@ class SimBATabular(EvasionAttack):
         self.categorical_groups = categorical_groups or []
         self.editable_mask = editable_mask
         self.norm = norm
+        self.only_increase_mask = only_increase_mask
+        self.only_decrease_mask = only_decrease_mask
+        self.max_abs_step = max_abs_step
         self._check_params()
 
     def generate(self, x: np.ndarray, y: np.ndarray | None = None, **kwargs) -> np.ndarray:
@@ -80,6 +91,7 @@ class SimBATabular(EvasionAttack):
             raise ValueError("SimBATabular expects inputs of shape (n_samples, n_features).")
         x = x.astype(ART_NUMPY_DTYPE)
         x_adv = x.copy()
+        self._x_reference = x.copy()
 
         y_pred_raw = self.estimator.predict(x, batch_size=self.batch_size)
         y_prob_pred = self._to_probability(y_pred_raw)
@@ -210,19 +222,18 @@ class SimBATabular(EvasionAttack):
         return np.min(x, axis=0), np.max(x, axis=0)
 
     def _project_tabular(self, x: np.ndarray, clip_min: np.ndarray, clip_max: np.ndarray) -> np.ndarray:
-        x = np.clip(x, clip_min, clip_max)
-        if self.editable_mask is not None:
-            x = x * self.editable_mask + (1 - self.editable_mask) * np.clip(x, clip_min, clip_max)
-        if self.integer_indices:
-            x[:, self.integer_indices] = np.round(x[:, self.integer_indices])
-        for group in self.categorical_groups:
-            sub = x[:, group]
-            max_idx = np.argmax(sub, axis=1)
-            sub[:] = 0
-            rows = np.arange(sub.shape[0])
-            sub[rows, max_idx] = 1
-            x[:, group] = sub
-        return x
+        return project_tabular_constraints(
+            x_adv=x,
+            x_orig=self._x_reference[: x.shape[0]],
+            feature_clip_min=clip_min,
+            feature_clip_max=clip_max,
+            integer_indices=self.integer_indices,
+            categorical_groups=self.categorical_groups,
+            editable_mask=self.editable_mask,
+            only_increase_mask=self.only_increase_mask,
+            only_decrease_mask=self.only_decrease_mask,
+            max_abs_step=self.max_abs_step,
+        )
 
     def _check_params(self) -> None:
         if not isinstance(self.max_iter, int) or self.max_iter <= 0:

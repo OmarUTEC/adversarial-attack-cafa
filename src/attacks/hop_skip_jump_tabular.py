@@ -16,6 +16,8 @@ from art.estimators.classification import ClassifierMixin
 from art.estimators.estimator import BaseEstimator
 from art.utils import check_and_transform_label_format, compute_success, get_labels_np_array, to_categorical
 
+from src.attacks.projection import project_tabular_constraints
+
 if TYPE_CHECKING:
     from art.utils import CLASSIFIER_TYPE
 
@@ -46,6 +48,9 @@ class HopSkipJump(EvasionAttack):
         "feature_importance",
         "attack_name",
         "max_eval_per_iter",
+        "only_increase_mask",
+        "only_decrease_mask",
+        "max_abs_step",
     ]
     _estimator_requirements = (BaseEstimator, ClassifierMixin)
 
@@ -69,6 +74,9 @@ class HopSkipJump(EvasionAttack):
         feature_importance: np.ndarray | None = None,
         attack_name: str | None = None,  # accepted but unused; kept for config symmetry
         max_eval_per_iter: int | None = 512,
+        only_increase_mask: np.ndarray | None = None,
+        only_decrease_mask: np.ndarray | None = None,
+        max_abs_step: np.ndarray | None = None,
     ) -> None:
         super().__init__(estimator=classifier)
         self._targeted = targeted
@@ -89,6 +97,9 @@ class HopSkipJump(EvasionAttack):
         self.editable_mask = editable_mask
         self.decision_threshold = decision_threshold
         self.feature_importance = feature_importance
+        self.only_increase_mask = only_increase_mask
+        self.only_decrease_mask = only_decrease_mask
+        self.max_abs_step = max_abs_step
         self._check_params()
         self.curr_iter = 0
 
@@ -570,26 +581,23 @@ class HopSkipJump(EvasionAttack):
     def _project_tabular(
         self, sample: np.ndarray, clip_min: np.ndarray, clip_max: np.ndarray, mask: np.ndarray | None
     ) -> np.ndarray:
+        base_editable_mask = self.editable_mask if self.editable_mask is not None else None
         if mask is not None:
-            sample = sample * mask + (1 - mask) * np.clip(sample, clip_min, clip_max)
-        sample = np.clip(sample, clip_min, clip_max)
+            base_editable_mask = mask if base_editable_mask is None else (base_editable_mask * mask)
 
-        if self.integer_indices:
-            sample[..., self.integer_indices] = np.round(sample[..., self.integer_indices])
-
-        for group in self.categorical_groups:
-            sub = sample[..., group]
-            max_idx = np.argmax(sub, axis=-1)
-            if sample.ndim == 1:
-                sub[:] = 0
-                sub[max_idx] = 1
-            else:
-                sub[:] = 0
-                rows = np.arange(sub.shape[0])
-                sub[rows, max_idx] = 1
-            sample[..., group] = sub
-
-        return sample
+        original = sample.copy()
+        return project_tabular_constraints(
+            x_adv=sample,
+            x_orig=original,
+            feature_clip_min=clip_min,
+            feature_clip_max=clip_max,
+            integer_indices=self.integer_indices,
+            categorical_groups=self.categorical_groups,
+            editable_mask=base_editable_mask,
+            only_increase_mask=self.only_increase_mask,
+            only_decrease_mask=self.only_decrease_mask,
+            max_abs_step=self.max_abs_step,
+        )
 
 
 class HopSkipJumpTabular(HopSkipJump):

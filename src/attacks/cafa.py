@@ -9,6 +9,8 @@ from art.estimators import BaseEstimator, LossGradientsMixin
 from art.estimators.classification import ClassifierMixin
 from art.summary_writer import SummaryWriter
 
+from src.attacks.projection import project_tabular_constraints
+
 logger = logging.getLogger(__name__)
 
 
@@ -33,6 +35,10 @@ class CaFA(EvasionAttack):
         'step_size',
         'perturb_categorical_each_steps',
         'summary_writer',
+        'editable_mask',
+        'only_increase_mask',
+        'only_decrease_mask',
+        'max_abs_step',
     ]
     # Requiring implementation of 'loss_gradient()' (i.e., white-box access), via `LossGradientsMixin`.
     _estimator_requirements = (BaseEstimator, LossGradientsMixin, ClassifierMixin)
@@ -61,6 +67,12 @@ class CaFA(EvasionAttack):
             eps: float = 0.03,
             step_size: float = 0.0003,
             perturb_categorical_each_steps: int = 10,
+
+            # Projection constraints:
+            editable_mask: np.ndarray = None,
+            only_increase_mask: np.ndarray = None,
+            only_decrease_mask: np.ndarray = None,
+            max_abs_step: np.ndarray = None,
 
             # Misc:  # TODO [ADD-FEATURE] integrate summary_writer in the code
             summary_writer: Union[str, bool, SummaryWriter] = False,
@@ -115,6 +127,10 @@ class CaFA(EvasionAttack):
 
         self.cat_encoding_method = cat_encoding_method
         self.one_hot_groups = one_hot_groups
+        self.editable_mask = editable_mask
+        self.only_increase_mask = only_increase_mask
+        self.only_decrease_mask = only_decrease_mask
+        self.max_abs_step = max_abs_step
 
         # Validations:
         self._validate_input()
@@ -246,10 +262,19 @@ class CaFA(EvasionAttack):
             # 5. Project back to standard-epsilon-ball
             x_adv = np.clip(x_adv, epsilon_ball_lower, epsilon_ball_upper)
 
-            # 6.1. Clip to integer features
-            x_adv[:, self.ordinal_indices] = np.round(x_adv[:, self.ordinal_indices])
-            # 6.2. Clip to feature ranges
-            x_adv = np.clip(x_adv, self.feature_ranges[:, 0], self.feature_ranges[:, 1])
+            # 6. Project back to feasible tabular domain
+            x_adv = project_tabular_constraints(
+                x_adv=x_adv,
+                x_orig=x,
+                feature_clip_min=self.feature_ranges[:, 0],
+                feature_clip_max=self.feature_ranges[:, 1],
+                integer_indices=self.ordinal_indices.tolist(),
+                categorical_groups=[group.tolist() for group in self.one_hot_groups],
+                editable_mask=self.editable_mask,
+                only_increase_mask=self.only_increase_mask,
+                only_decrease_mask=self.only_decrease_mask,
+                max_abs_step=self.max_abs_step,
+            )
 
             # Assert that non masked / early-stopped feature was perturbed (x_adv_before_perturb)
             assert np.allclose(x_adv[~mask.astype(bool)], x_adv_before_perturb[~mask.astype(bool)], atol=1e-6)

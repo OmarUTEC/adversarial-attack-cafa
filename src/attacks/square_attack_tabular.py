@@ -19,6 +19,8 @@ from art.estimators.estimator import BaseEstimator
 from art.estimators.classification.classifier import ClassifierMixin
 from art.utils import check_and_transform_label_format, get_labels_np_array
 
+from src.attacks.projection import project_tabular_constraints
+
 if TYPE_CHECKING:
     from art.utils import CLASSIFIER_TYPE
 
@@ -47,6 +49,9 @@ class SquareAttackTabular(EvasionAttack):
         "categorical_groups",
         "editable_mask",
         "attack_name",
+        "only_increase_mask",
+        "only_decrease_mask",
+        "max_abs_step",
     ]
 
     _estimator_requirements = (BaseEstimator,)
@@ -69,6 +74,9 @@ class SquareAttackTabular(EvasionAttack):
         categorical_groups: list[list[int]] | None = None,
         editable_mask: np.ndarray | None = None,
         attack_name: str | None = None,  # accepted but unused; for config symmetry
+        only_increase_mask: np.ndarray | None = None,
+        only_decrease_mask: np.ndarray | None = None,
+        max_abs_step: np.ndarray | None = None,
     ):
         super().__init__(estimator=estimator)
 
@@ -100,6 +108,9 @@ class SquareAttackTabular(EvasionAttack):
         self.integer_indices = integer_indices or []
         self.categorical_groups = categorical_groups or []
         self.editable_mask = editable_mask
+        self.only_increase_mask = only_increase_mask
+        self.only_decrease_mask = only_decrease_mask
+        self.max_abs_step = max_abs_step
 
         self._check_params()
 
@@ -119,25 +130,19 @@ class SquareAttackTabular(EvasionAttack):
         return self.p_init * p_ratio[i_ratio]
 
     def _project_tabular(self, x: np.ndarray) -> np.ndarray:
-        """Enforce per-feature clipping, integer rounding, one-hot, and editable mask."""
-        if self.feature_clip_min is not None and self.feature_clip_max is not None:
-            x = np.clip(x, self.feature_clip_min, self.feature_clip_max)
-
-        if self.editable_mask is not None:
-            x = x * self.editable_mask + (1 - self.editable_mask) * np.clip(x, self.feature_clip_min, self.feature_clip_max)
-
-        if self.integer_indices:
-            x[:, self.integer_indices] = np.round(x[:, self.integer_indices])
-
-        for group in self.categorical_groups:
-            sub = x[:, group]
-            max_idx = np.argmax(sub, axis=1)
-            sub[:] = 0
-            rows = np.arange(sub.shape[0])
-            sub[rows, max_idx] = 1
-            x[:, group] = sub
-
-        return x
+        """Enforce per-feature clipping, editability, monotonicity and one-hot consistency."""
+        return project_tabular_constraints(
+            x_adv=x,
+            x_orig=self._x_reference[: x.shape[0]],
+            feature_clip_min=self.feature_clip_min,
+            feature_clip_max=self.feature_clip_max,
+            integer_indices=self.integer_indices,
+            categorical_groups=self.categorical_groups,
+            editable_mask=self.editable_mask,
+            only_increase_mask=self.only_increase_mask,
+            only_decrease_mask=self.only_decrease_mask,
+            max_abs_step=self.max_abs_step,
+        )
 
     def _init_bounds(self, x: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
         if self.feature_clip_min is not None and self.feature_clip_max is not None:
@@ -153,6 +158,7 @@ class SquareAttackTabular(EvasionAttack):
 
         x_adv = x.astype(ART_NUMPY_DTYPE)
         x_orig = x_adv.copy()
+        self._x_reference = x_orig.copy()
 
         if isinstance(self.estimator, ClassifierMixin):
             if y is not None:
