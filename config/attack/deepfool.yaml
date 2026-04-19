@@ -1,0 +1,17 @@
+attack_name: deepfool
+
+max_iter: 20
+epsilon: 1.0e-06
+nb_grads: 10
+batch_size: 128
+verbose: true
+
+# Tabular constraints injected by the pipeline wrapper
+feature_clip_min:
+feature_clip_max:
+integer_indices:
+categorical_groups:
+editable_mask:
+only_increase_mask:
+only_decrease_mask:
+max_abs_step:

@@ -1,0 +1,20 @@
+attack_name: pgd
+
+norm: inf
+eps: 0.03333333333333333
+eps_step: 0.0033333333333333335
+max_iter: 40
+targeted: false
+num_random_init: 0
+batch_size: 128
+verbose: true
+
+# Tabular constraints injected by the pipeline wrapper
+feature_clip_min:
+feature_clip_max:
+integer_indices:
+categorical_groups:
+editable_mask:
+only_increase_mask:
+only_decrease_mask:
+max_abs_step:

@@ -9,13 +9,17 @@ import torch
 import numpy as np
 from art.estimators.classification import PyTorchClassifier, XGBoostClassifier
 
-from src.attacks.cafa import CaFA
-from src.attacks.square_attack_tabular import SquareAttackTabular
-from src.attacks.simba_tabular import SimBATabular
-from src.attacks.hop_skip_jump_tabular import HopSkipJumpTabular
-from src.attacks.zoo_attack_tabular import ZooAttackTabularFromDataset
-from src.attacks.sign_opt_tabular import SignOPTAttackTabularFromDataset
-from src.attacks.boundary_attack_tabular import BoundaryAttackTabularFromDataset
+from src.attacks.white_box.cafa import CaFA
+from src.attacks.white_box.deepfool_tabular import DeepFoolAttackTabular
+from src.attacks.white_box.fgm_tabular import FGMAttackTabular
+from src.attacks.white_box.jsma_tabular import JSMAAttackTabular
+from src.attacks.white_box.pgd_tabular import PGDAttackTabular
+from src.attacks.black_box.square_attack_tabular import SquareAttackTabular
+from src.attacks.black_box.simba_tabular import SimBATabular
+from src.attacks.black_box.hop_skip_jump_tabular import HopSkipJumpTabular
+from src.attacks.black_box.zoo_attack_tabular import ZooAttackTabularFromDataset
+from src.attacks.black_box.sign_opt_tabular import SignOPTAttackTabularFromDataset
+from src.attacks.black_box.boundary_attack_tabular import BoundaryAttackTabularFromDataset
 from src.models.utils import load_trained_model
 from src.utils import evaluate_crafted_samples
 from src.datasets.load_tabular_data import TabularDataset
@@ -50,6 +54,16 @@ def _art_input_shape(tab_dataset: TabularDataset) -> tuple[int]:
     return (tab_dataset.n_features,)
 
 
+def _classification_loss(output: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
+    """
+    ART may pass labels either as class indices or one-hot/probability vectors.
+    Normalize both cases to class indices for cross-entropy.
+    """
+    if target.ndim > 1:
+        target = target.argmax(dim=1)
+    return torch.functional.F.cross_entropy(output, target.long())
+
+
 def _get_model_module(model_type: str):
     """
     Return the module containing train/grid_search_hyperparameters for the requested model type.
@@ -82,7 +96,7 @@ def _build_art_classifier(model, model_type: str, tab_dataset: TabularDataset):
 
     return PyTorchClassifier(
         model=model,
-        loss=lambda output, target: torch.functional.F.cross_entropy(output, target.long()),
+        loss=_classification_loss,
         input_shape=_art_input_shape(tab_dataset),
         nb_classes=tab_dataset.n_classes,
     )
@@ -271,6 +285,114 @@ def main(cfg: DictConfig) -> None:
             X_adv = attack.generate(x=X, y=y)
             evaluations['after-boundary-attack'] = evaluate_crafted_samples(X_adv=X_adv, X_orig=X, y=y, **eval_params)
             logger.info(f"after-boundary-attack: {evaluations['after-boundary-attack']}")
+        elif attack_name == "pgd":
+            logger.info("Executing PGD (tabular) attack.")
+            attack_params = dict(cfg.attack)
+            for key in [
+                "feature_clip_min",
+                "feature_clip_max",
+                "integer_indices",
+                "categorical_groups",
+                "editable_mask",
+                "only_increase_mask",
+                "only_decrease_mask",
+                "max_abs_step",
+                "attack_name",
+            ]:
+                attack_params.pop(key, None)
+            attack = PGDAttackTabular(
+                estimator=classifier,
+                x_reference=X,
+                feature_clip_min=tab_dataset.feature_ranges[:, 0].astype(np.float32),
+                feature_clip_max=tab_dataset.feature_ranges[:, 1].astype(np.float32),
+                integer_indices=tab_dataset.ordinal_indices.tolist(),
+                categorical_groups=[grp.tolist() for grp in tab_dataset.one_hot_groups],
+                **attack_params,
+            )
+            X_adv = attack.generate(x=X, y=y)
+            evaluations["after-pgd"] = evaluate_crafted_samples(X_adv=X_adv, X_orig=X, y=y, **eval_params)
+            logger.info(f"after-pgd: {evaluations['after-pgd']}")
+        elif attack_name == "fgm":
+            logger.info("Executing FGM/FGSM (tabular) attack.")
+            attack_params = dict(cfg.attack)
+            for key in [
+                "feature_clip_min",
+                "feature_clip_max",
+                "integer_indices",
+                "categorical_groups",
+                "editable_mask",
+                "only_increase_mask",
+                "only_decrease_mask",
+                "max_abs_step",
+                "attack_name",
+            ]:
+                attack_params.pop(key, None)
+            attack = FGMAttackTabular(
+                estimator=classifier,
+                x_reference=X,
+                feature_clip_min=tab_dataset.feature_ranges[:, 0].astype(np.float32),
+                feature_clip_max=tab_dataset.feature_ranges[:, 1].astype(np.float32),
+                integer_indices=tab_dataset.ordinal_indices.tolist(),
+                categorical_groups=[grp.tolist() for grp in tab_dataset.one_hot_groups],
+                **attack_params,
+            )
+            X_adv = attack.generate(x=X, y=y)
+            evaluations["after-fgm"] = evaluate_crafted_samples(X_adv=X_adv, X_orig=X, y=y, **eval_params)
+            logger.info(f"after-fgm: {evaluations['after-fgm']}")
+        elif attack_name == "deepfool":
+            logger.info("Executing DeepFool (tabular) attack.")
+            attack_params = dict(cfg.attack)
+            for key in [
+                "feature_clip_min",
+                "feature_clip_max",
+                "integer_indices",
+                "categorical_groups",
+                "editable_mask",
+                "only_increase_mask",
+                "only_decrease_mask",
+                "max_abs_step",
+                "attack_name",
+            ]:
+                attack_params.pop(key, None)
+            attack = DeepFoolAttackTabular(
+                classifier=classifier,
+                x_reference=X,
+                feature_clip_min=tab_dataset.feature_ranges[:, 0].astype(np.float32),
+                feature_clip_max=tab_dataset.feature_ranges[:, 1].astype(np.float32),
+                integer_indices=tab_dataset.ordinal_indices.tolist(),
+                categorical_groups=[grp.tolist() for grp in tab_dataset.one_hot_groups],
+                **attack_params,
+            )
+            X_adv = attack.generate(x=X, y=y)
+            evaluations["after-deepfool"] = evaluate_crafted_samples(X_adv=X_adv, X_orig=X, y=y, **eval_params)
+            logger.info(f"after-deepfool: {evaluations['after-deepfool']}")
+        elif attack_name == "jsma":
+            logger.info("Executing JSMA (tabular) attack.")
+            attack_params = dict(cfg.attack)
+            for key in [
+                "feature_clip_min",
+                "feature_clip_max",
+                "integer_indices",
+                "categorical_groups",
+                "editable_mask",
+                "only_increase_mask",
+                "only_decrease_mask",
+                "max_abs_step",
+                "attack_name",
+            ]:
+                attack_params.pop(key, None)
+            attack = JSMAAttackTabular(
+                classifier=classifier,
+                x_reference=X,
+                feature_clip_min=tab_dataset.feature_ranges[:, 0].astype(np.float32),
+                feature_clip_max=tab_dataset.feature_ranges[:, 1].astype(np.float32),
+                integer_indices=tab_dataset.ordinal_indices.tolist(),
+                categorical_groups=[grp.tolist() for grp in tab_dataset.one_hot_groups],
+                **attack_params,
+            )
+            X_adv = attack.generate(x=X, y=y)
+            evaluations["after-jsma"] = evaluate_crafted_samples(X_adv=X_adv, X_orig=X, y=y, **eval_params)
+            logger.info(f"after-jsma: {evaluations['after-jsma']}")
         else:
             raise ValueError(f"Unsupported attack type: {attack_name}")
 

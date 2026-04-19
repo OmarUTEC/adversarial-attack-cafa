@@ -1,7 +1,7 @@
 import numpy as np
 from art.estimators import NeuralNetworkMixin
 
-from src.attacks.cafa import CaFA
+from src.attacks.white_box.cafa import CaFA
 
 
 def evaluate_crafted_samples(
