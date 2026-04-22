@@ -20,22 +20,22 @@ class XGBoostModel:
             'objective': 'multi:softprob' if n_classes > 2 else 'binary:logistic',
             'eval_metric': 'auc',
             'random_state': 42,
-            'use_label_encoder': False
         }
         if n_classes > 2:
             self.hparams['num_class'] = n_classes
             
         self.model = xgb.XGBClassifier(**self.hparams)
 
-    def fit(self, trainset, devset):
+    def fit(self, trainset, devset, early_stopping_rounds: int = 10):
         X_train, y_train = trainset
         X_val, y_val = devset
-        
+
         logger.info("Training XGBoost model...")
         self.model.fit(
             X_train, y_train,
             eval_set=[(X_val, y_val)],
-            verbose=True
+            early_stopping_rounds=early_stopping_rounds,
+            verbose=False,
         )
         
         y_pred = self.model.predict(X_val)
@@ -50,16 +50,30 @@ class XGBoostModel:
         logger.info(f"Validation Accuracy: {acc:.4f}, AUC: {auc:.4f}")
         return auc
 
+    @staticmethod
+    def _base_path(path: str) -> str:
+        return path[:-4] if path.endswith('.pkl') else path
+
     def save(self, path: str):
-        os.makedirs(os.path.dirname(path), exist_ok=True)
-        with open(path, 'wb') as f:
-            pickle.dump(self, f)
-        logger.info(f"Model saved to {path}")
+        base = self._base_path(path)
+        os.makedirs(os.path.dirname(base) or '.', exist_ok=True)
+        self.model.save_model(base + '.json')
+        with open(base + '.meta.pkl', 'wb') as f:
+            pickle.dump({'n_classes': self.n_classes, 'hparams': self.hparams}, f)
+        logger.info(f"Model saved to {base}.json")
 
     @staticmethod
     def load(path: str):
-        with open(path, 'rb') as f:
-            return pickle.load(f)
+        base = XGBoostModel._base_path(path)
+        try:
+            with open(base + '.meta.pkl', 'rb') as f:
+                meta = pickle.load(f)
+        except FileNotFoundError:
+            with open(path, 'rb') as f:
+                return pickle.load(f)
+        wrapper = XGBoostModel(n_classes=meta['n_classes'], hparams=meta['hparams'])
+        wrapper.model.load_model(base + '.json')
+        return wrapper
 
 def train(hparams: Dict[str, Any], trainset, testset, tab_dataset: TabularDataset, model_artifact_path: str):
     import torch

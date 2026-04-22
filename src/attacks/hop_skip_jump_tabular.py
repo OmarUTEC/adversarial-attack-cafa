@@ -46,6 +46,7 @@ class HopSkipJump(EvasionAttack):
         "feature_importance",
         "attack_name",
         "max_eval_per_iter",
+        "random_seed",
     ]
     _estimator_requirements = (BaseEstimator, ClassifierMixin)
 
@@ -69,6 +70,7 @@ class HopSkipJump(EvasionAttack):
         feature_importance: np.ndarray | None = None,
         attack_name: str | None = None,  # accepted but unused; kept for config symmetry
         max_eval_per_iter: int | None = 512,
+        random_seed: int | None = None,
     ) -> None:
         super().__init__(estimator=classifier)
         self._targeted = targeted
@@ -89,6 +91,7 @@ class HopSkipJump(EvasionAttack):
         self.editable_mask = editable_mask
         self.decision_threshold = decision_threshold
         self.feature_importance = feature_importance
+        self.random_seed = random_seed
         self._check_params()
         self.curr_iter = 0
 
@@ -115,6 +118,9 @@ class HopSkipJump(EvasionAttack):
 
         resume = kwargs.get("resume")
         start = self.curr_iter if resume else 0
+
+        if self.random_seed is not None:
+            np.random.seed(self.random_seed)
 
         if mask is not None:
             if len(mask.shape) == len(x.shape):
@@ -217,7 +223,7 @@ class HopSkipJump(EvasionAttack):
         clip_min: float,
         clip_max: float,
     ) -> np.ndarray | tuple[np.ndarray, int] | None:
-        nprd = np.random.RandomState()
+        nprd = np.random.RandomState(self.random_seed)
         initial_sample = None
 
         if self.targeted:
@@ -567,7 +573,7 @@ class HopSkipJump(EvasionAttack):
             return self.feature_clip_max.astype(ART_NUMPY_DTYPE)
         return np.ones(self.estimator.input_shape, dtype=ART_NUMPY_DTYPE) * clip_value
 
-    def s_project_tabular(
+    def _project_tabular(
         self, sample: np.ndarray, clip_min: np.ndarray, clip_max: np.ndarray, mask: np.ndarray | None
     ) -> np.ndarray:
         if mask is not None:

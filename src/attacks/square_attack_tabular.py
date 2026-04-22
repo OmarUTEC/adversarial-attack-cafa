@@ -183,11 +183,19 @@ class SquareAttackTabular(EvasionAttack):
 
             # init perturbation: flip a random subset
             k0 = max(1, int(round(self.p_init * n_features)))
+            x_orig_robust = x_orig[robust]
             for i in range(x_robust.shape[0]):
                 idx = np.random.choice(n_features, size=k0, replace=False)
                 delta = np.random.choice([-self.eps, self.eps], size=idx.shape[0])
                 x_robust[i, idx] = x_robust[i, idx] + delta
             x_robust = np.clip(x_robust, clip_min, clip_max)
+            if self.norm in [np.inf, "inf"]:
+                x_robust = np.clip(x_robust, x_orig_robust - self.eps, x_orig_robust + self.eps)
+            else:
+                diff = x_robust - x_orig_robust
+                norms = np.linalg.norm(diff, axis=1, keepdims=True)
+                scale = np.minimum(1.0, self.eps / (norms + 1e-12))
+                x_robust = x_orig_robust + diff * scale
             x_robust = self._project_tabular(x_robust)
 
             loss_new = self.loss(x_robust, y_robust)

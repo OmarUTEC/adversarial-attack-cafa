@@ -54,23 +54,27 @@ class BoundaryAttackTabular(ARTBoundaryAttack):
         self.categorical_groups = categorical_groups
 
     def generate(self, x: np.ndarray, y: np.ndarray | None = None, **kwargs) -> np.ndarray:
-        # BoundaryAttack in ART expects input_shape to be an iterable for np.random.randn(*shape).
-        # Some ART estimators return an int instead of a tuple.
+        # Fix input_shape: ART's BoundaryAttack needs a tuple for np.random.randn(*shape).
         original_input_shape = self.estimator.input_shape
-        if isinstance(original_input_shape, int):
-            # We monkey-patch the instance's _input_shape which is what the property usually returns
-            if hasattr(self.estimator, '_input_shape'):
-                self.estimator._input_shape = (original_input_shape,)
-            else:
-                # Fallback if _input_shape doesn't exist (less likely in ART)
-                pass
-
-        x_adv = super().generate(x=x, y=y, **kwargs)
-        
-        # Restore if we changed it
         if isinstance(original_input_shape, int) and hasattr(self.estimator, '_input_shape'):
-            self.estimator._input_shape = original_input_shape
-            
+            self.estimator._input_shape = (original_input_shape,)
+
+        # Wrap estimator.predict so every internal query from ART's boundary walk receives
+        # projected (constraint-valid) inputs.  Without this, the attack explores and anchors
+        # to invalid points (broken one-hot groups, out-of-range values) that only become
+        # valid after the post-hoc projection, making the found boundary unreliable.
+        original_predict = self.estimator.predict
+        def _projecting_predict(x_input, **pkwargs):
+            return original_predict(self._project_tabular(x_input), **pkwargs)
+        self.estimator.predict = _projecting_predict
+
+        try:
+            x_adv = super().generate(x=x, y=y, **kwargs)
+        finally:
+            self.estimator.predict = original_predict
+            if isinstance(original_input_shape, int) and hasattr(self.estimator, '_input_shape'):
+                self.estimator._input_shape = original_input_shape
+
         return self._project_tabular(x_adv)
 
     def _project_tabular(self, x: np.ndarray) -> np.ndarray:
