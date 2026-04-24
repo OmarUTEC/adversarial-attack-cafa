@@ -1,0 +1,20 @@
+name: li_small
+
+# Dataset parameters:
+params:
+  dataset_name: ${data.name}
+  data_file_path: '${data.paths.train_file_path}'
+  metadata_file_path: '${data.paths.metadata_file_path}'
+  val_file_path: '${data.paths.val_file_path}'
+  test_file_path: '${data.paths.test_file_path}'
+  encoding_method:
+  random_seed: 42
+  train_proportion: 0.8
+
+# Paths:
+paths:
+  data_dir_path: 'data/${data.name}/raw-data'
+  train_file_path: '${data.paths.data_dir_path}/train.csv'
+  val_file_path: '${data.paths.data_dir_path}/val.csv'
+  test_file_path: '${data.paths.data_dir_path}/test.csv'
+  metadata_file_path: '${data.paths.data_dir_path}/li_small.metadata.csv'

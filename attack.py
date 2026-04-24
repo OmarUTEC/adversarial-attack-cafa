@@ -2,8 +2,11 @@ import json
 import logging
 from typing import Dict
 import os
+from datetime import datetime
+from pathlib import Path
+from uuid import uuid4
 
-from omegaconf import DictConfig, OmegaConf
+from omegaconf import DictConfig, ListConfig, OmegaConf
 import hydra
 import torch
 import numpy as np
@@ -85,6 +88,132 @@ def _default_model_path(model_type: str, dataset_name: str) -> str:
     return f"trained-models/{dataset_name}-{model_type}.ckpt"
 
 
+def _model_file_name(model_type: str) -> str:
+    return "model.pkl" if model_type == "xgboost" else "model.ckpt"
+
+
+def _create_training_artifact_dir(dataset_name: str, model_type: str) -> Path:
+    run_id = f"{datetime.now().strftime('%Y-%m-%d-%H%M%S')}-{uuid4().hex[:8]}"
+    artifact_dir = Path("trained-models") / f"{dataset_name}-{model_type}-{run_id}"
+    artifact_dir.mkdir(parents=True, exist_ok=False)
+    return artifact_dir
+
+
+def _to_jsonable(value):
+    if isinstance(value, (DictConfig, ListConfig)):
+        return OmegaConf.to_container(value, resolve=True)
+    if isinstance(value, Path):
+        return str(value)
+    if isinstance(value, np.ndarray):
+        return value.tolist()
+    if isinstance(value, np.generic):
+        return value.item()
+    if isinstance(value, torch.Tensor):
+        return value.detach().cpu().item() if value.numel() == 1 else value.detach().cpu().tolist()
+    if isinstance(value, dict):
+        return {str(k): _to_jsonable(v) for k, v in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_to_jsonable(v) for v in value]
+    return value
+
+
+def _dataset_summary(tab_dataset: TabularDataset) -> Dict:
+    summary = {
+        "dataset_name": tab_dataset.data_parameters["dataset_name"],
+        "n_features": tab_dataset.n_features,
+        "n_classes": tab_dataset.n_classes,
+        "feature_names": tab_dataset.feature_names.tolist(),
+        "label_name": tab_dataset.label_name,
+        "encoding_method": tab_dataset.cat_encoding_method,
+        "train_shape": list(tab_dataset.X_train.shape),
+        "test_shape": list(tab_dataset.X_test.shape),
+        "train_positive_rate": float(tab_dataset.y_train.mean()),
+        "test_positive_rate": float(tab_dataset.y_test.mean()),
+    }
+    if getattr(tab_dataset, "has_predefined_splits", False):
+        summary["val_shape"] = list(tab_dataset.X_val.shape)
+        summary["val_positive_rate"] = float(tab_dataset.y_val.mean())
+    return summary
+
+
+def _write_training_documentation(
+    artifact_dir: Path,
+    model_type: str,
+    model_artifact_path: str,
+    tab_dataset: TabularDataset,
+    hyperparameters,
+    training_results,
+    cfg: DictConfig,
+    hydra_output_dir: str,
+) -> None:
+    report = {
+        "model_type": model_type,
+        "model_artifact_path": model_artifact_path,
+        "dataset": _dataset_summary(tab_dataset),
+        "hyperparameters": _to_jsonable(hyperparameters),
+        "training_results": _to_jsonable(training_results),
+        "config": _to_jsonable(cfg),
+        "hydra_output_dir": hydra_output_dir,
+    }
+    report_path = artifact_dir / "training_report.json"
+    with report_path.open("w", encoding="utf-8") as f:
+        json.dump(report, f, indent=4)
+
+    dataset_name = report["dataset"]["dataset_name"]
+    results = report["training_results"] or {}
+    validation_metrics = results.get("validation_metrics", {})
+    if not validation_metrics and "best_val_pr_auc" in results:
+        validation_metrics = {
+            "precision": results.get("best_val_precision"),
+            "recall": results.get("best_val_recall"),
+            "f1": results.get("best_val_f1"),
+            "pr_auc": results.get("best_val_pr_auc"),
+            "roc_auc": results.get("best_val_roc_auc"),
+            "confusion_matrix": results.get("best_val_confusion_matrix"),
+        }
+
+    lines = [
+        f"# Training Artifact: {dataset_name} / {model_type}",
+        "",
+        f"- Model artifact: `{Path(model_artifact_path).name}`",
+        f"- Dataset: `{dataset_name}`",
+        f"- Features: `{report['dataset']['n_features']}`",
+        f"- Classes: `{report['dataset']['n_classes']}`",
+        f"- Train shape: `{report['dataset']['train_shape']}`",
+        f"- Test shape: `{report['dataset']['test_shape']}`",
+    ]
+    if "val_shape" in report["dataset"]:
+        lines.append(f"- Validation shape: `{report['dataset']['val_shape']}`")
+    if validation_metrics:
+        confusion_matrix = validation_metrics.get("confusion_matrix")
+        if confusion_matrix is None and all(k in validation_metrics for k in ["tn", "fp", "fn", "tp"]):
+            confusion_matrix = {
+                "tn": validation_metrics["tn"],
+                "fp": validation_metrics["fp"],
+                "fn": validation_metrics["fn"],
+                "tp": validation_metrics["tp"],
+            }
+        lines += [
+            "",
+            "## Validation Metrics",
+            "",
+            f"- Precision: `{validation_metrics.get('precision')}`",
+            f"- Recall: `{validation_metrics.get('recall')}`",
+            f"- F1-score: `{validation_metrics.get('f1')}`",
+            f"- PR-AUC: `{validation_metrics.get('pr_auc')}`",
+            f"- ROC-AUC: `{validation_metrics.get('roc_auc')}`",
+            f"- Confusion matrix: `{confusion_matrix}`",
+        ]
+    lines += [
+        "",
+        "## Files",
+        "",
+        "- `training_report.json`: complete machine-readable training metadata.",
+        f"- `{Path(model_artifact_path).name}`: serialized trained model.",
+    ]
+    (artifact_dir / "README.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
 def _build_art_classifier(model, model_type: str, tab_dataset: TabularDataset):
     if model_type == "xgboost":
         classifier = XGBoostClassifier(
@@ -129,8 +258,26 @@ def main(cfg: DictConfig) -> None:
             best_hparams = model_module.grid_search_hyperparameters(trainset=trainset,
                                                                     testset=devset,
                                                                     tab_dataset=tab_dataset)
-        model_module.train(best_hparams, trainset=trainset, testset=devset, tab_dataset=tab_dataset,
-                           model_artifact_path=surrogate_model_path)
+        artifact_dir = _create_training_artifact_dir(cfg.data.name, surrogate_model_type)
+        surrogate_model_path = str(artifact_dir / _model_file_name(surrogate_model_type))
+        training_results = model_module.train(
+            best_hparams,
+            trainset=trainset,
+            testset=devset,
+            tab_dataset=tab_dataset,
+            model_artifact_path=surrogate_model_path,
+        )
+        _write_training_documentation(
+            artifact_dir=artifact_dir,
+            model_type=surrogate_model_type,
+            model_artifact_path=surrogate_model_path,
+            tab_dataset=tab_dataset,
+            hyperparameters=best_hparams,
+            training_results=training_results,
+            cfg=cfg,
+            hydra_output_dir=output_dir,
+        )
+        logger.info(f"Training artifact saved in {artifact_dir}")
     model = load_trained_model(surrogate_model_path, model_type=surrogate_model_type)
 
     # 3. Wrap the model to ART classifier, for executing the attack:

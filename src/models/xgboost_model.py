@@ -5,9 +5,9 @@ from typing import Any, Dict
 
 import torch
 import xgboost as xgb
-from sklearn.metrics import accuracy_score, roc_auc_score
 
 from src.datasets.load_tabular_data import TabularDataset
+from src.models.metrics import compute_binary_classification_metrics
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +27,10 @@ class XGBoostModel:
             "objective",
             "multi:softprob" if n_classes > 2 else "binary:logistic",
         )
-        self.hparams.setdefault("eval_metric", "auc")
+        self.hparams.setdefault("eval_metric", "aucpr")
+        if self.hparams.get("scale_pos_weight") == "auto":
+            self.hparams.pop("scale_pos_weight")
+
         if n_classes > 2:
             self.hparams["num_class"] = n_classes
 
@@ -38,6 +41,8 @@ class XGBoostModel:
         x_val, y_val = devset
 
         logger.info("Training XGBoost model.")
+        if self.n_classes == 2 and self.hparams.get("scale_pos_weight") == "auto":
+            raise ValueError("scale_pos_weight='auto' must be resolved before constructing XGBoostModel.")
         self.model.fit(
             x_train,
             y_train,
@@ -47,13 +52,23 @@ class XGBoostModel:
 
         y_pred = self.model.predict(x_val)
         y_prob = self.model.predict_proba(x_val)
-        acc = accuracy_score(y_val, y_pred)
         if self.n_classes == 2:
-            auc = roc_auc_score(y_val, y_prob[:, 1])
+            metrics = compute_binary_classification_metrics(y_val, y_prob[:, 1])
         else:
-            auc = roc_auc_score(y_val, y_prob, multi_class="ovr")
-        logger.info(f"Validation Accuracy: {acc:.4f}, AUC: {auc:.4f}")
-        return auc
+            raise ValueError("This fraud-detection pipeline currently expects binary classifiers.")
+        metrics["predicted_positive_rate"] = float(y_pred.mean())
+        self.last_validation_metrics = metrics
+        logger.info(
+            "Validation metrics: "
+            f"precision={metrics['precision']:.4f}, "
+            f"recall={metrics['recall']:.4f}, "
+            f"f1={metrics['f1']:.4f}, "
+            f"pr_auc={metrics['pr_auc']:.4f}, "
+            f"roc_auc={metrics['roc_auc']:.4f}, "
+            f"confusion_matrix={{tn={metrics['tn']}, fp={metrics['fp']}, "
+            f"fn={metrics['fn']}, tp={metrics['tp']}}}"
+        )
+        return metrics
 
     def save(self, path: str):
         os.makedirs(os.path.dirname(path), exist_ok=True)
@@ -80,16 +95,27 @@ def train(
     x_train, y_train = next(iter(trainloader))
     x_val, y_val = next(iter(testloader))
 
+    resolved_hparams = dict(hyperparameters)
+    if resolved_hparams.get("scale_pos_weight") == "auto":
+        positives = float((y_train.numpy() == 1).sum())
+        negatives = float((y_train.numpy() == 0).sum())
+        resolved_hparams["scale_pos_weight"] = negatives / positives if positives > 0 else 1.0
+
     model = XGBoostModel(
         n_classes=tab_dataset.n_classes,
-        hparams=hyperparameters,
+        hparams=resolved_hparams,
     )
-    model.fit((x_train.numpy(), y_train.numpy()), (x_val.numpy(), y_val.numpy()))
+    validation_metrics = model.fit((x_train.numpy(), y_train.numpy()), (x_val.numpy(), y_val.numpy()))
 
     if model_artifact_path is not None:
         model.save(model_artifact_path)
 
-    return model
+    return {
+        "model_artifact_path": model_artifact_path,
+        "resolved_hyperparameters": resolved_hparams,
+        "validation_metrics": validation_metrics,
+        "best_val_hp_metric": validation_metrics["pr_auc"],
+    }
 
 
 def grid_search_hyperparameters(

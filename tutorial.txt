@@ -11,3 +11,10 @@ python attack.py data=creditcard attack=square_attack
 Ejecutar SimBA tabular
 python attack.py data=creditcard attack=simba
 
+
+Activar entorno virtual
+source /home/alejandro/.venvs/adversarial-attack-cafa-py312/bin/activate
+cd /mnt/c/Users/aleja/adversarial-attack-cafa
+python attack.py --help
+
+

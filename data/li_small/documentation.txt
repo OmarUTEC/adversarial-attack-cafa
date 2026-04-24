@@ -1,0 +1,273 @@
+DOCUMENTACION DE DATA PREPROCESADA - LI-SMALL AML
+
+1. DESCRIPCION GENERAL
+
+Esta carpeta contiene la version preprocesada del dataset LI-Small del conjunto sintetico IBM AML.
+El objetivo del dataset es entrenar y evaluar modelos de clasificacion binaria capaces de identificar
+si una transaccion financiera es legitima o corresponde a lavado de dinero.
+
+Cada fila de los archivos train.csv, val.csv y test.csv representa una transaccion individual.
+La variable objetivo es is_laundering:
+
+- 0: transaccion legitima.
+- 1: transaccion fraudulenta / lavado de dinero.
+
+La data fue construida a partir de:
+
+- archive/LI-Small_Trans.csv: transacciones originales.
+- archive/LI-Small_accounts.csv: catalogo de cuentas, bancos y entidades.
+- archive/LI-Small_Patterns.txt: patrones conocidos de lavado, usados solo para auditoria.
+
+IMPORTANTE:
+patterns_parsed.csv no debe usarse como feature de entrenamiento, porque contiene informacion
+directamente asociada a los patrones de lavado y puede introducir fuga de etiqueta.
+
+
+2. ARCHIVOS GENERADOS
+
+train.csv
+- Archivo de entrenamiento.
+- Contiene solo variables del baseline y la variable objetivo.
+- Se aplico submuestreo de la clase mayoritaria para obtener aproximadamente 20 transacciones
+  legitimas por cada transaccion fraudulenta.
+
+val.csv
+- Archivo de validacion.
+- Mantiene la distribucion real de clases.
+- Debe usarse para ajustar parametros, comparar modelos y seleccionar umbrales.
+
+test.csv
+- Archivo de evaluacion final.
+- Mantiene la distribucion real de clases.
+- Debe usarse solo para la medicion final del baseline.
+
+patterns_parsed.csv
+- Version estructurada de LI-Small_Patterns.txt.
+- Sirve para auditoria, explicabilidad o analisis posterior de patrones.
+- No debe usarse como input del modelo baseline.
+
+feature_columns_model.txt
+- Lista de variables recomendadas para entrenamiento.
+
+README_preprocessing.md
+- Resumen tecnico del preprocesamiento.
+
+
+3. DISTRIBUCION DE CLASES
+
+train.csv:
+- 42,546 filas.
+- 40,520 transacciones legitimas.
+- 2,026 transacciones de lavado.
+- Tasa de lavado aproximada: 4.76%.
+
+val.csv:
+- 1,384,810 filas.
+- 1,384,027 transacciones legitimas.
+- 783 transacciones de lavado.
+- Tasa de lavado aproximada: 0.0565%.
+
+test.csv:
+- 1,384,810 filas.
+- 1,384,054 transacciones legitimas.
+- 756 transacciones de lavado.
+- Tasa de lavado aproximada: 0.0546%.
+
+
+4. VARIABLES DEL DATASET PREPROCESADO
+
+4.1 Variable objetivo
+
+is_laundering
+- Tipo: binaria.
+- Descripcion: indica si la transaccion corresponde a lavado de dinero.
+- Valores:
+  - 0: transaccion legitima.
+  - 1: transaccion fraudulenta / lavado.
+
+
+4.2 Variables de monto
+
+amount_received
+- Tipo: numerica continua.
+- Descripcion: monto recibido por la cuenta destino.
+
+amount_paid
+- Tipo: numerica continua.
+- Descripcion: monto pagado desde la cuenta origen.
+
+amount_paid_log1p
+- Tipo: numerica continua.
+- Descripcion: transformacion logaritmica log(1 + amount_paid).
+- Uso: reduce el impacto de montos extremadamente grandes.
+
+amount_received_log1p
+- Tipo: numerica continua.
+- Descripcion: transformacion logaritmica log(1 + amount_received).
+- Uso: reduce el impacto de outliers en montos recibidos.
+
+amount_abs_diff
+- Tipo: numerica continua.
+- Descripcion: diferencia absoluta entre amount_paid y amount_received.
+- Uso: captura diferencias por conversion de moneda, redondeos, comisiones o inconsistencias.
+
+amount_ratio_paid_to_received
+- Tipo: numerica continua.
+- Descripcion: ratio amount_paid / amount_received.
+- Uso: valores cercanos a 1 indican montos equivalentes; valores alejados pueden indicar conversion
+  de moneda o comportamiento atipico.
+
+
+4.3 Variables de moneda y canal
+
+receiving_currency
+- Tipo: categorica.
+- Descripcion: moneda en la que se recibio el dinero.
+- Ejemplos: US Dollar, Euro, Yuan, Bitcoin.
+
+payment_currency
+- Tipo: categorica.
+- Descripcion: moneda en la que se realizo el pago.
+
+payment_format
+- Tipo: categorica.
+- Descripcion: canal o formato de pago usado en la transaccion.
+- Ejemplos: ACH, Cheque, Credit Card, Cash, Wire, Bitcoin, Reinvestment.
+
+cross_currency
+- Tipo: binaria.
+- Descripcion: indica si la moneda pagada y la moneda recibida son distintas.
+- Valores:
+  - 0: misma moneda.
+  - 1: monedas distintas.
+
+
+4.4 Variables de entidad origen
+
+from_entity_type
+- Tipo: categorica.
+- Descripcion: tipo de entidad propietaria de la cuenta origen.
+- Ejemplos: Corporation, Partnership, Sole Proprietorship, Individual.
+
+from_bank_prefix
+- Tipo: categorica.
+- Descripcion: prefijo o nombre base del banco origen.
+- Ejemplos: China, France, National, Savings.
+
+from_entity_account_count
+- Tipo: numerica discreta.
+- Descripcion: cantidad de cuentas asociadas a la entidad origen dentro del catalogo de cuentas.
+
+from_entity_bank_count
+- Tipo: numerica discreta.
+- Descripcion: cantidad de bancos distintos asociados a la entidad origen.
+
+
+4.5 Variables de entidad destino
+
+to_entity_type
+- Tipo: categorica.
+- Descripcion: tipo de entidad propietaria de la cuenta destino.
+
+to_bank_prefix
+- Tipo: categorica.
+- Descripcion: prefijo o nombre base del banco destino.
+
+to_entity_account_count
+- Tipo: numerica discreta.
+- Descripcion: cantidad de cuentas asociadas a la entidad destino dentro del catalogo de cuentas.
+
+to_entity_bank_count
+- Tipo: numerica discreta.
+- Descripcion: cantidad de bancos distintos asociados a la entidad destino.
+
+
+4.6 Variables temporales derivadas
+
+hour
+- Tipo: numerica discreta.
+- Descripcion: hora del dia en que ocurrio la transaccion.
+- Rango esperado: 0 a 23.
+
+day
+- Tipo: numerica discreta.
+- Descripcion: dia del mes en que ocurrio la transaccion.
+
+day_of_week
+- Tipo: numerica discreta.
+- Descripcion: dia de la semana derivado del timestamp original.
+- Codificacion:
+  - 0: lunes.
+  - 1: martes.
+  - 2: miercoles.
+  - 3: jueves.
+  - 4: viernes.
+  - 5: sabado.
+  - 6: domingo.
+
+is_weekend
+- Tipo: binaria.
+- Descripcion: indica si la transaccion ocurrio durante fin de semana.
+- Valores:
+  - 0: lunes a viernes.
+  - 1: sabado o domingo.
+
+
+4.7 Variables relacionales simples
+
+same_bank
+- Tipo: binaria.
+- Descripcion: indica si el banco origen y el banco destino son el mismo.
+- Valores:
+  - 0: bancos distintos.
+  - 1: mismo banco.
+
+same_account
+- Tipo: binaria.
+- Descripcion: indica si la cuenta origen y la cuenta destino son la misma, considerando tambien el banco.
+- Valores:
+  - 0: cuenta destino distinta.
+  - 1: misma cuenta y mismo banco.
+
+same_entity
+- Tipo: binaria.
+- Descripcion: indica si la entidad origen y la entidad destino son la misma.
+- Valores:
+  - 0: entidades distintas.
+  - 1: misma entidad.
+
+
+5. VARIABLES EXCLUIDAS DEL BASELINE
+
+Las siguientes variables existen en la data original o durante el preprocesamiento, pero fueron excluidas
+de train.csv, val.csv y test.csv:
+
+- Timestamp.
+- from_bank.
+- from_account.
+- to_bank.
+- to_account.
+- from_entity_id.
+- to_entity_id.
+
+Motivo:
+son identificadores o campos de alta cardinalidad. Para el baseline inicial se excluyen para evitar que
+el modelo memorice cuentas, bancos o entidades especificas en lugar de aprender patrones generales.
+
+
+6. RECOMENDACION PARA ENTRENAMIENTO
+
+Para modelos tabulares tradicionales:
+
+- Codificar variables categoricas con One-Hot Encoding o codificacion equivalente.
+- Escalar variables numericas si el modelo lo requiere.
+- Usar metricas adecuadas para clases desbalanceadas:
+  - Precision.
+  - Recall.
+  - F1-score.
+  - PR-AUC.
+  - ROC-AUC.
+  - Matriz de confusion.
+
+No usar accuracy como metrica principal, ya que la clase fraudulenta es extremadamente minoritaria
+en validacion y test.

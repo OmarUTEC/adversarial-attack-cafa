@@ -7,18 +7,14 @@ import numpy as np
 import torch
 
 from sklearn.model_selection import train_test_split
-from src.datasets.preprocess.adult import get_adult_dataset
-from src.datasets.preprocess.bank import get_bank_dataset
-from src.datasets.preprocess.phishing import get_phishing_dataset
 from src.datasets.preprocess.creditcard import get_creditcard_dataset
+from src.datasets.preprocess.li_small import get_li_small_dataset
 
 logger = logging.getLogger(__name__)
 
 dataset_name_to_preprocess_func = {
-    'adult': get_adult_dataset,
-    'bank': get_bank_dataset,
-    'phishing': get_phishing_dataset,
     'creditcard': get_creditcard_dataset,
+    'li_small': get_li_small_dataset,
 }
 
 
@@ -45,7 +41,7 @@ class TabularDataset:
     ):
         """
         A reproducing constructor for the TabularDataset class.
-        :param dataset_name: name of the dataset (`adult`, `bank`, `phishing`, or newly added ones).
+        :param dataset_name: name of the dataset (`creditcard`, or newly added ones).
         :param data_file_path: path for the file containing the raw data.
         :param metadata_file_path: path for a CSV file containing the metadata of the dataset. The CSV must contain
                                    the columns `feature_name`, `type`, `range`, refer to the existing files.
@@ -63,28 +59,50 @@ class TabularDataset:
             'encoding_method': encoding_method,
             'random_seed': random_seed,
             'train_proportion': train_proportion,
+            **kwargs,
         }
 
         # Preprocess data
         assert dataset_name in dataset_name_to_preprocess_func, \
             f"Unknown dataset name: {dataset_name}. Available datasets: {dataset_name_to_preprocess_func.keys()}"
-        self.x_df, self.y_df, self.metadata_df = dataset_name_to_preprocess_func[dataset_name](
+        processed_data = dataset_name_to_preprocess_func[dataset_name](
             data_file_path=data_file_path,
             metadata_file_path=metadata_file_path,
-            encoding_method=encoding_method
+            encoding_method=encoding_method,
+            **kwargs,
         )
 
-        # Split to train and test:
-        X_train, X_test, y_train, y_test = train_test_split(self.x_df, self.y_df,
-                                                            train_size=train_proportion,
-                                                            random_state=random_seed,
-                                                            shuffle=True)
-        # Save DFs
-        self.X_train_df = X_train
-        # Save numpy arrays
-        self.X_train, self.X_test, self.y_train, self.y_test = (
-            X_train.values.astype(np.float32), X_test.values.astype(np.float32),
-            y_train.values.astype(np.float32), y_test.values.astype(np.float32))
+        self.has_predefined_splits = isinstance(processed_data, dict)
+        if self.has_predefined_splits:
+            self.X_train_df, self.y_train_df = processed_data["train"]
+            self.X_val_df, self.y_val_df = processed_data["val"]
+            self.X_test_df, self.y_test_df = processed_data["test"]
+            self.metadata_df = processed_data["metadata_df"]
+            self.x_df = self.X_train_df
+            self.y_df = self.y_train_df
+            self.X_train, self.X_val, self.X_test = (
+                self.X_train_df.values.astype(np.float32),
+                self.X_val_df.values.astype(np.float32),
+                self.X_test_df.values.astype(np.float32),
+            )
+            self.y_train, self.y_val, self.y_test = (
+                self.y_train_df.values.astype(np.float32),
+                self.y_val_df.values.astype(np.float32),
+                self.y_test_df.values.astype(np.float32),
+            )
+        else:
+            self.x_df, self.y_df, self.metadata_df = processed_data
+            # Split to train and test:
+            X_train, X_test, y_train, y_test = train_test_split(self.x_df, self.y_df,
+                                                                train_size=train_proportion,
+                                                                random_state=random_seed,
+                                                                shuffle=True)
+            # Save DFs
+            self.X_train_df = X_train
+            # Save numpy arrays
+            self.X_train, self.X_test, self.y_train, self.y_test = (
+                X_train.values.astype(np.float32), X_test.values.astype(np.float32),
+                y_train.values.astype(np.float32), y_test.values.astype(np.float32))
 
         self.metadata_df_features = self.metadata_df[self.metadata_df.type != 'label'].copy()
         self.feature_names = self.metadata_df_features.feature_name.values
@@ -96,6 +114,17 @@ class TabularDataset:
 
     def get_train_dev_sets(self, dev_set_proportion: float = 0.15):
         """Splits the original training set, into a new training set and a development set; to be used for training."""
+        if self.has_predefined_splits:
+            trainset = torch.utils.data.TensorDataset(
+                torch.tensor(self.X_train, dtype=torch.float32),
+                torch.tensor(self.y_train, dtype=torch.long)
+            )
+            devset = torch.utils.data.TensorDataset(
+                torch.tensor(self.X_val, dtype=torch.float32),
+                torch.tensor(self.y_val, dtype=torch.long)
+            )
+            return trainset, devset
+
         random.seed(self.data_parameters['random_seed'])
         heldout_indices = random.sample(range(len(self.X_train)), int(len(self.X_train) * dev_set_proportion))
         heldin_indices = [i for i in range(len(self.X_train)) if i not in heldout_indices]

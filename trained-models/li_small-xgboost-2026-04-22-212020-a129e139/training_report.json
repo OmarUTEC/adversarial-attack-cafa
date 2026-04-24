@@ -1,0 +1,223 @@
+{
+    "started_at": "2026-04-22T21:20:01",
+    "finished_at": "2026-04-22T21:22:22",
+    "elapsed_seconds": {
+        "training": 114.615717684,
+        "evaluation": 7.087318752000016,
+        "total": 140.51108151
+    },
+    "model_type": "xgboost",
+    "model_artifact_path": "trained-models/li_small-xgboost-2026-04-22-212020-a129e139/model.pkl",
+    "dataset": {
+        "dataset_name": "li_small",
+        "n_features": 25,
+        "n_classes": 2,
+        "feature_names": [
+            "amount_received",
+            "receiving_currency",
+            "amount_paid",
+            "payment_currency",
+            "payment_format",
+            "from_entity_type",
+            "from_bank_prefix",
+            "from_entity_account_count",
+            "from_entity_bank_count",
+            "to_entity_type",
+            "to_bank_prefix",
+            "to_entity_account_count",
+            "to_entity_bank_count",
+            "hour",
+            "day",
+            "day_of_week",
+            "is_weekend",
+            "amount_paid_log1p",
+            "amount_received_log1p",
+            "amount_abs_diff",
+            "amount_ratio_paid_to_received",
+            "same_bank",
+            "same_account",
+            "same_entity",
+            "cross_currency"
+        ],
+        "label_name": "is_laundering",
+        "encoding_method": null,
+        "train_shape": [
+            42546,
+            25
+        ],
+        "train_positive_count": 2026,
+        "train_negative_count": 40520,
+        "train_positive_rate": 0.0476190485060215,
+        "test_shape": [
+            1384810,
+            25
+        ],
+        "test_positive_count": 756,
+        "test_negative_count": 1384054,
+        "test_positive_rate": 0.0005459232488647103,
+        "val_shape": [
+            1384810,
+            25
+        ],
+        "val_positive_count": 783,
+        "val_negative_count": 1384027,
+        "val_positive_rate": 0.0005654205451719463
+    },
+    "hyperparameters": {
+        "n_estimators": 600,
+        "learning_rate": 0.03,
+        "max_depth": 4,
+        "min_child_weight": 5,
+        "subsample": 0.85,
+        "colsample_bytree": 0.85,
+        "reg_alpha": 0.1,
+        "reg_lambda": 2.0,
+        "gamma": 0.0,
+        "tree_method": "hist",
+        "n_jobs": -1,
+        "verbosity": 1,
+        "random_state": 42,
+        "scale_pos_weight": "auto"
+    },
+    "training_results": {
+        "model_artifact_path": "trained-models/li_small-xgboost-2026-04-22-212020-a129e139/model.pkl",
+        "resolved_hyperparameters": {
+            "n_estimators": 600,
+            "learning_rate": 0.03,
+            "max_depth": 4,
+            "min_child_weight": 5,
+            "subsample": 0.85,
+            "colsample_bytree": 0.85,
+            "reg_alpha": 0.1,
+            "reg_lambda": 2.0,
+            "gamma": 0.0,
+            "tree_method": "hist",
+            "n_jobs": -1,
+            "verbosity": 1,
+            "random_state": 42,
+            "scale_pos_weight": 20.0
+        },
+        "validation_metrics": {
+            "threshold": 0.5,
+            "precision": 0.0022601113703458204,
+            "recall": 0.9885057471264368,
+            "f1": 0.004509911316730955,
+            "pr_auc": 0.017795886692985777,
+            "roc_auc": 0.9454421253922102,
+            "tn": 1042340,
+            "fp": 341687,
+            "fn": 9,
+            "tp": 774,
+            "predicted_positive_rate": 0.24729818531062023
+        },
+        "best_val_hp_metric": 0.017795886692985777
+    },
+    "threshold_selection": {
+        "threshold": 0.9991426467895508,
+        "precision": 0.03637741568776052,
+        "recall": 0.12260536398467432,
+        "f1": 0.056107539450613676,
+        "pr_auc": 0.017795886692985777,
+        "roc_auc": 0.9454421253922102,
+        "tn": 1381484,
+        "fp": 2543,
+        "fn": 687,
+        "tp": 96,
+        "threshold_strategy": "max_f1"
+    },
+    "selected_threshold": 0.9991426467895508,
+    "validation_metrics": {
+        "threshold": 0.9991426467895508,
+        "precision": 0.03637741568776052,
+        "recall": 0.12260536398467432,
+        "f1": 0.056107539450613676,
+        "pr_auc": 0.017795886692985777,
+        "roc_auc": 0.9454421253922102,
+        "tn": 1381484,
+        "fp": 2543,
+        "fn": 687,
+        "tp": 96
+    },
+    "test_metrics": {
+        "threshold": 0.9991426467895508,
+        "precision": 0.032618825722273995,
+        "recall": 0.18518518518518517,
+        "f1": 0.0554675118858954,
+        "pr_auc": 0.019172061473860278,
+        "roc_auc": 0.9518643129446971,
+        "tn": 1379902,
+        "fp": 4152,
+        "fn": 616,
+        "tp": 140
+    },
+    "config": {
+        "n_samples_to_attack": 2000,
+        "data_split_to_attack": "test",
+        "save_attack_artifacts": true,
+        "perform_training": false,
+        "perform_training_grid_search_hparams": false,
+        "perform_attack": true,
+        "transfer": {
+            "surrogate_model": null,
+            "target_models": []
+        },
+        "threshold_selection": {
+            "strategy": "max_f1",
+            "min_precision": null,
+            "min_recall": null
+        },
+        "data": {
+            "name": "li_small",
+            "params": {
+                "dataset_name": "li_small",
+                "data_file_path": "data/li_small/raw-data/train.csv",
+                "metadata_file_path": "data/li_small/raw-data/li_small.metadata.csv",
+                "val_file_path": "data/li_small/raw-data/val.csv",
+                "test_file_path": "data/li_small/raw-data/test.csv",
+                "encoding_method": null,
+                "random_seed": 42,
+                "train_proportion": 0.8
+            },
+            "paths": {
+                "data_dir_path": "data/li_small/raw-data",
+                "train_file_path": "data/li_small/raw-data/train.csv",
+                "val_file_path": "data/li_small/raw-data/val.csv",
+                "test_file_path": "data/li_small/raw-data/test.csv",
+                "metadata_file_path": "data/li_small/raw-data/li_small.metadata.csv"
+            }
+        },
+        "ml_model": {
+            "model_type": "xgboost",
+            "model_artifact_path": "trained-models/li_small-xgboost.pkl",
+            "perform_training": false,
+            "perform_grid_search_hparams": false,
+            "default_hparams": {
+                "n_estimators": 600,
+                "learning_rate": 0.03,
+                "max_depth": 4,
+                "min_child_weight": 5,
+                "subsample": 0.85,
+                "colsample_bytree": 0.85,
+                "reg_alpha": 0.1,
+                "reg_lambda": 2.0,
+                "gamma": 0.0,
+                "tree_method": "hist",
+                "n_jobs": -1,
+                "verbosity": 1,
+                "random_state": 42,
+                "scale_pos_weight": "auto"
+            }
+        },
+        "attack": {
+            "attack_name": "cafa",
+            "random_init": true,
+            "random_seed": null,
+            "max_iter": 250,
+            "max_iter_tabpgd": 100,
+            "eps": 0.03333333333333333,
+            "step_size": 0.0003333333333333333,
+            "perturb_categorical_each_steps": 10
+        }
+    },
+    "hydra_output_dir": "/mnt/c/Users/aleja/adversarial-attack-cafa/outputs/2026-04-22/21-20-01"
+}

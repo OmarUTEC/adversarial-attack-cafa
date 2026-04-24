@@ -6,11 +6,11 @@ from typing import Any, Dict, List
 import optuna
 import pytorch_lightning as pl
 from pytorch_lightning.callbacks import ModelCheckpoint
-from sklearn.metrics import roc_auc_score
 import torch
 from torch import nn
 
 from src.datasets.load_tabular_data import TabularDataset
+from src.models.metrics import compute_buffered_epoch_metrics, update_epoch_metric_buffer
 
 logger = logging.getLogger(__name__)
 
@@ -104,6 +104,7 @@ class LitLSTMAttention(pl.LightningModule):
             dropout=dropout,
         )
         self.loss = nn.CrossEntropyLoss()
+        self._metric_buffers = {}
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.model(x)
@@ -112,19 +113,18 @@ class LitLSTMAttention(pl.LightningModule):
         x, y = batch
         logits = self(x)
         loss = self.loss(logits, y)
-        preds = logits.argmax(dim=1, keepdim=True)
-        acc = preds.eq(y.view_as(preds)).float().mean()
-        # Guard against degenerate ROC AUC inputs
-        try:
-            auc = roc_auc_score(y.cpu(), preds.cpu())
-        except ValueError:
-            auc = torch.tensor(0.0)
-
-        self.log(f"{stage}_loss", loss)
-        self.log(f"{stage}_acc", acc)
-        self.log(f"{stage}_auc", auc)
-        self.log(f"{stage}_hp_metric", auc, on_step=False, on_epoch=True)
+        update_epoch_metric_buffer(self._metric_buffers, stage, y, logits)
+        self.log(f"{stage}_loss", loss, on_step=False, on_epoch=True)
         return loss
+
+    def _log_epoch_metrics(self, stage: str):
+        metrics = compute_buffered_epoch_metrics(self._metric_buffers, stage)
+        if not metrics:
+            return
+        for name, value in metrics.items():
+            self.log(f"{stage}_{name}", float(value), on_step=False, on_epoch=True)
+        self.log(f"{stage}_hp_metric", metrics["pr_auc"], on_step=False, on_epoch=True)
+        logger.info(f"{stage} metrics: {metrics}")
 
     def training_step(self, batch, batch_idx):
         return self._shared_step(batch, "train")
@@ -134,6 +134,15 @@ class LitLSTMAttention(pl.LightningModule):
 
     def test_step(self, batch, batch_idx):
         self._shared_step(batch, "test")
+
+    def on_train_epoch_end(self):
+        self._log_epoch_metrics("train")
+
+    def on_validation_epoch_end(self):
+        self._log_epoch_metrics("val")
+
+    def on_test_epoch_end(self):
+        self._log_epoch_metrics("test")
 
     def configure_optimizers(self) -> torch.optim.Optimizer:
         return torch.optim.Adam(
@@ -175,7 +184,7 @@ def train(
         ModelCheckpoint(
             monitor="val_hp_metric",
             mode="max",
-            filename='{epoch}-{val_hp_metric:.3f}'
+            filename='{epoch}-{val_pr_auc:.3f}'
         )
     ]
     if additional_callbacks:
@@ -191,7 +200,17 @@ def train(
 
     results = {
         'best_val_loss': trainer.callback_metrics['val_loss'].item(),
-        'best_val_acc': trainer.callback_metrics['val_acc'].item(),
+        'best_val_precision': trainer.callback_metrics['val_precision'].item(),
+        'best_val_recall': trainer.callback_metrics['val_recall'].item(),
+        'best_val_f1': trainer.callback_metrics['val_f1'].item(),
+        'best_val_pr_auc': trainer.callback_metrics['val_pr_auc'].item(),
+        'best_val_roc_auc': trainer.callback_metrics['val_roc_auc'].item(),
+        'best_val_confusion_matrix': {
+            'tn': int(trainer.callback_metrics['val_tn'].item()),
+            'fp': int(trainer.callback_metrics['val_fp'].item()),
+            'fn': int(trainer.callback_metrics['val_fn'].item()),
+            'tp': int(trainer.callback_metrics['val_tp'].item()),
+        },
         'best_val_hp_metric': trainer.callback_metrics['val_hp_metric'].item(),
         'best_model_path': trainer.checkpoint_callback.best_model_path,
         'best_model_val_hp_metric': trainer.checkpoint_callback.best_model_score,

@@ -3,8 +3,17 @@ model_artifact_path: trained-models/${data.name}-${ml_model.model_type}.pkl
 perform_training: ${perform_training}
 perform_grid_search_hparams: ${perform_training_grid_search_hparams}
 default_hparams:
+  n_estimators: 1400
+  learning_rate: 0.015
   max_depth: 6
-  learning_rate: 0.1
-  n_estimators: 100
+  min_child_weight: 3
+  subsample: 0.9
+  colsample_bytree: 0.85
+  reg_alpha: 0.05
+  reg_lambda: 2.0
+  gamma: 0.1
+  tree_method: hist
+  n_jobs: -1
   verbosity: 1
   random_state: 42
+  scale_pos_weight: 2

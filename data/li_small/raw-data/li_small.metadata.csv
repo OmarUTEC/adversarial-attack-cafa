@@ -1,0 +1,27 @@
+feature_name,type,range,dc-mining-type
+amount_received,continuous,"[0, 1000000000000]",float
+receiving_currency,categorical,,string
+amount_paid,continuous,"[0, 1000000000000]",float
+payment_currency,categorical,,string
+payment_format,categorical,,string
+from_entity_type,categorical,,string
+from_bank_prefix,categorical,,string
+from_entity_account_count,ordinal,"[0, 1000000]",integer
+from_entity_bank_count,ordinal,"[0, 1000000]",integer
+to_entity_type,categorical,,string
+to_bank_prefix,categorical,,string
+to_entity_account_count,ordinal,"[0, 1000000]",integer
+to_entity_bank_count,ordinal,"[0, 1000000]",integer
+hour,ordinal,"[0, 23]",integer
+day,ordinal,"[1, 31]",integer
+day_of_week,ordinal,"[0, 6]",integer
+is_weekend,ordinal,"[0, 1]",integer
+amount_paid_log1p,continuous,"[0, 50]",float
+amount_received_log1p,continuous,"[0, 50]",float
+amount_abs_diff,continuous,"[0, 1000000000000]",float
+amount_ratio_paid_to_received,continuous,"[0, 1000000000000]",float
+same_bank,ordinal,"[0, 1]",integer
+same_account,ordinal,"[0, 1]",integer
+same_entity,ordinal,"[0, 1]",integer
+cross_currency,ordinal,"[0, 1]",integer
+is_laundering,label,,

@@ -19,3 +19,9 @@ perform_attack: True  # whether to execute the attack or not. debugging purposes
 transfer:
   surrogate_model:  # e.g., mlp / logistic_regression / lstm_attention; if null, use ml_model.model_type
   target_models: []  # list of model types to evaluate transfer on, e.g., [mlp, logistic_regression]
+
+# Model-performance threshold selection. Used by train_models.py.
+threshold_selection:
+  strategy: max_f1  # options: max_f1, max_recall, max_precision
+  min_precision:
+  min_recall:

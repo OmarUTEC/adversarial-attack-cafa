@@ -10,6 +10,9 @@ __pycache__/
 # ignorar datasets grandes
 data/creditcard/raw-data/
 data/creditcard/raw-data/creditcard_2023.csv
+data/creditcard/raw-data/creditcard_20233.zip
 creditcard_2023.csv
+data/li_small/raw-data/test.csv
+data/li_small/raw-data/val.csv
 trained-models/creditcard-xgboost.pkl
 _remote_compare/
