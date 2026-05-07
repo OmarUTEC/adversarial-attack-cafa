@@ -11,6 +11,7 @@ from src.datasets.preprocess.adult import get_adult_dataset
 from src.datasets.preprocess.bank import get_bank_dataset
 from src.datasets.preprocess.phishing import get_phishing_dataset
 from src.datasets.preprocess.creditcard import get_creditcard_dataset
+from src.datasets.preprocess.amlworld import get_amlworld_dataset
 
 logger = logging.getLogger(__name__)
 
@@ -19,6 +20,8 @@ dataset_name_to_preprocess_func = {
     'bank': get_bank_dataset,
     'phishing': get_phishing_dataset,
     'creditcard': get_creditcard_dataset,
+    'amlworld_hi': get_amlworld_dataset,
+    'amlworld_li': get_amlworld_dataset,
 }
 
 
@@ -96,9 +99,12 @@ class TabularDataset:
 
     def get_train_dev_sets(self, dev_set_proportion: float = 0.15):
         """Splits the original training set, into a new training set and a development set; to be used for training."""
-        random.seed(self.data_parameters['random_seed'])
-        heldout_indices = random.sample(range(len(self.X_train)), int(len(self.X_train) * dev_set_proportion))
-        heldin_indices = [i for i in range(len(self.X_train)) if i not in heldout_indices]
+        rng = np.random.default_rng(self.data_parameters['random_seed'])
+        n = len(self.X_train)
+        indices = rng.permutation(n)
+        n_dev = int(n * dev_set_proportion)
+        heldout_indices = indices[:n_dev]
+        heldin_indices  = indices[n_dev:]
         trainset = torch.utils.data.TensorDataset(
             torch.tensor(self.X_train[heldin_indices], dtype=torch.float32),
             torch.tensor(self.y_train[heldin_indices], dtype=torch.long)
@@ -108,6 +114,15 @@ class TabularDataset:
             torch.tensor(self.y_train[heldout_indices], dtype=torch.long)
         )
         return trainset, devset
+
+    @property
+    def class_weight_minority(self) -> float:
+        """sqrt(n_majority / n_minority) — weight for the fraud class in CrossEntropyLoss."""
+        n_legit = float((self.y_train == 0).sum())
+        n_fraud = float((self.y_train == 1).sum())
+        if n_fraud == 0:
+            return 1.0
+        return float(np.sqrt(n_legit / n_fraud))
 
     @property
     def structure_constraints(self):

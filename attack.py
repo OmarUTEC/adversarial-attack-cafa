@@ -111,10 +111,24 @@ def main(cfg: DictConfig) -> None:
         )
     eval_params = dict(classifier=classifier, tab_dataset=tab_dataset)
 
-    # 4. Evaluate before the attack:
-    X, y = tab_dataset.X_test[:cfg.n_samples_to_attack], tab_dataset.y_test[:cfg.n_samples_to_attack]
+    # 4. Select samples to attack:
+    # For imbalanced datasets (class_weight > 3): attack only fraud samples that the
+    # model currently classifies correctly, so ASR/FNR measure real evasion of detected fraud.
+    # For balanced datasets: take the first n samples as before.
     if cfg.data_split_to_attack == 'train':
-        X, y = tab_dataset.X_train[:cfg.n_samples_to_attack], tab_dataset.y_train[:cfg.n_samples_to_attack]
+        X_pool, y_pool = tab_dataset.X_train, tab_dataset.y_train
+    else:
+        X_pool, y_pool = tab_dataset.X_test, tab_dataset.y_test
+
+    if tab_dataset.class_weight_minority > 3.0:
+        y_pred_pool = classifier.predict(X_pool).argmax(axis=1)
+        fraud_correct = np.where((y_pool == 1) & (y_pred_pool == 1))[0]
+        indices = fraud_correct[:cfg.n_samples_to_attack]
+        logger.info(f"Imbalanced dataset: attacking {len(indices)} correctly-classified fraud samples.")
+    else:
+        indices = np.arange(min(cfg.n_samples_to_attack, len(X_pool)))
+
+    X, y = X_pool[indices], y_pool[indices]
     evaluations: Dict[str, Dict[str, float]] = {}
 
     evaluations['before-attack'] = evaluate_crafted_samples(X_adv=X, X_orig=X, y=y, **eval_params)
@@ -232,7 +246,14 @@ def main(cfg: DictConfig) -> None:
                 evaluations[eval_key] = evaluate_crafted_samples(X_adv=X_adv, X_orig=X, y=y, **eval_params_target)
                 logger.info(f"{eval_key}: {evaluations[eval_key]}")
 
-    # 5. Log & save evaluations:
+    # 5. Compute ΔFNR between before and after attack:
+    if X_adv is not None:
+        attack_key = [k for k in evaluations if k != 'before-attack'][0]
+        evaluations[attack_key]['delta_fnr'] = (
+            evaluations[attack_key]['fnr'] - evaluations['before-attack']['fnr']
+        )
+
+    # 6. Log & save evaluations:
     logger.info(f"Evaluations: {evaluations}")
     with open(os.path.join(output_dir, "evaluations.json"), "w") as f:
         json.dump(evaluations, f, indent=4)

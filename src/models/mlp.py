@@ -6,7 +6,7 @@ from typing import List, Dict, Any
 import optuna
 import pytorch_lightning as pl
 from pytorch_lightning.callbacks import ModelCheckpoint
-from sklearn.metrics import roc_auc_score
+from sklearn.metrics import roc_auc_score, f1_score, average_precision_score, recall_score
 from torch import nn
 import torch
 
@@ -63,12 +63,13 @@ class LitMLP(pl.LightningModule):
                  # Optimization HPs
                  lr=1e-3,
                  weight_decay=1e-5,
+                 class_weight: float = 1.0,
 
                  **kwargs):
         super().__init__()
         self.save_hyperparameters()
         self.model = MLP(input_dim, output_dim, n_layers, hidden_dim)
-        self.loss = nn.CrossEntropyLoss()
+        self.register_buffer('class_weights', torch.tensor([1.0, class_weight]))
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.model(x)
@@ -83,17 +84,28 @@ class LitMLP(pl.LightningModule):
         x, y = batch
         if logits is None:
             logits = self(x)
-        loss = self.loss(logits, y)
+        loss = nn.functional.cross_entropy(logits, y, weight=self.class_weights)
         pred = logits.argmax(dim=1, keepdim=True)
-        accuracy = pred.eq(y.view_as(pred)).float().mean()
-        auc = roc_auc_score(y.cpu(), pred.cpu())
-        self.log(f"{stage}_acc", accuracy)
-        self.log(f"{stage}_loss", loss)
-        self.log(f"{stage}_auc", auc)
+        y_np   = y.cpu().numpy()
+        pred_np = pred.squeeze().cpu().numpy()
+        probs  = torch.softmax(logits, dim=1)[:, 1].detach().cpu().numpy()
 
-        # metric aggregated across epoch:
-        # 'hp_metric' is the metric to be optimized for hps tuning
-        self.log(f"{stage}_hp_metric", auc, on_step=False, on_epoch=True)
+        accuracy = pred.eq(y.view_as(pred)).float().mean()
+        try:
+            auc    = roc_auc_score(y_np, probs)
+            auc_pr = average_precision_score(y_np, probs)
+        except ValueError:
+            auc = auc_pr = 0.0
+        f1     = f1_score(y_np, pred_np, pos_label=1, zero_division=0)
+        recall = recall_score(y_np, pred_np, pos_label=1, zero_division=0)
+
+        self.log(f"{stage}_acc",          accuracy)
+        self.log(f"{stage}_loss",         loss)
+        self.log(f"{stage}_auc",          auc)
+        self.log(f"{stage}_auc_pr",       auc_pr)
+        self.log(f"{stage}_f1_fraud",     f1)
+        self.log(f"{stage}_recall_fraud", recall)
+        self.log(f"{stage}_hp_metric",    auc, on_step=False, on_epoch=True)
 
     def validation_step(self, batch, batch_idx):
         self.evaluate(batch, stage="val")
@@ -145,6 +157,7 @@ def train(
 
     # Define the model
     model = LitMLP(input_dim=tab_dataset.n_features, output_dim=tab_dataset.n_classes,
+                   class_weight=tab_dataset.class_weight_minority,
                    **hyperparameters)
 
     # Define callbacks:
