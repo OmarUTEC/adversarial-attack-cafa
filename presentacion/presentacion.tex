@@ -1,0 +1,559 @@
+\documentclass[aspectratio=169, 10pt]{beamer}
+
+% --- TEMA Y ESTILO ---
+\usetheme{Madrid}
+\usecolortheme{seahorse}
+
+% Colores institucionales UTEC
+\definecolor{UtecBlue}{RGB}{0, 164, 216}
+\setbeamercolor{structure}{fg=blue!60!black}
+\setbeamercolor{alerted text}{fg=red!80!black}
+
+% --- PAQUETES ---
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{booktabs}
+\usepackage{caption}
+\usepackage{tikz}
+
+% --- METADATOS ---
+\title[Robustez Adversarial en Datos Tabulares]{Framework de Evaluación de Robustez Adversarial en Modelos Basados en Datos Tabulares para la Detección de Fraude Financiero y Lavado de Activos}
+\subtitle{}
+
+\author[Chavarria \& Chipayo]{
+    \textbf{Javier Omar Chavarria Humareda} \\
+    \textbf{Alejandro Sebastian Chipayo Flores}
+}
+
+\institute[UTEC]{
+    \footnotesize{Asesor: Ariana Mirella Villegas Suárez} \\
+    \vspace{0.3cm}
+    Universidad de Ingeniería y Tecnología (UTEC) \\
+    Carrera de Ciencia de la Computación
+}
+
+\date{2026}
+
+% --- INICIO ---
+\begin{document}
+
+% 1. PORTADA
+\begin{frame}
+    \titlepage
+\end{frame}
+
+% 2. AGENDA
+\begin{frame}{Agenda}
+    \tableofcontents
+\end{frame}
+
+% ================= SECCIÓN 1: INTRODUCCIÓN =================
+\section{Planteamiento del Problema}
+
+% ---------------------------------------------------------
+% DIAPOSITIVA 1: CONTEXTO GLOBAL
+% ---------------------------------------------------------
+\begin{frame}{Fraude Financiero como Problema Global}
+
+\begin{alertblock}{Problema}
+El fraude financiero genera pérdidas multimillonarias
+cada año y compromete la estabilidad del sistema
+financiero internacional.
+\end{alertblock}
+
+\vspace{0.2cm}
+
+\begin{columns}
+
+\column{0.45\textwidth}
+
+\begin{block}{Fraude con tarjeta}
+Uso no autorizado de medios de pago
+para obtener beneficios ilícitos.
+
+\end{block}
+
+\column{0.45\textwidth}
+
+\begin{block}{Lavado de dinero}
+Ocultamiento del origen ilícito
+de fondos mediante redes complejas
+de transacciones.
+
+\end{block}
+
+\end{columns}
+
+\vspace{0.7cm}
+
+\centering
+\textbf{Mayor digitalización $\rightarrow$ Mayor volumen transaccional $\rightarrow$ Supervisión manual inviable}
+
+\end{frame}
+
+% ---------------------------------------------------------
+% DIAPOSITIVA 2: USO DEL MACHINE LEARNING
+% ---------------------------------------------------------
+\begin{frame}{Uso de Machine Learning}
+
+\begin{block}{Necesidad}
+
+El crecimiento de transacciones financieras digitales
+ha impulsado el uso de modelos automáticos capaces
+de detectar actividades sospechosas a gran escala.
+
+\end{block}
+
+\vspace{0.2cm}
+
+\begin{exampleblock}{Capacidades}
+
+Los modelos aprenden patrones a partir de:
+
+\begin{itemize}
+\item Montos
+\item Frecuencia
+\item Canales de pago
+\item Relaciones entre cuentas
+\item Historial transaccional
+\end{itemize}
+
+\end{exampleblock}
+
+\pause
+
+\begin{alertblock}{Pregunta}
+¿Estos modelos siguen siendo confiables frente a atacantes activos?
+\end{alertblock}
+
+\end{frame}
+
+% ---------------------------------------------------------
+% DIAPOSITIVA 3: BRECHA DE INVESTIGACIÓN
+% ---------------------------------------------------------
+\begin{frame}{Brecha Detectada}
+
+\begin{alertblock}{Vulnerabilidad}
+La mayoría de modelos se evalúan bajo
+condiciones normales, asumiendo datos honestos
+durante inferencia.
+\end{alertblock}
+
+\vspace{0.25cm}
+
+\begin{columns}
+
+\column{0.5\textwidth}
+
+\begin{block}{En visión}
+Ataques adversariales ampliamente estudiados.
+
+\end{block}
+
+\column{0.5\textwidth}
+
+\begin{block}{En datos tabulares}
+Escasa estandarización y menor evidencia empírica.
+
+\end{block}
+
+\end{columns}
+
+\vspace{0.2cm}
+
+\begin{exampleblock}{Dificultad adicional}
+Las perturbaciones deben respetar semántica,
+tipos de variables y consistencia financiera.
+
+\end{exampleblock}
+
+\end{frame}
+
+% ---------------------------------------------------------
+% DIAPOSITIVA 4: PREGUNTA Y OBJETIVOS
+% ---------------------------------------------------------
+\begin{frame}{Pregunta y Objetivos de Investigación}
+
+\small
+
+\begin{alertblock}{Pregunta de Investigación}
+
+¿Cómo diseñar e implementar un \textbf{framework
+sistemático, reproducible y extensible} que permita
+evaluar la robustez de modelos de clasificación
+binaria en datos tabulares frente a ataques
+adversariales de evasión en escenarios
+\textit{white-box} y \textit{black-box},
+considerando tanto condiciones simuladas
+como realistas?
+
+\end{alertblock}
+
+\vspace{0.1cm}
+
+\begin{block}{Objetivo General}
+
+Diseñar e implementar un framework experimental
+para evaluar la robustez adversarial de modelos
+financieros bajo distintos escenarios de amenaza.
+
+\end{block}
+
+\vspace{0.1cm}
+
+\begin{exampleblock}{Objetivos Específicos}
+
+\begin{columns}
+
+\column{0.5\textwidth}
+
+\begin{itemize}
+\item Integrar modelos y ataques adversariales
+en una arquitectura modular.
+
+\item Entrenar modelos base:
+
+{\scriptsize XGBoost, Regresión Logística,
+MLP y LSTM-Attention}
+\end{itemize}
+
+
+\column{0.5\textwidth}
+
+\begin{itemize}
+\item Evaluar robustez bajo escenarios
+\textit{white-box} y \textit{black-box}.
+
+\item Analizar la transferibilidad
+de ejemplos adversariales.
+\end{itemize}
+
+\end{columns}
+
+\end{exampleblock}
+
+\end{frame}
+
+% ================= SECCIÓN 2: MARCO TEÓRICO =================
+\section{Marco Teórico}
+
+\begin{frame}{Fundamentos: Modelos Víctima y Escenarios de Ataque}
+    \begin{columns}
+        \column{0.5\textwidth}
+        \textbf{Arquitecturas Evaluadas (Clasificación):}
+        \begin{itemize}
+            \item \textbf{Regresión Logística (LR):} Lineal de referencia.
+            \item \textbf{XGBoost:} Ensamble de árboles con gradient boosting optimizado.
+            \item \textbf{Multi-Layer Perceptron (MLP):} Red neuronal densa clásica.
+            \item \textbf{LSTM-Attention:} Red recurrente con mecanismo de atención aditiva.
+        \end{itemize}
+
+        \column{0.5\textwidth}
+        \textbf{Escenarios de Amenaza:}
+        \begin{itemize}
+            \item \textbf{Caja Blanca:} Acceso total a gradientes y parámetros internos. \textit{(CaFA)}
+            \item \textbf{Caja Negra:} Solo entradas y salidas del modelo. \textit{(HopSkipJump, BoundaryAttack, SquareAttack)}
+        \end{itemize}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{Fundamentos: Formulación Matemática de la Evasión}
+    La generación de un ejemplo adversarial se formula como un problema de optimización restringido:
+
+    \[
+    A_i(\theta, \mathcal{B}) = \max_{\delta \in \mathcal{B}} L\big(f_\theta(x_i + \delta), y_i\big)
+    \]
+
+    \vspace{0.2cm}
+    El impacto global del ataque se cuantifica mediante el riesgo adversarial empírico:
+
+    \[
+    R_{P_n}(\theta, \mathcal{B}) = \frac{1}{n} \sum_{i=1}^{n} A_i(\theta, \mathcal{B})
+    \]
+
+    \textbf{Estrategias Algorítmicas bajo Evaluación:}
+    \begin{itemize}
+        \item \textbf{CaFA:} Ataque de caja blanca basado en gradientes sobre datos tabulares.
+        \item \textbf{Square Attack:} Ataque de caja negra basado en consultas de tipo score.
+        \item \textbf{HopSkipJump (HSJ) / Boundary Attack:} Ataques basados en la frontera de decisión geométrica.
+    \end{itemize}
+\end{frame}
+
+% ================= SECCIÓN 3: METODOLOGÍA =================
+\section{Diseño Metodológico}
+% --- DIAPOSITIVA 1: TEXTO DE LOS CASOS DE ESTUDIO ---
+\begin{frame}{Dataset usados}
+    \textbf{Configuración de los Conjuntos de Datos:}
+    \vspace{0.4cm}
+    \begin{itemize}
+        \item \textbf{Credit Card Fraud 2023:} \\
+        Entorno tabular de variables continuas de alta densidad, transformadas mediante PCA. Dataset \textbf{balanceado} (50/50), 568\,630 transacciones, 29 features.
+        
+        \vspace{0.4cm}
+        
+        \item \textbf{IBM Transactions for AML:} \\
+        Entorno de simulación masiva multiagente. Variables explícitas con alto significado semántico. Dataset con \textbf{imbalance extremo} (1:993), 5\,078\,208 transacciones, 15 features.
+    \end{itemize}
+\end{frame}
+
+% --- DIAPOSITIVA 2: DIAGRAMA A TODA PÁGINA (FULL SCREEN) ---
+\begin{frame}[plain] % [plain] remueve cabeceras, pies de página y barras laterales
+    \begin{picture}(0,0)
+        % Centra y expande la imagen a todo el ancho y alto disponible de la pantalla
+        \put(-10,-150){\includegraphics[width=\paperwidth,height=\paperheight,keepaspectratio]{imagenes/Architecture.jpeg}}
+    \end{picture}
+\end{frame}
+
+\begin{frame}{Protocolo de Evaluación Semántica: Mecanismo de Proyección}
+    Para preservar la validez del ejemplo adversarial en el dominio transaccional, se introduce un operador de post-procesamiento $\Pi_{\mathcal{C}}$ que proyecta el vector perturbado al espacio de restricciones reales.
+
+    \vspace{0.3cm}
+    \textbf{Dimensiones de la Validación Semántica:}
+    \begin{enumerate}
+        \item \textbf{Inmutabilidad Estricta:} Bloqueo de atributos históricos inalterables (ID del cliente, marcas de tiempo fijas).
+        \item \textbf{Consistencia de Tipos:} Operaciones de discretización y redondeo para conservar coherencia en variables numéricas discretas.
+        \item \textbf{Límites Operativos:} Preservación de rangos lógicos del negocio ($\text{Monto} \ge 0$).
+    \end{enumerate}
+\end{frame}
+
+% ================= SECCIÓN 4: RESULTADOS =================
+\section{Resultados y Discusión}
+
+% ── Slide: métricas baseline — todos los modelos y datasets ──
+\begin{frame}{Rendimiento Baseline — Pre-Ataque}
+    \small
+    \begin{columns}
+        \column{0.5\textwidth}
+        \centering
+        \textbf{Credit Card 2023} \\[0.3em]
+        \begin{tabular}{lcccc}
+        \toprule
+        \textbf{Modelo} & \textbf{AUC-ROC} & \textbf{Recall} & \textbf{F1} \\
+        \midrule
+        XGBoost   & 1.000 & 99.97\% & 99.98\% \\
+        MLP       & 1.000 & 99.98\% & 99.97\% \\
+        Log. Reg. & 0.991 & 99.21\% & 99.26\% \\
+        LSTM-Att. & 0.818 & 94.16\% & 81.94\% \\
+        \bottomrule
+        \end{tabular}
+
+        \column{0.5\textwidth}
+        \centering
+        \textbf{AMLworld HI-Small} \\[0.3em]
+        \begin{tabular}{lcccc}
+        \toprule
+        \textbf{Modelo} & \textbf{AUC-ROC} & \textbf{Recall} & \textbf{F1} \\
+        \midrule
+        XGBoost   & 0.966 & 33.95\% & 20.32\% \\
+        MLP       & 0.913 &  0.00\% &  0.00\% \\
+        Log. Reg. & 0.567 & 10.67\% &  1.03\% \\
+        LSTM-Att. & ---   &    ---  &    ---  \\
+        \bottomrule
+        \end{tabular}
+    \end{columns}
+
+    \vspace{0.4cm}
+    \begin{alertblock}{Efecto del imbalance (1:993)}
+        En AMLworld, MLP y LSTM-Att.\ no detectan ningún fraude (Recall = 0\%).
+        Solo XGBoost y Log.\ Reg.\ son evaluables adversarialmente.
+    \end{alertblock}
+\end{frame}
+
+% ── Slide: métricas de clasificación baseline ──
+\begin{frame}{Resultados Empíricos: Caso de Estudio XGBoost (IBM AML)}
+    \begin{columns}
+        \column{0.55\textwidth}
+        \centering
+        \small
+        \begin{tabular}{lcc}
+        \toprule
+        \textbf{Configuración} & \textbf{ASR (\%)} & \textbf{$L_0$ Medio} \\
+        \midrule
+        Línea Base (Pre-Ataque) & 0.05\% & 0.00 \\
+        \midrule
+        \textbf{Square Attack}    & 100.0\% & 6.05 \\
+        \textbf{HopSkipJump}      &   2.2\% & 2.56 \\
+        \textbf{Boundary Attack}  & 100.0\% & 5.81 \\
+        \textbf{CaFA}             &   N/A   &  ---  \\
+        \bottomrule
+        \end{tabular}
+        \vspace{0.2cm}
+        \captionof{table}{\small Robustez de XGBoost — AMLworld HI-Small}
+
+        \column{0.45\textwidth}
+        \textbf{Hallazgos clave:}
+        \begin{itemize}
+            \item \textbf{Vulnerabilidad crítica:} Square Attack y Boundary Attack logran 100\% de evasión modificando solo 5--6 features de 15.
+            \item \textbf{Único modelo resistente:} HopSkipJump es el único ataque que XGBoost resiste (2.2\% ASR) por la irregularidad de sus fronteras de decisión.
+            \item \textbf{CaFA incompatible:} Requiere gradientes; XGBoost es un árbol de decisión.
+        \end{itemize}
+    \end{columns}
+\end{frame}
+
+% ── Slide: Gráfico de burbujas — Credit Card (Pantalla Completa y Centrada) ──
+\begin{frame}[plain] 
+    \begin{tikzpicture}[remember picture, overlay]
+        % Coloca la imagen exactamente en el centro de la diapositiva
+        \node[at=(current page.center)] {
+            \includegraphics[width=\paperwidth, height=\paperheight, keepaspectratio]{imagenes/bubble_creditcard.png}
+        };
+    \end{tikzpicture}
+\end{frame}
+
+% ── Slide: Interpretación Credit Card ──
+\begin{frame}{Interpretación — Credit Card 2023}
+    \small
+    \begin{columns}
+        \column{0.5\textwidth}
+        \begin{block}{CaFA (caja blanca)}
+            Evasión moderada (24--78\%). Modifica pocas features ($L_0 < 12$).
+            LSTM-Att. es el más resistente (24\%).
+            Log. Reg. el más vulnerable (78\%).
+        \end{block}
+        \begin{block}{HopSkipJump (caja negra)}
+            Evasión casi total en los 4 modelos ($\approx$99\%).
+            Costo alto: modifica $\sim$30 de 29 features.
+            Alta evasión pero bajo sigilo por $L_0$ elevado.
+        \end{block}
+
+        \column{0.5\textwidth}
+        \begin{block}{BoundaryAttack (caja negra)}
+            XGBoost: 99.95\% evasión pero $L_0 = 29.85$ (muy costoso).
+            MLP y Log. Reg.: 48\% evasión con $L_0 \approx 14$.
+        \end{block}
+        \begin{block}{SquareAttack (caja negra)}
+            MLP y Log. Reg.: \textbf{100\% evasión} con $L_0 \approx 12$--16.
+            \textbf{Mayor amenaza:} alta efectividad con costo moderado.
+            LSTM-Att. resiste mejor (22.6\%).
+        \end{block}
+    \end{columns}
+\end{frame}
+
+% ── Slide: Gráfico de burbujas — AMLworld (Pantalla Completa y Centrada) ──
+\begin{frame}[plain] 
+    \begin{tikzpicture}[remember picture, overlay]
+        % Coloca la imagen exactamente en el centro de la diapositiva
+        \node[at=(current page.center)] {
+            \includegraphics[width=\paperwidth, height=\paperheight, keepaspectratio]{imagenes/bubble_amlworld.png}
+        };
+    \end{tikzpicture}
+\end{frame}
+
+
+% ── Slide: Interpretación AMLworld ──
+\begin{frame}{Interpretación — AMLworld HI-Small (IBM)}
+    \small
+    \begin{columns}
+        \column{0.5\textwidth}
+        \begin{alertblock}{Hallazgo principal: imbalance extremo (1:993)}
+            MLP y LSTM-Att. obtienen Recall = 0\% en entrenamiento base.
+            Solo XGBoost (Recall 33.9\%) y Log. Reg. (10.7\%) son evaluables adversarialmente.
+        \end{alertblock}
+
+        \begin{block}{CaFA (caja blanca)}
+            Solo compatible con Log. Reg. (requiere gradientes).
+            \textbf{100\% evasión con $L_0 = 3.55$:} máxima efectividad con mínimo costo.
+        \end{block}
+
+        \column{0.5\textwidth}
+        \begin{block}{HopSkipJump}
+            \textbf{Único ataque resistido:} XGBoost 2.2\%, Log. Reg. 5.2\%.
+            Fronteras de decisión irregulares dificultan la navegación geométrica.
+        \end{block}
+        \begin{block}{BoundaryAttack y SquareAttack}
+            \textbf{100\% evasión} sobre XGBoost y Log. Reg.
+            $L_0 \approx 4$--6 features modificadas de 15.
+            \textbf{Impacto operacional catastrófico:} todos los fraudes detectados escapan.
+        \end{block}
+    \end{columns}
+\end{frame}
+
+
+% ── Slide: Comparativa evasión — Gráfico de barras ──
+\begin{frame}[plain]
+    \begin{tikzpicture}[remember picture, overlay]
+        \node[at=(current page.center)] {
+            \includegraphics[width=\paperwidth, height=\paperheight, keepaspectratio]{imagenes/evasion_bars.png}
+        };
+    \end{tikzpicture}
+\end{frame}
+
+% ── Slide: Síntesis comparativa ──
+\begin{frame}{Síntesis: Tasa de Evasión por Ataque y Modelo}
+    \small
+    \begin{columns}
+        \column{0.5\textwidth}
+        \begin{block}{Credit Card — Dataset balanceado}
+            \begin{itemize}
+                \item \textbf{HopSkipJump:} ataque más efectivo en todos los modelos ($\approx$78--99.95\%), pero modifica casi todas las features.
+                \item \textbf{SquareAttack:} 100\% sobre MLP y Log.\ Reg.\ con $L_0$ moderado — mayor amenaza real.
+                \item \textbf{LSTM-Att.} es el modelo más robusto en este dataset.
+            \end{itemize}
+        \end{block}
+
+        \column{0.5\textwidth}
+        \begin{block}{AMLworld — Dataset imbalanceado (1:993)}
+            \begin{itemize}
+                \item MLP y LSTM-Att.\ no evaluables (Recall = 0\%).
+                \item BoundaryAttack y SquareAttack: \textbf{100\% evasión} sobre los 2 modelos viables.
+                \item \textbf{HopSkipJump:} único ataque resistido ($\leq$5.2\%).
+                \item \textbf{N/A} no es robustez: el modelo falla antes del ataque.
+            \end{itemize}
+        \end{block}
+    \end{columns}
+
+    \vspace{0.2cm}
+    \centering
+    \small\textit{En ambos datasets, ningún modelo es robusto ante todos los ataques evaluados.}
+\end{frame}
+
+% ================= SECCIÓN 5: CONCLUSIONES =================
+\section{Conclusiones y Trabajo Futuro}
+
+\begin{frame}{Conclusiones y Proyecciones}
+    \begin{block}{Conclusiones Fundamentales}
+        \begin{enumerate}
+            \item \textbf{Ineficacia de métricas convencionales:} Clasificadores con rendimiento óptimo bajo condiciones normales colapsan ante perturbaciones intencionales sutiles.
+            \item \textbf{El imbalance determina la vulnerabilidad:} En AMLworld, el desbalance extremo hace que 3 de 4 modelos sean inútiles para evaluación adversarial, independientemente de su arquitectura.
+            \item \textbf{$L_0$ como métrica de sigilo:} El costo $L_0$ se establece como métrica indispensable para diseñar esquemas de detección de anomalías adversariales.
+        \end{enumerate}
+    \end{block}
+
+    \vspace{0.2cm}
+    \begin{exampleblock}{Trabajo Futuro}
+        \begin{itemize}
+            \item \textbf{Entrenamiento adversarial:} incorporar ejemplos adversariales al proceso de entrenamiento para aumentar la robustez activa de los modelos.
+            \item \textbf{Defensa basada en $L_0$:} diseñar reglas de detección que alerten cuando múltiples features cambian simultáneamente.
+            \item \textbf{Técnicas de balanceo:} evaluar SMOTE, submuestreo y pérdidas focales junto con robustez adversarial en datasets imbalanceados.
+            \item \textbf{Transferibilidad:} analizar si ataques generados sobre un modelo son efectivos contra modelos desconocidos.
+        \end{itemize}
+    \end{exampleblock}
+\end{frame}
+
+% ===== REFERENCIAS =====
+\begin{frame}{Referencias Principales}
+\footnotesize
+\begin{itemize}
+    \item Altman, E. et al. (2024). Realistic Synthetic Financial Transactions for Anti-Money Laundering Models. \textit{NeurIPS Datasets and Benchmarks Track}.
+    \item Cartella, F. et al. (2021). Adversarial Attacks on Tabular Data in Financial Fraud Detection. \textit{ACM International Conference on AI in Finance}.
+    \item Chen, J. et al. (2019). HopSkipJumpAttack: A query-efficient decision-based attack. \textit{IEEE Symposium on Security and Privacy}.
+    \item Dyrmishi, S. et al. (2025). Adversarial Attacks and Defenses on Tabular Data: A Systematic Survey. \textit{arXiv preprint}.
+\end{itemize}
+\end{frame}
+
+% ===== FINAL =====
+\begin{frame}
+    \centering
+    \Huge \textbf{¡Muchas Gracias!}
+
+    \vspace{1cm}
+    \normalsize
+    Javier Chavarria \& Alejandro Chipayo \\
+    \vspace{0.2cm}
+    \footnotesize{Ciencia de la Computación --- UTEC}
+\end{frame}
+
+\end{document}

@@ -1,8 +1,11 @@
 """
 Gráficos de burbujas — L0 vs Tasa de Evasión
 4 cuadrantes: CaFA | HopSkipJump | BoundaryAttack | SquareAttack
-  · Forma  = Modelo  (fija en todos los paneles)
-  · Color  = Modelo  (fija en todos los paneles)
+
+Muestra los 4 modelos en todos los paneles:
+  · Evaluables   → puntos sólidos en su posición real (L0, evasión%)
+  · No evaluables → puntos semitransparentes en zona inferior «N/A»
+Codificación: forma + color = modelo  (consistente en todos los paneles)
 """
 import os
 import matplotlib
@@ -14,7 +17,7 @@ import numpy as np
 OUT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # ─────────────────────────────────────────────────────────────
-# PALETA  —  cada modelo tiene forma y color únicos
+# PALETA
 # ─────────────────────────────────────────────────────────────
 MODEL_STYLE = {
     'XGBoost':   {'marker': 'o', 'color': '#2563EB'},
@@ -30,10 +33,7 @@ ATTACK_TITLE_COLOR = {
     'BoundaryAttack': '#0369A1',
     'SquareAttack':   '#7C3AED',
 }
-DS_COLOR = {
-    'Credit Card': '#1D4ED8',
-    'AMLworld HI': '#B45309',
-}
+DS_COLOR = {'Credit Card': '#1D4ED8', 'AMLworld HI': '#B45309'}
 
 NAN = float('nan')
 
@@ -66,6 +66,14 @@ L0_DATA = {
     },
 }
 
+# Razón por la que un modelo no es evaluable en AMLworld
+NA_REASON = {
+    'CaFA':           {'XGBoost': 'sin gradientes', 'MLP': 'Recall=0%', 'LSTM-Att.': 'Recall=0%'},
+    'HopSkipJump':    {'MLP': 'Recall=0%', 'LSTM-Att.': 'Recall=0%'},
+    'BoundaryAttack': {'MLP': 'Recall=0%', 'LSTM-Att.': 'Recall=0%'},
+    'SquareAttack':   {'MLP': 'Recall=0%', 'LSTM-Att.': 'Recall=0%'},
+}
+
 GROUPS = [
     ('CaFA',           'CaFA'),
     ('HopSkipJump',    'HopSkipJump'),
@@ -85,7 +93,7 @@ plt.rcParams.update({
 
 
 # ─────────────────────────────────────────────────────────────
-# Dispersar puntos casi coincidentes
+# Separar puntos casi coincidentes
 # ─────────────────────────────────────────────────────────────
 def _spread(items, x_tol=0.9, y_tol=5.0):
     n      = len(items)
@@ -112,59 +120,42 @@ def _spread(items, x_tol=0.9, y_tol=5.0):
 
 
 # ─────────────────────────────────────────────────────────────
-# Colocación de etiquetas en coordenadas de datos (sin conversión)
+# Colocación de etiquetas en coordenadas de datos
 # ─────────────────────────────────────────────────────────────
-def _place_labels(items, x_range, y_range=132,
-                  plot_w_in=5.2, plot_h_in=3.8):
-    """
-    Trabaja directamente en unidades de datos para posicionar etiquetas.
-    Convierte dimensiones de texto (pulgadas) a unidades de datos y
-    detecta colisiones con bounding-boxes 2D.
-    Retorna lista de (text_x, text_y) en coordenadas de datos.
-    """
+def _place_labels(items, x_range, plot_w_in=5.2, plot_h_in=3.8):
     if not items:
         return []
-
-    du_per_x_in = x_range  / plot_w_in   # unidades de datos por pulgada (X)
-    du_per_y_in = y_range  / plot_h_in   # unidades de datos por pulgada (Y)
-
-    # Dimensiones de texto en unidades de datos (fuente ~8pt = ~0.11in alto)
-    CHAR_W = 0.052 * du_per_x_in   # ~0.052in por carácter
-    LINE_H = 0.115 * du_per_y_in   # ~0.115in por línea
-    DX     = 0.10  * du_per_x_in   # offset horizontal desde el punto
-
-    step   = LINE_H * 1.35          # separación mínima entre centros de etiqueta
-    dy_candidates = [i * step for i in
-                     [1, 2, -1, 3, -2, 4, -3, 5, -4, 6, -5, 7, -6, 8, -7]]
+    du_per_x_in = x_range / plot_w_in
+    du_per_y_in = 132.0   / plot_h_in
+    CHAR_W = 0.056 * du_per_x_in
+    LINE_H = 0.130 * du_per_y_in   # altura generosa para evitar solapamiento
+    DX     = 0.12  * du_per_x_in
+    step   = LINE_H * 1.5           # separación vertical mínima ampliada
+    dy_cands = [i * step for i in
+                [1, 2, -1, 3, -2, 4, -3, 5, -4, 6, -5, 7, -6, 8, -7, 9, -8]]
 
     indexed  = sorted(enumerate(items), key=lambda t: -t[1][1])
     positions = [None] * len(items)
-    placed    = []   # (x1, y1, x2, y2) en coordenadas de datos
+    placed    = []
 
     for orig_idx, (l0, ev, model, atk) in indexed:
-        lbl   = model
-        nl    = 1
-        lw    = len(lbl) * CHAR_W
-        lh    = nl * LINE_H
-        tx1   = l0 + DX
-        tx2   = tx1 + lw
-
-        chosen_dy = dy_candidates[0]
-        for cdy in dy_candidates:
+        lw  = len(model) * CHAR_W
+        lh  = LINE_H
+        tx1 = l0 + DX
+        tx2 = tx1 + lw
+        chosen = dy_cands[0]
+        for cdy in dy_cands:
             ty1 = ev + cdy - lh / 2
             ty2 = ev + cdy + lh / 2
             if not any(tx1 < bx2 and tx2 > bx1 and ty1 < by2 and ty2 > by1
                        for bx1, by1, bx2, by2 in placed):
-                chosen_dy = cdy
+                chosen = cdy
                 placed.append((tx1, ty1, tx2, ty2))
                 break
         else:
-            chosen_dy = dy_candidates[-1]
-            placed.append((tx1, ev + chosen_dy - lh/2,
-                           tx2, ev + chosen_dy + lh/2))
-
-        positions[orig_idx] = (l0 + DX, ev + chosen_dy)
-
+            chosen = dy_cands[-1]
+            placed.append((tx1, ev+chosen-lh/2, tx2, ev+chosen+lh/2))
+        positions[orig_idx] = (l0 + DX, ev + chosen)
     return positions
 
 
@@ -172,6 +163,7 @@ def _place_labels(items, x_range, y_range=132,
 # Panel individual
 # ─────────────────────────────────────────────────────────────
 def draw_panel(ax, ds, atk, panel_title, total_feat):
+    # Puntos evaluables
     raw = []
     for model in MODELS:
         ev = EVASION[ds][atk][model]
@@ -179,57 +171,37 @@ def draw_panel(ax, ds, atk, panel_title, total_feat):
         if not (np.isnan(ev) or np.isnan(l0)):
             raw.append((l0, ev * 100, model, atk))
 
-    # Panel vacío
-    if not raw:
-        ax.text(0.5, 0.5, 'N/A\n(no compatible\ncon este ataque)',
-                ha='center', va='center', fontsize=10,
-                color='#9CA3AF', style='italic', transform=ax.transAxes)
-        ax.set_facecolor('#F9FAFB')
-        ax.set_title(panel_title, fontsize=12, fontweight='bold',
-                     color='#6B7280', pad=10)
-        ax.set_xlabel('L0 — Features modificadas', fontsize=9)
-        ax.set_ylabel('Tasa de evasión (%)', fontsize=9)
-        ax.set_xlim(0, total_feat + 1)
-        ax.set_ylim(-8, 115)
-        return
-
-    items = _spread(raw)
-
-    # Zona de alta amenaza
-    threat_x = 8 if ds == 'AMLworld HI' else 16
-    ax.add_patch(plt.Rectangle(
-        (0, 75), threat_x, 42,
-        facecolor='#FEE2E2', alpha=0.45, zorder=0,
-        linestyle='--', edgecolor='#EF4444', linewidth=0.8))
-    ax.text(0.5, 112, 'Alta amenaza', fontsize=7.5,
-            color='#EF4444', alpha=0.80, style='italic')
+    # Línea de referencia 100% de evasión
     ax.axhline(100, color='#EF4444', linestyle='--',
                linewidth=0.9, alpha=0.35, zorder=1)
 
-    # Puntos: forma + color = modelo
-    for (l0, ev, model, _atk) in items:
-        s = MODEL_STYLE[model]
-        ax.scatter(l0, ev, s=270,
-                   marker=s['marker'],
-                   color=s['color'],
-                   edgecolors='white',
-                   linewidths=1.8,
-                   zorder=4, alpha=0.93)
+    x_range = max(total_feat + 10, (max(l0 for l0, *_ in raw) + 10) if raw else total_feat + 10)
 
-    # Etiquetas en coordenadas de datos
-    x_range = max(total_feat + 10, max(l0 for l0, *_ in items) + 10)
-    positions = _place_labels(items, x_range=x_range)
 
-    for (l0, ev, model, _atk), (tx, ty) in zip(items, positions):
-        ax.text(tx, ty, model,
-                ha='left', va='center',
-                fontsize=8.2,
-                color=MODEL_STYLE[model]['color'],
-                fontweight='bold',
-                zorder=5)
+    # ── Puntos evaluables ─────────────────────────────────────
+    if raw:
+        items = _spread(raw)
+        for (l0, ev, model, _atk) in items:
+            s = MODEL_STYLE[model]
+            ax.scatter(l0, ev, s=270,
+                       marker=s['marker'],
+                       color=s['color'],
+                       edgecolors='white',
+                       linewidths=1.8,
+                       zorder=6, alpha=0.93)
+
+        # Etiquetas
+        positions = _place_labels(items, x_range=x_range)
+        for (l0, ev, model, _atk), (tx, ty) in zip(items, positions):
+            ax.text(tx, ty, model,
+                    ha='left', va='center',
+                    fontsize=8.2,
+                    color=MODEL_STYLE[model]['color'],
+                    fontweight='bold',
+                    zorder=7)
 
     ax.set_xlim(-0.5, x_range)
-    ax.set_ylim(-10, 122)
+    ax.set_ylim(-13, 122)
     ax.set_xlabel('L0 — Features modificadas', fontsize=9)
     ax.set_ylabel('Tasa de evasión (%)', fontsize=9)
     ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda y, _: f'{y:.0f}%'))
@@ -270,8 +242,7 @@ def plot_creditcard():
     build_legend(fig)
     fig.suptitle(
         'Eficiencia de ataques adversariales — Credit Card 2023\n'
-        'Eje X: features modificadas (L0)  ·  Eje Y: tasa de evasión  ·  '
-        'Zona roja: alta amenaza',
+        'Eje X: features modificadas (L0)  ·  Eje Y: tasa de evasión',
         fontsize=13, fontweight='bold', color=DS_COLOR[ds], y=1.02)
     fig.tight_layout(rect=[0, 0.06, 1, 1])
     path = os.path.join(OUT_DIR, 'bubble_creditcard.png')
@@ -291,8 +262,7 @@ def plot_amlworld():
     build_legend(fig)
     fig.suptitle(
         'Eficiencia de ataques adversariales — AMLworld HI-Small (IBM)\n'
-        'Eje X: features modificadas (L0)  ·  Eje Y: tasa de evasión  ·  '
-        'Zona roja: alta amenaza',
+        'Eje X: features modificadas (L0)  ·  Eje Y: tasa de evasión',
         fontsize=13, fontweight='bold', color=DS_COLOR[ds], y=1.02)
     fig.tight_layout(rect=[0, 0.06, 1, 1])
     path = os.path.join(OUT_DIR, 'bubble_amlworld.png')
