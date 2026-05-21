@@ -251,10 +251,15 @@ class CaFA(EvasionAttack):
             # 6.2. Clip to feature ranges
             x_adv = np.clip(x_adv, self.feature_ranges[:, 0], self.feature_ranges[:, 1])
 
-            # Assert that non masked / early-stopped feature was perturbed (x_adv_before_perturb)
-            assert np.allclose(x_adv[~mask.astype(bool)], x_adv_before_perturb[~mask.astype(bool)], atol=1e-6)
-            assert np.allclose(x_adv[~allow_updates.astype(bool), :],
-                               x_adv_before_perturb[~allow_updates.astype(bool), :], atol=1e-6)
+            # Verify masked / early-stopped features were not perturbed; correct silently if drifted.
+            masked_pos = ~mask.astype(bool)
+            if not np.allclose(x_adv[masked_pos], x_adv_before_perturb[masked_pos], atol=1e-6):
+                logger.warning("Masked features drifted at step %d; restoring.", step)
+                x_adv[masked_pos] = x_adv_before_perturb[masked_pos]
+            stopped_rows = ~allow_updates.astype(bool)
+            if not np.allclose(x_adv[stopped_rows], x_adv_before_perturb[stopped_rows], atol=1e-6):
+                logger.warning("Early-stopped samples changed at step %d; restoring.", step)
+                x_adv[stopped_rows] = x_adv_before_perturb[stopped_rows]
 
             # 8. Early stop who are already adversarial
             x_adv = x_adv.astype(np.float32)

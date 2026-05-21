@@ -1,0 +1,33 @@
+{
+    "before-attack": {
+        "is_misclassified_rate": 0.0,
+        "confusion_matrix": {
+            "TP": 369,
+            "FP": 0,
+            "FN": 0,
+            "TN": 0
+        },
+        "fnr": 0.0,
+        "recall_fraud": 1.0,
+        "l0_costs_mean": 0.0,
+        "l0_costs_on_mis_mean": 0.0,
+        "stand_linf_costs_mean": 0.0,
+        "stand_linf_costs_on_mis_mean": 0.0
+    },
+    "after-hop-skip-jump": {
+        "is_misclassified_rate": 0.02168021680216802,
+        "confusion_matrix": {
+            "TP": 361,
+            "FP": 0,
+            "FN": 8,
+            "TN": 0
+        },
+        "fnr": 0.02168021680216802,
+        "recall_fraud": 0.978319783197832,
+        "l0_costs_mean": 2.5582655826558267,
+        "l0_costs_on_mis_mean": 4.625,
+        "stand_linf_costs_mean": 1.0701734629891995e-05,
+        "stand_linf_costs_on_mis_mean": 1.4734868604148363e-05,
+        "delta_fnr": 0.02168021680216802
+    }
+}

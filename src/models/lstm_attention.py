@@ -6,7 +6,7 @@ from typing import Any, Dict, List
 import optuna
 import pytorch_lightning as pl
 from pytorch_lightning.callbacks import ModelCheckpoint
-from sklearn.metrics import roc_auc_score
+from sklearn.metrics import roc_auc_score, f1_score, average_precision_score, recall_score
 import torch
 from torch import nn
 
@@ -91,6 +91,7 @@ class LitLSTMAttention(pl.LightningModule):
             dropout: float = 0.3,
             lr: float = 1e-3,
             weight_decay: float = 1e-5,
+            class_weight: float = 1.0,
             **kwargs
     ):
         super().__init__()
@@ -103,7 +104,7 @@ class LitLSTMAttention(pl.LightningModule):
             n_lstm_layers=n_lstm_layers,
             dropout=dropout,
         )
-        self.loss = nn.CrossEntropyLoss()
+        self.register_buffer('class_weights', torch.tensor([1.0, class_weight]))
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.model(x)
@@ -111,19 +112,28 @@ class LitLSTMAttention(pl.LightningModule):
     def _shared_step(self, batch: List[torch.Tensor], stage: str):
         x, y = batch
         logits = self(x)
-        loss = self.loss(logits, y)
+        loss = nn.functional.cross_entropy(logits, y, weight=self.class_weights)
         preds = logits.argmax(dim=1, keepdim=True)
-        acc = preds.eq(y.view_as(preds)).float().mean()
-        # Guard against degenerate ROC AUC inputs
-        try:
-            auc = roc_auc_score(y.cpu(), preds.cpu())
-        except ValueError:
-            auc = torch.tensor(0.0)
+        y_np    = y.cpu().numpy()
+        pred_np = preds.squeeze().cpu().numpy()
+        probs   = torch.softmax(logits, dim=1)[:, 1].detach().cpu().numpy()
 
-        self.log(f"{stage}_loss", loss)
-        self.log(f"{stage}_acc", acc)
-        self.log(f"{stage}_auc", auc)
-        self.log(f"{stage}_hp_metric", auc, on_step=False, on_epoch=True)
+        acc = preds.eq(y.view_as(preds)).float().mean()
+        try:
+            auc    = roc_auc_score(y_np, probs)
+            auc_pr = average_precision_score(y_np, probs)
+        except ValueError:
+            auc = auc_pr = 0.0
+        f1     = f1_score(y_np, pred_np, pos_label=1, zero_division=0)
+        recall = recall_score(y_np, pred_np, pos_label=1, zero_division=0)
+
+        self.log(f"{stage}_loss",         loss)
+        self.log(f"{stage}_acc",          acc)
+        self.log(f"{stage}_auc",          auc)
+        self.log(f"{stage}_auc_pr",       auc_pr)
+        self.log(f"{stage}_f1_fraud",     f1)
+        self.log(f"{stage}_recall_fraud", recall)
+        self.log(f"{stage}_hp_metric",    auc, on_step=False, on_epoch=True)
         return loss
 
     def training_step(self, batch, batch_idx):
@@ -168,6 +178,7 @@ def train(
     model = LitLSTMAttention(
         input_dim=tab_dataset.n_features,
         output_dim=tab_dataset.n_classes,
+        class_weight=tab_dataset.class_weight_minority,
         **hyperparameters
     )
 

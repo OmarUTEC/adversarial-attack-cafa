@@ -2,9 +2,9 @@ attack_name: square_attack
 
 # Core hyperparameters
 norm: inf  # {inf, 2}
-max_iter: 200          # más iteraciones para explorar mejor el espacio
-eps: 0.5               # radio mayor de perturbación (Linf)
-p_init: 0.5            # mayor proporción de features al inicio para diversidad
-nb_restarts: 15         # múltiples reinicios para escapar óptimos locales
-batch_size: 128        # tamaño de lote para predicciones del modelo
+max_iter: 200
+eps: 5.0               # ~10% del rango típico de features PCA ([-40,40] → rango=80)
+p_init: 0.5
+nb_restarts: 15
+batch_size: 128
 verbose: true

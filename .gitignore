@@ -9,3 +9,11 @@ outputs/
 data/creditcard/raw-data/
 data/creditcard/raw-data/creditcard_2023.csv
 creditcard_2023.csv
+data/amlworld/raw-data/HI-Small_Trans.csv
+data/amlworld/raw-data/LI-Small_Trans.csv
+data/archive.zip
+data/archive/
+
+# ignorar pycache
+__pycache__/
+*.pyc
