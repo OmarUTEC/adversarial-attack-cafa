@@ -1,0 +1,50 @@
+[2026-06-02 02:52:26,809][__main__][INFO] - Used config: n_samples_to_attack: 2000
+data_split_to_attack: test
+save_attack_artifacts: true
+perform_training: false
+perform_training_grid_search_hparams: false
+perform_attack: true
+transfer:
+  surrogate_model: null
+  target_models: []
+data:
+  name: amlworld_hi
+  params:
+    dataset_name: ${data.name}
+    data_file_path: ${data.paths.data_file_path}
+    metadata_file_path: ${data.paths.metadata_file_path}
+    encoding_method: one_hot_encoding
+    random_seed: 42
+    train_proportion: 0.8
+  paths:
+    data_dir_path: data/amlworld/raw-data
+    data_file_path: ${data.paths.data_dir_path}/HI-Small_Trans.csv
+    metadata_file_path: ${data.paths.data_dir_path}/amlworld.metadata.csv
+ml_model:
+  model_type: mlp
+  model_artifact_path: trained-models/amlworld_hi-mlp-smote.ckpt
+  perform_training: ${perform_training}
+  perform_grid_search_hparams: ${perform_training_grid_search_hparams}
+  default_hparams:
+    n_layers: 3
+    hidden_dim: 128
+    lr: 0.001
+    weight_decay: 1.0e-05
+attack:
+  attack_name: square_attack
+  norm: 'inf'
+  max_iter: 200
+  eps: 5.0
+  p_init: 0.5
+  nb_restarts: 15
+  batch_size: 128
+  verbose: true
+
+[2026-06-02 02:52:41,367][src.models.utils][INFO] - Loading model from trained-models/amlworld_hi-mlp-smote.ckpt
+[2026-06-02 02:52:41,708][art.estimators.classification.pytorch][INFO] - Inferred 1 hidden layers on PyTorch classifier.
+[2026-06-02 02:52:47,565][__main__][INFO] - Imbalanced dataset: attacking 885 correctly-classified fraud samples.
+[2026-06-02 02:52:50,158][__main__][INFO] - before-attack: {'is_misclassified_rate': 0.0, 'confusion_matrix': {'TP': 885, 'FP': 0, 'FN': 0, 'TN': 0}, 'fnr': 0.0, 'recall_fraud': 1.0, 'l0_costs_mean': 0.0, 'l0_costs_on_mis_mean': 0.0, 'stand_linf_costs_mean': 0.0, 'stand_linf_costs_on_mis_mean': 0.0}
+[2026-06-02 02:52:50,158][__main__][INFO] - Executing SquareAttack (tabular) attack.
+[2026-06-02 02:52:57,606][__main__][INFO] - after-square-attack: {'is_misclassified_rate': 1.0, 'confusion_matrix': {'TP': 0, 'FP': 0, 'FN': 885, 'TN': 0}, 'fnr': 1.0, 'recall_fraud': 0.0, 'l0_costs_mean': 6.1661016949152545, 'l0_costs_on_mis_mean': 6.1661016949152545, 'stand_linf_costs_mean': 1.0706518625112743e-05, 'stand_linf_costs_on_mis_mean': 1.0706518625112743e-05}
+[2026-06-02 02:52:57,611][__main__][INFO] - Evaluations: {'before-attack': {'is_misclassified_rate': 0.0, 'confusion_matrix': {'TP': 885, 'FP': 0, 'FN': 0, 'TN': 0}, 'fnr': 0.0, 'recall_fraud': 1.0, 'l0_costs_mean': 0.0, 'l0_costs_on_mis_mean': 0.0, 'stand_linf_costs_mean': 0.0, 'stand_linf_costs_on_mis_mean': 0.0}, 'after-square-attack': {'is_misclassified_rate': 1.0, 'confusion_matrix': {'TP': 0, 'FP': 0, 'FN': 885, 'TN': 0}, 'fnr': 1.0, 'recall_fraud': 0.0, 'l0_costs_mean': 6.1661016949152545, 'l0_costs_on_mis_mean': 6.1661016949152545, 'stand_linf_costs_mean': 1.0706518625112743e-05, 'stand_linf_costs_on_mis_mean': 1.0706518625112743e-05, 'delta_fnr': 1.0}}
+[2026-06-02 02:52:57,612][__main__][INFO] - Finished run. results saved in /home/omar/Desktop/TESIS1/adversarial-attack-cafa/outputs/amlworld_hi_smote/square_attack_mlp
