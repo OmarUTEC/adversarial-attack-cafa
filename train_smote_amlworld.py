@@ -25,7 +25,7 @@ DATA_PARAMS = {
     'train_proportion':   0.8,
 }
 
-MODELS_TO_TRAIN = ['mlp', 'lstm_attention']
+MODELS_TO_TRAIN = ['lstm_attention']
 
 HPARAMS = {
     'mlp': {
