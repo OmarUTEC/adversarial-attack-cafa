@@ -1,0 +1,4 @@
+- data=amlworld_hi
+- ml_model=mlp
+- attack=cafa
+- ml_model.model_artifact_path=trained-models/amlworld_hi-mlp-smote.ckpt

@@ -1,0 +1,17 @@
+{
+    "modelo": "MLP",
+    "dataset": "AMLworld HI-Small",
+    "tecnica": "SMOTE ratio 1:10",
+    "metricas": {
+        "AUC-ROC": 0.9351,
+        "Recall": 0.8234,
+        "Precision": 0.0093,
+        "F1": 0.0184
+    },
+    "confusion_matrix": {
+        "TP": 527,
+        "FP": 56058,
+        "FN": 113,
+        "TN": 552703
+    }
+}

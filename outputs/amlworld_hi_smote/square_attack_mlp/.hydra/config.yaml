@@ -1,0 +1,41 @@
+n_samples_to_attack: 2000
+data_split_to_attack: test
+save_attack_artifacts: true
+perform_training: false
+perform_training_grid_search_hparams: false
+perform_attack: true
+transfer:
+  surrogate_model: null
+  target_models: []
+data:
+  name: amlworld_hi
+  params:
+    dataset_name: ${data.name}
+    data_file_path: ${data.paths.data_file_path}
+    metadata_file_path: ${data.paths.metadata_file_path}
+    encoding_method: one_hot_encoding
+    random_seed: 42
+    train_proportion: 0.8
+  paths:
+    data_dir_path: data/amlworld/raw-data
+    data_file_path: ${data.paths.data_dir_path}/HI-Small_Trans.csv
+    metadata_file_path: ${data.paths.data_dir_path}/amlworld.metadata.csv
+ml_model:
+  model_type: mlp
+  model_artifact_path: trained-models/amlworld_hi-mlp-smote.ckpt
+  perform_training: ${perform_training}
+  perform_grid_search_hparams: ${perform_training_grid_search_hparams}
+  default_hparams:
+    n_layers: 3
+    hidden_dim: 128
+    lr: 0.001
+    weight_decay: 1.0e-05
+attack:
+  attack_name: square_attack
+  norm: 'inf'
+  max_iter: 200
+  eps: 5.0
+  p_init: 0.5
+  nb_restarts: 15
+  batch_size: 128
+  verbose: true

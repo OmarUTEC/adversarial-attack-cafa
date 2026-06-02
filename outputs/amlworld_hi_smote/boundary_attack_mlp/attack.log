@@ -1,0 +1,1046 @@
+[2026-06-02 02:50:36,729][__main__][INFO] - Used config: n_samples_to_attack: 2000
+data_split_to_attack: test
+save_attack_artifacts: true
+perform_training: false
+perform_training_grid_search_hparams: false
+perform_attack: true
+transfer:
+  surrogate_model: null
+  target_models: []
+data:
+  name: amlworld_hi
+  params:
+    dataset_name: ${data.name}
+    data_file_path: ${data.paths.data_file_path}
+    metadata_file_path: ${data.paths.metadata_file_path}
+    encoding_method: one_hot_encoding
+    random_seed: 42
+    train_proportion: 0.8
+  paths:
+    data_dir_path: data/amlworld/raw-data
+    data_file_path: ${data.paths.data_dir_path}/HI-Small_Trans.csv
+    metadata_file_path: ${data.paths.data_dir_path}/amlworld.metadata.csv
+ml_model:
+  model_type: mlp
+  model_artifact_path: trained-models/amlworld_hi-mlp-smote.ckpt
+  perform_training: ${perform_training}
+  perform_grid_search_hparams: ${perform_training_grid_search_hparams}
+  default_hparams:
+    n_layers: 3
+    hidden_dim: 128
+    lr: 0.001
+    weight_decay: 1.0e-05
+attack:
+  attack_name: boundary_attack
+  max_iter: 20
+  num_trial: 10
+  sample_size: 10
+  init_size: 50
+  epsilon: 0.1
+  delta: 0.1
+  targeted: false
+  verbose: true
+  feature_clip_min: null
+  feature_clip_max: null
+  integer_indices: null
+  categorical_groups: null
+  editable_mask: null
+
+[2026-06-02 02:50:51,048][src.models.utils][INFO] - Loading model from trained-models/amlworld_hi-mlp-smote.ckpt
+[2026-06-02 02:50:51,410][art.estimators.classification.pytorch][INFO] - Inferred 1 hidden layers on PyTorch classifier.
+[2026-06-02 02:50:57,164][__main__][INFO] - Imbalanced dataset: attacking 885 correctly-classified fraud samples.
+[2026-06-02 02:50:59,662][__main__][INFO] - before-attack: {'is_misclassified_rate': 0.0, 'confusion_matrix': {'TP': 885, 'FP': 0, 'FN': 0, 'TN': 0}, 'fnr': 0.0, 'recall_fraud': 1.0, 'l0_costs_mean': 0.0, 'l0_costs_on_mis_mean': 0.0, 'stand_linf_costs_mean': 0.0, 'stand_linf_costs_on_mis_mean': 0.0}
+[2026-06-02 02:50:59,662][__main__][INFO] - Executing Boundary Attack (tabular).
+[2026-06-02 02:50:59,684][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:50:59,756][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:50:59,802][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:50:59,869][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:50:59,916][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:50:59,964][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:50:59,965][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:00,003][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:00,005][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:00,050][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:00,092][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:00,094][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:00,159][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:00,225][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:00,296][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:00,367][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:00,432][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:00,502][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:00,549][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:00,596][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:00,660][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:00,731][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:00,786][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:00,788][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:00,857][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:00,916][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:00,917][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:00,970][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:00,972][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:01,042][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:01,088][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:01,160][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:01,207][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:01,254][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:01,300][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:01,373][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:01,419][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:01,486][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:01,531][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:01,584][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:01,585][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:01,654][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:01,727][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:01,797][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:01,864][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:01,905][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:01,907][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:01,966][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:01,968][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:02,038][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:02,104][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:02,149][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:02,207][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:02,273][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:02,343][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:02,388][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:02,432][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:02,497][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:02,564][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:02,632][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:02,694][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:02,762][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:02,831][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:02,898][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:02,944][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:02,979][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:02,980][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:03,047][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:03,113][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:03,150][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:03,152][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:03,220][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:03,265][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:03,332][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:03,379][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:03,450][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:03,516][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:03,580][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:03,643][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:03,688][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:03,726][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:03,728][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:03,774][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:03,840][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:03,907][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:03,954][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:04,019][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:04,087][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:04,154][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:04,221][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:04,276][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:04,277][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:04,322][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:04,390][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:04,463][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:04,509][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:04,556][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:04,625][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:04,694][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:04,740][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:04,784][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:04,786][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:04,848][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:04,914][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:04,980][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:05,042][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:05,087][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:05,148][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:05,201][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:05,203][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:05,266][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:05,316][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:05,383][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:05,450][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:05,515][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:05,575][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:05,615][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:05,617][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:05,662][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:05,732][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:05,778][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:05,850][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:05,917][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:05,963][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:06,035][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:06,108][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:06,175][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:06,244][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:06,314][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:06,381][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:06,427][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:06,473][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:06,544][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:06,591][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:06,660][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:06,707][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:06,754][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:06,800][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:06,846][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:06,896][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:06,898][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:06,944][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:06,990][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:07,036][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:07,103][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:07,165][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:07,167][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:07,232][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:07,276][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:07,278][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:07,324][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:07,394][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:07,466][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:07,534][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:07,580][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:07,654][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:07,723][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:07,769][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:07,815][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:07,884][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:07,937][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:07,938][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:07,984][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:08,052][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:08,123][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:08,192][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:08,260][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:08,306][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:08,308][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:08,362][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:08,364][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:08,437][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:08,483][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:08,550][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:08,596][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:08,638][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:08,640][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:08,686][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:08,753][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:08,822][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:08,891][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:08,962][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:09,006][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:09,007][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:09,073][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:09,140][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:09,186][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:09,252][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:09,298][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:09,345][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:09,410][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:09,456][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:09,495][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:09,497][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:09,565][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:09,630][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:09,687][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:09,689][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:09,737][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:09,738][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:09,785][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:09,830][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:09,831][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:09,900][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:09,947][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:10,019][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:10,066][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:10,113][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:10,183][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:10,249][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:10,295][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:10,359][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:10,403][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:10,405][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:10,475][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:10,522][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:10,524][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:10,570][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:10,615][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:10,617][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:10,683][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:10,750][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:10,815][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:10,885][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:10,950][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:10,996][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:11,066][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:11,142][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:11,209][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:11,279][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:11,326][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:11,327][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:11,393][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:11,439][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:11,506][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:11,567][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:11,568][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:11,639][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:11,720][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:11,804][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:11,875][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:11,941][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:11,986][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:12,051][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:12,096][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:12,164][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:12,209][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:12,268][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:12,270][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:12,344][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:12,397][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:12,398][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:12,443][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:12,512][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:12,550][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:12,552][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:12,620][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:12,665][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:12,733][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:12,768][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:12,770][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:12,838][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:12,889][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:12,936][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:12,981][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:13,046][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:13,114][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:13,159][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:13,204][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:13,248][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:13,293][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:13,338][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:13,403][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:13,469][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:13,515][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:13,584][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:13,648][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:13,719][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:13,789][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:13,856][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:13,925][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:13,986][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:14,050][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:14,092][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:14,093][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:14,158][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:14,224][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:14,289][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:14,351][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:14,409][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:14,410][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:14,479][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:14,524][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:14,588][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:14,633][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:14,695][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:14,756][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:14,825][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:14,897][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:14,942][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:15,009][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:15,074][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:15,141][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:15,206][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:15,272][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:15,307][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:15,308][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:15,354][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:15,422][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:15,497][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:15,601][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:15,656][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:15,734][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:15,822][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:15,919][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:15,921][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:16,004][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:16,107][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:16,157][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:16,236][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:16,300][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:16,302][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:16,350][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:16,424][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:16,425][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:16,508][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:16,558][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:16,606][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:16,668][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:16,714][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:16,784][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:16,850][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:16,920][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:16,985][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:17,056][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:17,132][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:17,205][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:17,288][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:17,369][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:17,487][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:17,582][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:17,690][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:17,786][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:17,850][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:17,942][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:18,016][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:18,063][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:18,134][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:18,183][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:18,249][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:18,347][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:18,454][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:18,508][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:18,571][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:18,649][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:18,707][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:18,760][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:18,839][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:18,887][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:18,954][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:19,001][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:19,075][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:19,146][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:19,212][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:19,278][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:19,347][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:19,420][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:19,486][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:19,550][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:19,606][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:19,651][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:19,697][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:19,741][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:19,785][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:19,830][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:19,874][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:19,941][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:20,004][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:20,072][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:20,144][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:20,210][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:20,264][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:20,330][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:20,374][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:20,375][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:20,444][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:20,497][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:20,498][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:20,568][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:20,639][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:20,707][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:20,773][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:20,817][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:20,862][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:20,926][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:20,995][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:21,040][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:21,109][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:21,173][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:21,216][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:21,218][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:21,284][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:21,351][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:21,416][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:21,461][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:21,526][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:21,560][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:21,562][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:21,630][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:21,701][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:21,766][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:21,812][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:21,860][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:21,921][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:21,967][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:22,032][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:22,078][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:22,144][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:22,212][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:22,278][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:22,347][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:22,392][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:22,458][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:22,525][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:22,569][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:22,644][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:22,713][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:22,786][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:22,852][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:22,901][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:22,968][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:23,033][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:23,098][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:23,143][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:23,188][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:23,246][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:23,316][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:23,384][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:23,451][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:23,512][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:23,557][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:23,626][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:23,692][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:23,763][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:23,808][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:23,880][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:23,948][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:24,012][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:24,047][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:24,048][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:24,094][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:24,155][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:24,200][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:24,266][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:24,314][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:24,378][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:24,423][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:24,492][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:24,537][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:24,604][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:24,669][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:24,724][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:24,784][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:24,847][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:24,892][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:24,937][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:25,005][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:25,044][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:25,045][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:25,108][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:25,152][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:25,153][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:25,221][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:25,273][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:25,318][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:25,369][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:25,371][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:25,434][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:25,503][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:25,571][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:25,636][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:25,711][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:25,757][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:25,802][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:25,868][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:25,933][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:25,998][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:26,062][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:26,107][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:26,152][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:26,220][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:26,265][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:26,310][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:26,355][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:26,428][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:26,496][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:26,564][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:26,610][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:26,674][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:26,741][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:26,786][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:26,854][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:26,899][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:26,944][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:27,008][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:27,050][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:27,052][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:27,111][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:27,113][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:27,158][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:27,219][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:27,264][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:27,309][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:27,354][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:27,400][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:27,464][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:27,519][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:27,520][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:27,566][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:27,635][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:27,704][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:27,767][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:27,836][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:27,906][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:27,972][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:28,044][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:28,090][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:28,135][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:28,180][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:28,247][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:28,314][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:28,359][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:28,427][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:28,493][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:28,561][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:28,632][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:28,697][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:28,743][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:28,814][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:28,884][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:28,948][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:28,995][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:29,062][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:29,109][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:29,180][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:29,252][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:29,323][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:29,391][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:29,437][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:29,483][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:29,550][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:29,612][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:29,689][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:29,756][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:29,827][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:29,903][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:29,905][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:29,952][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:30,005][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:30,076][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:30,148][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:30,206][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:30,208][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:30,249][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:30,250][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:30,318][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:30,366][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:30,410][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:30,411][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:30,477][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:30,544][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:30,590][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:30,637][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:30,683][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:30,685][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:30,756][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:30,800][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:30,851][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:30,885][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:30,886][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:30,946][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:31,012][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:31,079][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:31,148][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:31,193][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:31,238][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:31,301][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:31,363][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:31,435][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:31,501][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:31,568][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:31,605][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:31,607][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:31,675][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:31,744][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:31,810][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:31,855][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:31,901][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:31,967][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:32,012][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:32,070][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:32,115][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:32,152][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:32,153][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:32,220][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:32,265][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:32,311][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:32,378][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:32,439][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:32,506][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:32,550][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:32,590][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:32,592][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:32,637][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:32,682][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:32,727][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:32,761][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:32,763][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:32,808][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:32,876][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:32,945][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:33,015][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:33,059][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:33,132][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:33,170][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:33,171][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:33,234][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:33,279][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:33,328][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:33,395][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:33,463][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:33,532][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:33,577][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:33,623][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:33,692][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:33,754][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:33,806][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:33,808][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:33,875][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:33,921][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:33,984][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:34,048][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:34,112][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:34,165][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:34,210][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:34,248][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:34,250][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:34,318][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:34,363][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:34,408][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:34,478][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:34,524][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:34,569][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:34,633][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:34,701][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:34,766][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:34,828][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:34,874][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:34,919][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:34,984][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:35,028][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:35,095][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:35,140][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:35,208][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:35,294][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:35,340][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:35,403][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:35,467][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:35,534][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:35,601][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:35,645][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:35,690][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:35,759][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:35,803][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:35,867][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:35,912][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:35,958][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:35,960][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:36,028][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:36,095][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:36,164][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:36,233][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:36,280][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:36,345][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:36,413][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:36,479][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:36,525][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:36,589][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:36,654][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:36,701][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:36,748][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:36,817][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:36,818][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:36,889][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:36,959][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:37,028][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:37,099][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:37,166][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:37,213][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:37,279][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:37,326][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:37,374][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:37,444][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:37,511][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:37,555][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:37,557][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:37,624][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:37,670][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:37,718][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:37,763][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:37,765][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:37,835][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:37,903][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:37,984][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:38,040][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:38,042][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:38,087][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:38,153][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:38,222][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:38,223][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:38,270][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:38,342][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:38,416][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:38,499][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:38,581][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:38,645][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:38,646][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:38,690][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:38,692][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:38,772][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:38,839][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:38,841][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:38,948][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:39,053][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:39,121][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:39,190][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:39,239][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:39,287][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:39,360][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:39,409][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:39,411][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:39,463][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:39,539][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:39,599][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:39,601][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:39,648][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:39,730][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:39,788][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:39,840][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:39,842][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:39,921][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:39,990][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:40,036][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:40,038][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:40,117][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:40,191][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:40,265][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:40,348][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:40,442][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:40,523][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:40,592][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:40,670][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:40,716][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:40,763][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:40,803][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:40,805][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:40,870][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:40,921][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:41,008][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:41,091][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:41,171][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:41,219][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:41,289][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:41,352][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:41,414][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:41,416][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:41,487][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:41,532][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:41,577][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:41,645][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:41,711][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:41,782][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:41,848][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:41,921][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:41,992][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:42,053][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:42,116][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:42,186][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:42,232][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:42,300][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:42,364][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:42,423][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:42,424][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:42,489][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:42,537][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:42,581][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:42,626][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:42,671][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:42,742][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:42,788][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:42,855][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:42,922][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:42,983][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:43,046][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:43,092][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:43,165][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:43,232][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:43,293][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:43,339][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:43,341][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:43,386][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:43,440][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:43,442][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:43,509][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:43,555][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:43,627][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:43,696][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:43,740][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:43,810][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:43,876][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:43,948][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:44,005][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:44,007][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:44,073][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:44,118][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:44,183][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:44,223][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:44,225][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:44,293][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:44,354][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:44,400][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:44,465][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:44,531][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:44,575][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:44,620][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:44,676][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:44,678][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:44,745][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:44,806][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:44,807][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:44,871][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:44,946][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:45,016][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:45,085][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:45,157][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:45,224][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:45,288][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:45,362][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:45,407][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:45,471][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:45,512][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:45,514][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:45,580][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:45,644][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:45,720][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:45,770][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:45,772][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:45,838][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:45,909][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:45,953][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:45,997][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:46,066][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:46,119][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:46,121][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:46,186][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:46,248][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:46,250][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:46,306][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:46,375][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:46,420][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:46,484][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:46,555][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:46,621][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:46,687][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:46,756][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:46,824][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:46,889][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:46,953][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:46,997][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:47,059][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:47,132][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:47,134][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:47,178][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:47,242][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:47,288][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:47,333][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:47,386][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:47,431][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:47,500][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:47,577][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:47,641][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:47,711][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:47,755][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:47,820][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:47,887][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:47,950][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:47,998][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:48,066][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:48,138][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:48,173][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:48,175][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:48,222][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:48,267][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:48,329][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:48,397][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:48,460][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:48,505][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:48,572][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:48,639][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:48,708][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:48,770][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:48,832][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:48,834][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:48,903][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:48,969][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:49,003][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:49,004][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:49,073][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:49,142][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:49,209][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:49,277][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:49,342][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:49,387][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:49,434][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:49,506][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:49,553][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:49,621][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:49,688][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:49,758][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:49,823][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:49,884][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:49,947][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:50,019][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:50,085][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:50,153][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:50,198][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:50,272][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:50,337][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:50,406][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:50,474][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:50,539][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:50,587][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:50,589][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:50,634][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:50,678][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:50,741][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:50,805][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:50,868][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:50,935][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:51,001][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:51,067][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:51,129][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:51,174][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:51,242][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:51,286][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:51,331][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:51,377][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:51,421][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:51,494][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:51,558][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:51,560][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:51,629][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:51,693][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:51,756][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:51,825][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:51,869][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:51,936][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:51,971][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:51,972][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:52,044][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:52,089][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:52,159][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:52,203][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:52,250][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:52,308][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:52,310][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:52,378][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:52,444][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:52,446][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:52,492][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:52,554][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:52,599][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:52,645][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:52,708][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:52,742][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:52,743][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:52,801][art.attacks.evasion.boundary][WARNING] - Adversarial example found but not optimal.
+[2026-06-02 02:51:52,802][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:52,864][art.attacks.evasion.boundary][INFO] - Found initial adversarial image for untargeted attack.
+[2026-06-02 02:51:52,945][art.attacks.evasion.boundary][INFO] - Success rate of Boundary attack: 100.00%
+[2026-06-02 02:51:55,443][__main__][INFO] - after-boundary-attack: {'is_misclassified_rate': 1.0, 'confusion_matrix': {'TP': 0, 'FP': 0, 'FN': 885, 'TN': 0}, 'fnr': 1.0, 'recall_fraud': 0.0, 'l0_costs_mean': 4.5288135593220336, 'l0_costs_on_mis_mean': 4.5288135593220336, 'stand_linf_costs_mean': 0.05429516729667926, 'stand_linf_costs_on_mis_mean': 0.05429516729667926}
+[2026-06-02 02:51:55,443][__main__][INFO] - Evaluations: {'before-attack': {'is_misclassified_rate': 0.0, 'confusion_matrix': {'TP': 885, 'FP': 0, 'FN': 0, 'TN': 0}, 'fnr': 0.0, 'recall_fraud': 1.0, 'l0_costs_mean': 0.0, 'l0_costs_on_mis_mean': 0.0, 'stand_linf_costs_mean': 0.0, 'stand_linf_costs_on_mis_mean': 0.0}, 'after-boundary-attack': {'is_misclassified_rate': 1.0, 'confusion_matrix': {'TP': 0, 'FP': 0, 'FN': 885, 'TN': 0}, 'fnr': 1.0, 'recall_fraud': 0.0, 'l0_costs_mean': 4.5288135593220336, 'l0_costs_on_mis_mean': 4.5288135593220336, 'stand_linf_costs_mean': 0.05429516729667926, 'stand_linf_costs_on_mis_mean': 0.05429516729667926, 'delta_fnr': 1.0}}
+[2026-06-02 02:51:55,443][__main__][INFO] - Finished run. results saved in /home/omar/Desktop/TESIS1/adversarial-attack-cafa/outputs/amlworld_hi_smote/boundary_attack_mlp
