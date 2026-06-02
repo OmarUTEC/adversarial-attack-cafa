@@ -1,0 +1,22 @@
+{
+  "logistic_regression": {
+    "model": "logistic_regression",
+    "dataset": "amlworld_hi",
+    "training_method": "smote",
+    "accuracy": 0.8287318202628483,
+    "auc_roc": 0.8435928044318706,
+    "auc_pr": 0.00445644675845537,
+    "f1_fraud": 0.009546675270694744,
+    "recall_fraud": 0.7859375
+  },
+  "xgboost": {
+    "model": "xgboost",
+    "dataset": "amlworld_hi",
+    "training_method": "smote",
+    "accuracy": 0.9589564178595047,
+    "auc_roc": 0.9660725073140362,
+    "auc_pr": 0.09543501385742278,
+    "f1_fraud": 0.03659194206917803,
+    "recall_fraud": 0.7421875
+  }
+}
