@@ -13,5 +13,6 @@ tensorboardX==2.6.2.2
 optuna==3.4.0
 pytorch-tabnet
 hydra-core==1.3.2
+imbalanced-learn==0.14.1
 
 

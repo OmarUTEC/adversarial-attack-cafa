@@ -11,6 +11,7 @@ data/creditcard/raw-data/creditcard_2023.csv
 creditcard_2023.csv
 data/amlworld/raw-data/HI-Small_Trans.csv
 data/amlworld/raw-data/LI-Small_Trans.csv
+data/amlworld/smote/*.npz
 data/archive.zip
 data/archive/
 

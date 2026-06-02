@@ -78,7 +78,7 @@ class LitMLP(pl.LightningModule):
         x, y = batch
         logits = self(x)
         self.evaluate(batch, logits=logits, stage='train')
-        return self.loss(logits, y)
+        return nn.functional.cross_entropy(logits, y, weight=self.class_weights)
 
     def evaluate(self, batch, stage=None, logits=None):
         x, y = batch
