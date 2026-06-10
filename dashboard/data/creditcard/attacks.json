@@ -1,0 +1,300 @@
+{
+  "dataset": "Credit Card 2023",
+  "records": [
+    {
+      "dataset": "Credit Card 2023",
+      "attack": "BoundaryAttack",
+      "model": "Log. Reg.",
+      "evasion": 47.95,
+      "recall_post": null,
+      "l0": 14.135,
+      "delta_fnr": null,
+      "linf": 0.171247,
+      "total_fraud": 0,
+      "cm_before": {},
+      "cm_after": {},
+      "baseline": {
+        "auc_roc": 0.9784,
+        "recall": 0.9214,
+        "f1": 0.7453,
+        "precision": 0.6219
+      }
+    },
+    {
+      "dataset": "Credit Card 2023",
+      "attack": "BoundaryAttack",
+      "model": "LSTM-Att.",
+      "evasion": 52.05,
+      "recall_post": null,
+      "l0": 20.948,
+      "delta_fnr": null,
+      "linf": 40.946806,
+      "total_fraud": 0,
+      "cm_before": {},
+      "cm_after": {},
+      "baseline": {
+        "auc_roc": 0.9827,
+        "recall": 0.9375,
+        "f1": 0.8136,
+        "precision": 0.7072
+      }
+    },
+    {
+      "dataset": "Credit Card 2023",
+      "attack": "BoundaryAttack",
+      "model": "MLP",
+      "evasion": 48.0,
+      "recall_post": null,
+      "l0": 14.322,
+      "delta_fnr": null,
+      "linf": 49.165144,
+      "total_fraud": 0,
+      "cm_before": {},
+      "cm_after": {},
+      "baseline": {
+        "auc_roc": 0.9814,
+        "recall": 0.9656,
+        "f1": 0.8291,
+        "precision": 0.7302
+      }
+    },
+    {
+      "dataset": "Credit Card 2023",
+      "attack": "BoundaryAttack",
+      "model": "XGBoost",
+      "evasion": 99.95,
+      "recall_post": null,
+      "l0": 29.85,
+      "delta_fnr": null,
+      "linf": 88.759957,
+      "total_fraud": 0,
+      "cm_before": {},
+      "cm_after": {},
+      "baseline": {
+        "auc_roc": 0.9756,
+        "recall": 0.9995,
+        "f1": 0.8697,
+        "precision": 0.9583
+      }
+    },
+    {
+      "dataset": "Credit Card 2023",
+      "attack": "CaFA",
+      "model": "Log. Reg.",
+      "evasion": 78.5,
+      "recall_post": null,
+      "l0": 9.615,
+      "delta_fnr": null,
+      "linf": 0.025396,
+      "total_fraud": 0,
+      "cm_before": {},
+      "cm_after": {},
+      "baseline": {
+        "auc_roc": 0.9784,
+        "recall": 0.9214,
+        "f1": 0.7453,
+        "precision": 0.6219
+      }
+    },
+    {
+      "dataset": "Credit Card 2023",
+      "attack": "CaFA",
+      "model": "LSTM-Att.",
+      "evasion": 23.7,
+      "recall_post": null,
+      "l0": 0.602,
+      "delta_fnr": null,
+      "linf": 0.000726,
+      "total_fraud": 0,
+      "cm_before": {},
+      "cm_after": {},
+      "baseline": {
+        "auc_roc": 0.9827,
+        "recall": 0.9375,
+        "f1": 0.8136,
+        "precision": 0.7072
+      }
+    },
+    {
+      "dataset": "Credit Card 2023",
+      "attack": "CaFA",
+      "model": "MLP",
+      "evasion": 52.85,
+      "recall_post": null,
+      "l0": 11.935,
+      "delta_fnr": null,
+      "linf": 0.017543,
+      "total_fraud": 0,
+      "cm_before": {},
+      "cm_after": {},
+      "baseline": {
+        "auc_roc": 0.9814,
+        "recall": 0.9656,
+        "f1": 0.8291,
+        "precision": 0.7302
+      }
+    },
+    {
+      "dataset": "Credit Card 2023",
+      "attack": "HopSkipJump",
+      "model": "Log. Reg.",
+      "evasion": 99.2,
+      "recall_post": null,
+      "l0": 29.825,
+      "delta_fnr": null,
+      "linf": 0.157678,
+      "total_fraud": 0,
+      "cm_before": {},
+      "cm_after": {},
+      "baseline": {
+        "auc_roc": 0.9784,
+        "recall": 0.9214,
+        "f1": 0.7453,
+        "precision": 0.6219
+      }
+    },
+    {
+      "dataset": "Credit Card 2023",
+      "attack": "HopSkipJump",
+      "model": "LSTM-Att.",
+      "evasion": 77.9,
+      "recall_post": null,
+      "l0": 29.977,
+      "delta_fnr": null,
+      "linf": 39.41314,
+      "total_fraud": 0,
+      "cm_before": {},
+      "cm_after": {},
+      "baseline": {
+        "auc_roc": 0.9827,
+        "recall": 0.9375,
+        "f1": 0.8136,
+        "precision": 0.7072
+      }
+    },
+    {
+      "dataset": "Credit Card 2023",
+      "attack": "HopSkipJump",
+      "model": "MLP",
+      "evasion": 99.8,
+      "recall_post": null,
+      "l0": 29.864,
+      "delta_fnr": null,
+      "linf": 0.148991,
+      "total_fraud": 0,
+      "cm_before": {},
+      "cm_after": {},
+      "baseline": {
+        "auc_roc": 0.9814,
+        "recall": 0.9656,
+        "f1": 0.8291,
+        "precision": 0.7302
+      }
+    },
+    {
+      "dataset": "Credit Card 2023",
+      "attack": "HopSkipJump",
+      "model": "XGBoost",
+      "evasion": 99.95,
+      "recall_post": null,
+      "l0": 29.967,
+      "delta_fnr": null,
+      "linf": 71.376596,
+      "total_fraud": 0,
+      "cm_before": {},
+      "cm_after": {},
+      "baseline": {
+        "auc_roc": 0.9756,
+        "recall": 0.9995,
+        "f1": 0.8697,
+        "precision": 0.9583
+      }
+    },
+    {
+      "dataset": "Credit Card 2023",
+      "attack": "SquareAttack",
+      "model": "Log. Reg.",
+      "evasion": 100.0,
+      "recall_post": null,
+      "l0": 15.582,
+      "delta_fnr": null,
+      "linf": 0.712419,
+      "total_fraud": 0,
+      "cm_before": {},
+      "cm_after": {},
+      "baseline": {
+        "auc_roc": 0.9784,
+        "recall": 0.9214,
+        "f1": 0.7453,
+        "precision": 0.6219
+      }
+    },
+    {
+      "dataset": "Credit Card 2023",
+      "attack": "SquareAttack",
+      "model": "LSTM-Att.",
+      "evasion": 22.55,
+      "recall_post": null,
+      "l0": 0.415,
+      "delta_fnr": null,
+      "linf": 0.01557,
+      "total_fraud": 0,
+      "cm_before": {},
+      "cm_after": {},
+      "baseline": {
+        "auc_roc": 0.9827,
+        "recall": 0.9375,
+        "f1": 0.8136,
+        "precision": 0.7072
+      }
+    },
+    {
+      "dataset": "Credit Card 2023",
+      "attack": "SquareAttack",
+      "model": "MLP",
+      "evasion": 100.0,
+      "recall_post": null,
+      "l0": 11.916,
+      "delta_fnr": null,
+      "linf": 0.627182,
+      "total_fraud": 0,
+      "cm_before": {},
+      "cm_after": {},
+      "baseline": {
+        "auc_roc": 0.9814,
+        "recall": 0.9656,
+        "f1": 0.8291,
+        "precision": 0.7302
+      }
+    },
+    {
+      "dataset": "Credit Card 2023",
+      "attack": "SquareAttack",
+      "model": "XGBoost",
+      "evasion": 50.3,
+      "recall_post": 99.17,
+      "l0": 18.911,
+      "delta_fnr": 0.0073,
+      "linf": 0.734521,
+      "total_fraud": 960,
+      "cm_before": {
+        "TP": 959,
+        "FP": 0,
+        "FN": 1,
+        "TN": 1040
+      },
+      "cm_after": {
+        "TP": 952,
+        "FP": 998,
+        "FN": 8,
+        "TN": 42
+      },
+      "baseline": {
+        "auc_roc": 0.9756,
+        "recall": 0.9995,
+        "f1": 0.8697,
+        "precision": 0.9583
+      }
+    }
+  ]
+}

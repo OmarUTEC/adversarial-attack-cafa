@@ -42,7 +42,7 @@ EVASION = {
         'CaFA':           {'XGBoost': NAN,    'MLP': 0.529, 'Log. Reg.': 0.785, 'LSTM-Att.': 0.237},
         'HopSkipJump':    {'XGBoost': 0.9995, 'MLP': 0.998, 'Log. Reg.': 0.992, 'LSTM-Att.': 0.779},
         'BoundaryAttack': {'XGBoost': 0.9995, 'MLP': 0.480, 'Log. Reg.': 0.480, 'LSTM-Att.': 0.521},
-        'SquareAttack':   {'XGBoost': NAN,    'MLP': 1.000, 'Log. Reg.': 1.000, 'LSTM-Att.': 0.226},
+        'SquareAttack':   {'XGBoost': 0.0083, 'MLP': 1.000, 'Log. Reg.': 1.000, 'LSTM-Att.': 0.226},
     },
     'AMLworld HI': {
         'CaFA':           {'XGBoost': NAN,   'MLP': NAN,  'Log. Reg.': 1.000, 'LSTM-Att.': NAN},
@@ -56,7 +56,7 @@ L0_DATA = {
         'CaFA':           {'XGBoost': NAN,   'MLP': 11.94, 'Log. Reg.': 9.62,  'LSTM-Att.': 0.60},
         'HopSkipJump':    {'XGBoost': 29.97, 'MLP': 29.86, 'Log. Reg.': 29.83, 'LSTM-Att.': 29.98},
         'BoundaryAttack': {'XGBoost': 29.85, 'MLP': 14.32, 'Log. Reg.': 14.14, 'LSTM-Att.': 20.95},
-        'SquareAttack':   {'XGBoost': NAN,   'MLP': 11.92, 'Log. Reg.': 15.58, 'LSTM-Att.': 0.42},
+        'SquareAttack':   {'XGBoost': 18.91, 'MLP': 11.92, 'Log. Reg.': 15.58, 'LSTM-Att.': 0.42},
     },
     'AMLworld HI': {
         'CaFA':           {'XGBoost': NAN,  'MLP': NAN, 'Log. Reg.': 3.55, 'LSTM-Att.': NAN},

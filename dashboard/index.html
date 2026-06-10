@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>AdversarialAI — Dashboard</title>
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
+:root{
+  --bg:#04081A;--s1:rgba(255,255,255,.04);--s2:rgba(255,255,255,.07);
+  --bd:rgba(255,255,255,.08);--bd2:rgba(255,255,255,.13);
+  --ac:#6366F1;--ac2:#06B6D4;
+  --g:#10B981;--r:#F43F5E;--y:#F59E0B;--p:#A855F7;
+  --tx:#F8FAFC;--mu:#64748B;--mu2:#94A3B8;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--tx);font-family:'Inter',sans-serif;height:100vh;overflow:hidden;}
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 70% 45% at 15% 8%, rgba(99,102,241,.11) 0%,transparent 55%),
+    radial-gradient(ellipse 55% 35% at 85% 85%,rgba(6,182,212,.08) 0%,transparent 55%),
+    radial-gradient(ellipse 40% 30% at 55% 40%,rgba(168,85,247,.05) 0%,transparent 50%);}
+.app{position:relative;z-index:1;display:flex;flex-direction:column;height:100vh;}
+
+/* ── HEADER ── */
+@keyframes shimmer{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+@keyframes pulse-glow{0%,100%{box-shadow:0 0 20px rgba(99,102,241,.5),0 0 40px rgba(6,182,212,.2)}
+  50%{box-shadow:0 0 30px rgba(99,102,241,.8),0 0 60px rgba(6,182,212,.35)}}
+
+header{
+  padding:0 28px;height:58px;display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid var(--bd);flex-shrink:0;position:relative;overflow:hidden;
+  background:linear-gradient(135deg,rgba(4,8,26,.95) 0%,rgba(10,15,40,.95) 50%,rgba(4,8,26,.95) 100%);
+  backdrop-filter:blur(20px);}
+header::before{content:'';position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(90deg,transparent 0%,rgba(99,102,241,.04) 30%,rgba(6,182,212,.04) 70%,transparent 100%);
+  animation:shimmer 6s ease infinite;background-size:200% 200%;}
+header::after{content:'';position:absolute;left:0;right:0;top:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(99,102,241,.6),rgba(6,182,212,.6),transparent);}
+
+.logo{display:flex;align-items:center;gap:14px;}
+.logo-icon{
+  width:40px;height:40px;border-radius:11px;
+  background:linear-gradient(135deg,#4F46E5,#0891B2);
+  display:flex;align-items:center;justify-content:center;
+  animation:pulse-glow 3s ease-in-out infinite;position:relative;}
+.logo-icon::after{content:'';position:absolute;inset:-3px;border-radius:14px;
+  background:linear-gradient(135deg,rgba(99,102,241,.3),rgba(6,182,212,.3));
+  z-index:-1;filter:blur(6px);}
+.logo h1{
+  font-size:1.05rem;font-weight:800;letter-spacing:-.02em;
+  background:linear-gradient(90deg,#E0E7FF,#A5F3FC,#C4B5FD,#E0E7FF);
+  background-size:300% 100%;
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  animation:shimmer 4s ease infinite;}
+.logo p{
+  font-size:.62rem;margin-top:1px;letter-spacing:.06em;text-transform:uppercase;
+  background:linear-gradient(90deg,var(--mu2),var(--ac2),var(--mu2));
+  background-size:200% 100%;
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  animation:shimmer 5s ease infinite;}
+
+.hstats{display:flex;gap:6px;}
+.hs{display:flex;flex-direction:column;align-items:flex-end;padding:7px 14px;border-radius:10px;
+  background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);transition:all .2s;}
+.hs:hover{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.12);}
+.hs .v{font-size:1.1rem;font-weight:800;font-family:'JetBrains Mono';}
+.hs .l{font-size:.55rem;color:var(--mu);text-transform:uppercase;letter-spacing:.09em;margin-top:1px;}
+.v.c{background:linear-gradient(90deg,var(--ac2),#818CF8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.v.g{background:linear-gradient(90deg,var(--g),#34D399);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.v.r{background:linear-gradient(90deg,var(--r),#FB7185);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+
+/* ── CONTROLS ── */
+.controls{
+  padding:9px 28px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  border-bottom:1px solid var(--bd);flex-shrink:0;background:rgba(4,8,26,.4);}
+.clbl{font-size:.6rem;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.09em;white-space:nowrap;}
+.pills{display:flex;gap:3px;}
+.pill{padding:4px 12px;border-radius:999px;border:1px solid var(--bd);background:transparent;
+  color:var(--mu2);cursor:pointer;font-size:.71rem;font-family:'Inter';font-weight:500;transition:all .15s;}
+.pill:hover{background:var(--s2);color:var(--tx);border-color:var(--bd2);}
+.pill.active{background:linear-gradient(135deg,var(--ac),var(--ac2));border-color:transparent;
+  color:#fff;font-weight:600;box-shadow:0 0 12px rgba(99,102,241,.4);}
+.sep{width:1px;height:20px;background:var(--bd);flex-shrink:0;}
+
+/* ── LEGEND BAR ── */
+.legend-bar{
+  display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap;
+  padding:7px 20px;border-bottom:1px solid var(--bd);flex-shrink:0;background:rgba(4,8,26,.3);}
+.li{display:flex;align-items:center;gap:6px;font-size:.72rem;color:var(--mu2);font-weight:500;}
+.li-sym{width:12px;height:12px;flex-shrink:0;}
+
+/* ── MAIN: charts fill all width, floating toolbar on right ── */
+.main{flex:1;position:relative;overflow:hidden;min-height:0;}
+.charts-wrap{width:100%;height:100%;display:flex;flex-direction:column;overflow:hidden;min-height:0;padding:6px 70px 6px 6px;}
+.charts-grid{flex:1;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:4px;min-height:0;}
+.chart-panel{position:relative;background:rgba(255,255,255,.015);border:1px solid var(--bd);border-radius:10px;overflow:hidden;}
+.panel-title{position:absolute;top:7px;left:50%;transform:translateX(-50%);
+  font-size:.74rem;font-weight:700;z-index:10;pointer-events:none;letter-spacing:.01em;}
+.panel-div{width:100%;height:100%;}
+.single-wrap{flex:1;position:relative;min-height:0;padding:4px;}
+.single-inner{width:100%;height:100%;background:rgba(255,255,255,.015);border:1px solid var(--bd);border-radius:10px;overflow:hidden;}
+.single-title{font-size:.82rem;font-weight:700;padding:8px 0 0;text-align:center;}
+#single-chart{width:100%;height:calc(100% - 28px);}
+
+/* ── FLOATING TOOLBAR ── */
+.toolbar{
+  position:absolute;right:6px;top:50%;transform:translateY(-50%);
+  display:flex;flex-direction:column;gap:6px;z-index:10;}
+.tb-btn{
+  width:52px;height:52px;border-radius:12px;
+  border:1px solid var(--bd);background:rgba(4,8,26,.7);
+  backdrop-filter:blur(12px);cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  color:var(--mu);transition:all .2s;position:relative;}
+.tb-btn:hover{background:rgba(99,102,241,.15);border-color:rgba(99,102,241,.4);color:var(--tx);
+  box-shadow:0 0 16px rgba(99,102,241,.2);transform:translateX(-2px);}
+.tb-btn.active-modal{background:rgba(99,102,241,.2);border-color:rgba(99,102,241,.5);color:#A5B4FC;
+  box-shadow:0 0 20px rgba(99,102,241,.3);}
+.tb-btn svg{flex-shrink:0;}
+.tb-lbl{font-size:.5rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;line-height:1;}
+
+/* ── SHARED MODAL STYLES ── */
+@keyframes modal-in{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
+@keyframes fu{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+.modal-overlay{
+  position:fixed;inset:0;z-index:1000;
+  background:rgba(2,5,18,.88);backdrop-filter:blur(8px);
+  display:flex;align-items:center;justify-content:center;padding:24px;}
+.modal-overlay.hidden{display:none;}
+.modal-box{
+  position:relative;width:min(900px,95vw);max-height:90vh;
+  background:linear-gradient(160deg,#0B1120 0%,#060C1E 100%);
+  border:1px solid rgba(99,102,241,.3);border-radius:16px;
+  box-shadow:0 0 60px rgba(99,102,241,.2),0 0 120px rgba(6,182,212,.1);
+  display:flex;flex-direction:column;
+  animation:modal-in .22s cubic-bezier(.4,0,.2,1);}
+.modal-box.wide{width:min(1100px,96vw);}
+.modal-box.narrow{width:min(620px,95vw);}
+.modal-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px 24px 14px;border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0;}
+.modal-title{font-size:1rem;font-weight:800;letter-spacing:-.01em;
+  background:linear-gradient(90deg,#E0E7FF,#A5F3FC);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.modal-subtitle{font-size:.65rem;color:var(--mu);margin-top:2px;}
+.modal-close{
+  width:32px;height:32px;border-radius:8px;border:1px solid var(--bd);
+  background:var(--s1);cursor:pointer;color:var(--mu2);
+  display:flex;align-items:center;justify-content:center;transition:all .15s;font-size:1rem;}
+.modal-close:hover{background:rgba(244,63,94,.15);border-color:rgba(244,63,94,.3);color:#FB7185;}
+.modal-body{flex:1;overflow-y:auto;padding:20px 24px 24px;
+  scrollbar-width:thin;scrollbar-color:var(--bd) transparent;}
+.modal-body::-webkit-scrollbar{width:4px;}
+.modal-body::-webkit-scrollbar-thumb{background:var(--bd);border-radius:2px;}
+
+/* ── RANKING MODAL CONTENT ── */
+.rank-header{font-size:.62rem;font-weight:700;color:var(--mu);text-transform:uppercase;
+  letter-spacing:.1em;margin-bottom:16px;}
+.rank-row{
+  display:flex;align-items:center;gap:12px;
+  background:var(--s1);border:1px solid var(--bd);border-radius:10px;
+  padding:14px 18px;margin-bottom:10px;
+  transition:border-color .15s,background .15s;cursor:default;}
+.rank-row:hover{background:var(--s2);border-color:var(--bd2);}
+.rank-num{font-size:.75rem;font-weight:600;color:var(--mu);font-family:'JetBrains Mono';width:26px;text-align:center;}
+.rank-sym{width:26px;height:26px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.rank-info{flex:1;}
+.rank-name{font-size:.9rem;font-weight:700;margin-bottom:5px;}
+.rank-bar-track{height:5px;background:rgba(255,255,255,.07);border-radius:999px;overflow:hidden;}
+.rank-bar-fill{height:100%;border-radius:999px;transition:width .6s cubic-bezier(.4,0,.2,1);}
+.rank-val{font-size:.88rem;font-weight:700;font-family:'JetBrains Mono';white-space:nowrap;min-width:52px;text-align:right;}
+
+.divider-lbl{font-size:.62rem;font-weight:700;color:var(--mu);text-transform:uppercase;
+  letter-spacing:.1em;margin:20px 0 12px;display:flex;align-items:center;gap:6px;}
+.divider-lbl::after{content:'';flex:1;height:1px;background:var(--bd);}
+.stat-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+.sc{background:var(--s1);border:1px solid var(--bd);border-radius:10px;padding:14px 16px;}
+.sc .sk{font-size:.6rem;color:var(--mu);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;}
+.sc .sv{font-size:1.05rem;font-weight:700;font-family:'JetBrains Mono';}
+.sc .sd{font-size:.62rem;color:var(--mu);margin-top:3px;}
+
+/* ── HEATMAP MODAL CONTENT ── */
+.heatmap-wrap{overflow-x:auto;border-radius:10px;border:1px solid var(--bd);}
+table.hm{width:100%;border-collapse:collapse;}
+table.hm thead tr{background:rgba(99,102,241,.08);border-bottom:1px solid rgba(99,102,241,.2);}
+table.hm th{padding:10px 14px;color:var(--mu2);font-weight:700;text-align:center;
+  border-bottom:1px solid var(--bd);white-space:nowrap;font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;}
+table.hm th:first-child{text-align:left;padding-left:16px;}
+table.hm tbody tr{border-bottom:1px solid rgba(255,255,255,.04);transition:background .12s;}
+table.hm tbody tr:last-child{border-bottom:none;}
+table.hm tbody tr:hover td{background:rgba(255,255,255,.025);}
+table.hm td{padding:10px 14px;text-align:center;font-family:'JetBrains Mono';font-size:.8rem;
+  border-bottom:1px solid rgba(255,255,255,.03);}
+table.hm td:first-child{text-align:left;padding-left:16px;font-family:'Inter';color:var(--mu2);font-size:.78rem;font-weight:500;}
+.hm-note{margin-top:16px;font-size:.67rem;color:var(--mu);line-height:1.7;padding:10px 14px;
+  background:var(--s1);border-radius:8px;border:1px solid var(--bd);}
+
+/* ── DETAIL MODAL CONTENT ── */
+.dc{animation:fu .2s ease;}
+.mh{display:flex;align-items:center;gap:10px;margin-bottom:6px;}
+.mdot{width:13px;height:13px;border-radius:50%;flex-shrink:0;}
+.mname{font-size:1.1rem;font-weight:700;}
+.dsub{font-size:.7rem;color:var(--mu);margin-bottom:14px;line-height:1.5;}
+.abadge{display:inline-flex;align-items:center;gap:4px;padding:3px 11px;border-radius:999px;
+  font-size:.65rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;margin-bottom:14px;}
+.abadge.CaFA{background:rgba(244,63,94,.15);color:#FB7185;border:1px solid rgba(244,63,94,.25);}
+.abadge.HopSkipJump{background:rgba(245,158,11,.15);color:#FCD34D;border:1px solid rgba(245,158,11,.25);}
+.abadge.BoundaryAttack{background:rgba(6,182,212,.15);color:#67E8F9;border:1px solid rgba(6,182,212,.25);}
+.abadge.SquareAttack{background:rgba(168,85,247,.15);color:#C084FC;border:1px solid rgba(168,85,247,.25);}
+.slbl{font-size:.6rem;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.1em;
+  margin:16px 0 10px;display:flex;align-items:center;gap:6px;}
+.slbl::after{content:'';flex:1;height:1px;background:var(--bd);}
+.mgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.mbox{background:var(--s1);border:1px solid var(--bd);border-radius:9px;padding:13px 14px;}
+.mbox .ml{font-size:.6rem;color:var(--mu);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;}
+.mbox .mv{font-size:1.25rem;font-weight:700;font-family:'JetBrains Mono';}
+.mv.red{color:var(--r);}.mv.yellow{color:var(--y);}.mv.green{color:var(--g);}
+.bt{height:4px;background:rgba(255,255,255,.07);border-radius:999px;margin-top:5px;overflow:hidden;}
+.bf{height:100%;border-radius:999px;}
+.cmgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.cmc{background:var(--s1);border:1px solid var(--bd);border-radius:8px;padding:10px 12px;}
+.cmc .ck{font-size:.58rem;color:var(--mu);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;}
+.cmc .cv{font-size:1.05rem;font-weight:700;font-family:'JetBrains Mono';}
+.cmc.tp{border-color:rgba(16,185,129,.3);}.cmc.tp .cv{color:var(--g);}
+.cmc.fn{border-color:rgba(244,63,94,.3);}.cmc.fn .cv{color:var(--r);}
+.cmc.fp{border-color:rgba(245,158,11,.3);}.cmc.fp .cv{color:var(--y);}
+.blgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+.blc{background:var(--s1);border:1px solid var(--bd);border-radius:8px;padding:10px 12px;}
+.blc .bk{font-size:.58rem;color:var(--mu);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;}
+.blc .bv{font-size:.9rem;font-weight:600;font-family:'JetBrains Mono';color:var(--mu2);}
+
+.empty-modal{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-height:200px;gap:12px;text-align:center;padding:40px;}
+.empty-modal svg{color:#334155;}
+.empty-modal h3{font-size:.9rem;font-weight:600;color:var(--mu2);}
+.empty-modal p{font-size:.72rem;color:var(--mu);line-height:1.5;max-width:300px;}
+
+/* ── BASELINE TABLE MODAL ── */
+.bl-section{margin-bottom:28px;}
+.bl-ds-title{font-size:.7rem;font-weight:800;color:var(--ac2);text-transform:uppercase;
+  letter-spacing:.12em;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.bl-ds-title::after{content:'';flex:1;height:1px;background:rgba(6,182,212,.2);}
+.bl-table-wrap{border-radius:10px;border:1px solid rgba(255,255,255,.08);overflow:hidden;}
+table.blt{width:100%;border-collapse:collapse;}
+table.blt thead tr{background:linear-gradient(90deg,rgba(99,102,241,.12),rgba(6,182,212,.08));
+  border-bottom:1px solid rgba(99,102,241,.2);}
+table.blt th{padding:10px 14px;font-weight:700;color:var(--mu2);text-align:right;white-space:nowrap;
+  letter-spacing:.06em;font-size:.63rem;text-transform:uppercase;}
+table.blt th:first-child{text-align:left;padding-left:16px;}
+table.blt tbody tr{border-bottom:1px solid rgba(255,255,255,.04);transition:background .12s;}
+table.blt tbody tr:last-child{border-bottom:none;}
+table.blt tbody tr:hover td{background:rgba(255,255,255,.025);}
+table.blt td{padding:9px 14px;text-align:right;font-family:'JetBrains Mono';font-size:.76rem;white-space:nowrap;color:var(--mu2);}
+table.blt td:first-child{text-align:left;padding-left:16px;font-family:'Inter';font-size:.76rem;font-weight:600;}
+.blt-best{color:#6EE7B7 !important;font-weight:700;}
+.blt-good{color:#93C5FD !important;}
+.blt-warn{color:#FCD34D !important;}
+.blt-bad{color:#FB7185 !important;}
+.bl-footer{margin-top:20px;display:flex;flex-direction:column;gap:10px;}
+.bl-legend{display:flex;flex-wrap:wrap;gap:10px;}
+.bl-leg-item{display:flex;align-items:center;gap:5px;font-size:.66rem;color:var(--mu);}
+.bl-leg-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.bl-note{font-size:.65rem;color:var(--mu);line-height:1.7;padding:12px 14px;
+  background:var(--s1);border-radius:8px;border:1px solid var(--bd);}
+.bl-note strong{color:var(--mu2);}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ MODALS ═══════════════ -->
+
+<!-- RANKING MODAL -->
+<div class="modal-overlay hidden" id="m-ranking">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div><div class="modal-title">Ranking de Robustez</div>
+        <div class="modal-subtitle">Modelos ordenados por tasa de evasión media ante todos los ataques</div></div>
+      <button class="modal-close" data-close="m-ranking">&#x2715;</button>
+    </div>
+    <div class="modal-body" id="mb-ranking"></div>
+  </div>
+</div>
+
+<!-- HEATMAP MODAL -->
+<div class="modal-overlay hidden" id="m-heatmap">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div><div class="modal-title">Mapa de Calor — Evasión</div>
+        <div class="modal-subtitle">Tasa de evasión (%) por modelo y tipo de ataque</div></div>
+      <button class="modal-close" data-close="m-heatmap">&#x2715;</button>
+    </div>
+    <div class="modal-body" id="mb-heatmap"></div>
+  </div>
+</div>
+
+<!-- BASELINE MODAL -->
+<div class="modal-overlay hidden" id="m-baseline">
+  <div class="modal-box wide">
+    <div class="modal-header">
+      <div><div class="modal-title">Métricas de Clasificación Baseline</div>
+        <div class="modal-subtitle">Rendimiento pre-ataque de cada detector sobre el conjunto de test</div></div>
+      <button class="modal-close" data-close="m-baseline">&#x2715;</button>
+    </div>
+    <div class="modal-body" id="mb-baseline">
+      <div style="text-align:center;padding:40px;color:var(--mu)">Cargando métricas...</div>
+    </div>
+  </div>
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="modal-overlay hidden" id="m-detail">
+  <div class="modal-box narrow">
+    <div class="modal-header">
+      <div><div class="modal-title">Detalle del Experimento</div>
+        <div class="modal-subtitle">Métricas completas del punto seleccionado</div></div>
+      <button class="modal-close" data-close="m-detail">&#x2715;</button>
+    </div>
+    <div class="modal-body" id="mb-detail"></div>
+  </div>
+</div>
+
+<!-- ═══════════════ APP ═══════════════ -->
+<div class="app">
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+      </svg>
+    </div>
+    <div>
+      <h1>AdversarialAI Dashboard</h1>
+      <p>Robustez adversarial en detección de fraude financiero</p>
+    </div>
+  </div>
+  <div class="hstats">
+    <div class="hs"><div class="v c">37</div><div class="l">Ataques</div></div>
+    <div class="hs"><div class="v g">4</div><div class="l">Modelos</div></div>
+    <div class="hs"><div class="v r">3</div><div class="l">Datasets</div></div>
+  </div>
+</header>
+
+<div class="controls">
+  <span class="clbl">Dataset</span>
+  <div class="pills" id="ds-btns">
+    <button class="pill active" data-key="creditcard">Credit Card</button>
+    <button class="pill" data-key="amlworld_sinsmote">AMLworld sin SMOTE</button>
+    <button class="pill" data-key="amlworld_smote">AMLworld con SMOTE</button>
+  </div>
+  <div class="sep"></div>
+  <span class="clbl">Ataque</span>
+  <div class="pills" id="atk-btns">
+    <button class="pill active" data-atk="all">Todos</button>
+    <button class="pill" data-atk="CaFA">CaFA</button>
+    <button class="pill" data-atk="HopSkipJump">HopSkipJump</button>
+    <button class="pill" data-atk="BoundaryAttack">BoundaryAttack</button>
+    <button class="pill" data-atk="SquareAttack">SquareAttack</button>
+  </div>
+</div>
+
+<div class="legend-bar" id="legend-bar"></div>
+
+<div class="main">
+  <div id="chart-area" class="charts-wrap"></div>
+
+  <!-- FLOATING TOOLBAR -->
+  <div class="toolbar">
+    <button class="tb-btn" data-modal="m-ranking" title="Ranking de robustez">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
+      </svg>
+      <span class="tb-lbl">Ranking</span>
+    </button>
+    <button class="tb-btn" data-modal="m-heatmap" title="Mapa de calor">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+        <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+      </svg>
+      <span class="tb-lbl">Heatmap</span>
+    </button>
+    <button class="tb-btn" data-modal="m-baseline" title="Métricas baseline" id="btn-baseline">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+      </svg>
+      <span class="tb-lbl">Baseline</span>
+    </button>
+    <button class="tb-btn" id="btn-detail" data-modal="m-detail" title="Detalle del punto seleccionado">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      <span class="tb-lbl">Detalle</span>
+    </button>
+  </div>
+</div>
+
+</div>
+<script>
+const DATA_FILES={
+  creditcard:'data/creditcard/attacks.json',
+  amlworld_sinsmote:'data/amlworld_sinsmote/attacks.json',
+  amlworld_smote:'data/amlworld_smote/attacks.json',
+};
+const BASELINES_FILE='data/baselines.json';
+let baselineCache=null, cache={}, lastRecords=[], lastPoint=null;
+let currentDS='creditcard', currentAtk='all';
+
+const MODEL_COLORS={
+  'XGBoost':'#2563EB','MLP':'#16A34A','Log. Reg.':'#D97706','LSTM-Att.':'#9333EA',
+  'MLP (SMOTE)':'#16A34A','LSTM-Att.(SMOTE)':'#9333EA',
+};
+const MODEL_SYMBOLS={
+  'XGBoost':'circle','MLP':'triangle-up','Log. Reg.':'square','LSTM-Att.':'diamond',
+  'MLP (SMOTE)':'triangle-up','LSTM-Att.(SMOTE)':'diamond',
+};
+const MODEL_SVG={
+  circle:`<svg viewBox="0 0 14 14"><circle cx="7" cy="7" r="6" fill="COLOR" stroke="white" stroke-width="1"/></svg>`,
+  'triangle-up':`<svg viewBox="0 0 14 14"><polygon points="7,1 13,13 1,13" fill="COLOR" stroke="white" stroke-width="1"/></svg>`,
+  square:`<svg viewBox="0 0 14 14"><rect x="1" y="1" width="12" height="12" fill="COLOR" stroke="white" stroke-width="1"/></svg>`,
+  diamond:`<svg viewBox="0 0 14 14"><polygon points="7,1 13,7 7,13 1,7" fill="COLOR" stroke="white" stroke-width="1"/></svg>`,
+};
+const ATTACKS=['CaFA','HopSkipJump','BoundaryAttack','SquareAttack'];
+const ATK_COLORS={CaFA:'#EF4444',HopSkipJump:'#F59E0B',BoundaryAttack:'#3B82F6',SquareAttack:'#8B5CF6'};
+
+/* ── DATA LOADING ── */
+async function load(key){
+  if(cache[key]) return cache[key];
+  const r=await fetch(DATA_FILES[key]);
+  const d=await r.json();
+  cache[key]=d.records;
+  return d.records;
+}
+async function loadBaselines(){
+  if(baselineCache) return baselineCache;
+  const r=await fetch(BASELINES_FILE);
+  baselineCache=await r.json();
+  return baselineCache;
+}
+
+/* ── LEGEND ── */
+function buildLegend(records){
+  const models=[...new Set(records.map(r=>r.model))];
+  document.getElementById('legend-bar').innerHTML=models.map(m=>{
+    const sym=MODEL_SYMBOLS[m]||'circle';
+    const svg=(MODEL_SVG[sym]||MODEL_SVG.circle).replace(/COLOR/g,MODEL_COLORS[m]||'#888');
+    return`<div class="li"><div class="li-sym">${svg}</div><span>${m}</span></div>`;
+  }).join('');
+}
+
+/* ── CHART ── */
+const BASE_LAYOUT={
+  paper_bgcolor:'rgba(0,0,0,0)',plot_bgcolor:'rgba(0,0,0,0)',
+  font:{color:'#94A3B8',family:'Inter',size:10},
+  margin:{t:10,b:42,l:50,r:8},hovermode:'closest',showlegend:false,
+  hoverlabel:{bgcolor:'#1E293B',bordercolor:'rgba(255,255,255,.15)',font:{family:'Inter',size:11,color:'#F8FAFC'}},
+  xaxis:{title:{text:'L0',font:{size:9,color:'#64748B'},standoff:3},
+    gridcolor:'rgba(255,255,255,.04)',zerolinecolor:'rgba(255,255,255,.06)',
+    tickfont:{size:9,color:'#64748B'},tickcolor:'transparent'},
+  yaxis:{title:{text:'Evasión (%)',font:{size:9,color:'#64748B'},standoff:3},
+    range:[-8,118],ticksuffix:'%',
+    gridcolor:'rgba(255,255,255,.04)',zerolinecolor:'rgba(255,255,255,.06)',
+    tickfont:{size:9,color:'#64748B'},tickcolor:'transparent'},
+  shapes:[{type:'line',x0:0,x1:1,xref:'paper',y0:100,y1:100,
+    line:{color:'rgba(244,63,94,.3)',dash:'dash',width:1.1}}],
+};
+const CFG={responsive:true,displaylogo:false,displayModeBar:false};
+
+function makeTrace(model,recs){
+  const color=MODEL_COLORS[model]||'#888';
+  return{
+    x:recs.map(r=>r.l0),y:recs.map(r=>r.evasion),
+    mode:'markers',type:'scatter',name:model,showlegend:false,
+    marker:{symbol:MODEL_SYMBOLS[model]||'circle',size:14,color,
+      line:{color:'rgba(255,255,255,.6)',width:1.5},opacity:.93},
+    customdata:recs,
+    hovertext:recs.map(r=>
+      `<b style="font-size:13px">${r.model}</b><br>`+
+      `<span style="color:#64748B;font-size:10px">${r.attack}</span><br><br>`+
+      `Evasión: <b>${r.evasion}%</b><br>`+
+      `Recall post-ataque: <b>${r.recall_post}%</b><br>`+
+      `L0 medio: <b>${r.l0}</b><br>`+
+      `ΔFNR: <b>${r.delta_fnr}</b><br>`+
+      `<span style="color:#64748B;font-size:9px">← clic para ver detalle completo</span>`),
+    hovertemplate:'%{hovertext}<extra></extra>',
+  };
+}
+
+function renderPanel(divId,records,atk){
+  const pts=records.filter(r=>r.attack===atk);
+  const byModel={};
+  pts.forEach(r=>{(byModel[r.model]=byModel[r.model]||[]).push(r);});
+  const traces=Object.entries(byModel).map(([m,rs])=>makeTrace(m,rs));
+  Plotly.newPlot(divId,traces,BASE_LAYOUT,CFG);
+  document.getElementById(divId).on('plotly_click',ev=>{
+    const pt=ev.points[0];
+    if(pt.customdata){
+      lastPoint=pt.customdata[pt.pointIndex];
+      openModal('m-detail');
+      buildDetailHTML();
+      // highlight detail button
+      document.getElementById('btn-detail').classList.add('active-modal');
+    }
+  });
+}
+
+function render(records){
+  lastRecords=records;
+  buildLegend(records);
+  const area=document.getElementById('chart-area');
+  const atksToShow=currentAtk==='all'?ATTACKS:[currentAtk];
+
+  if(atksToShow.length===4){
+    area.innerHTML=`<div class="charts-grid">${ATTACKS.map((atk,i)=>
+      `<div class="chart-panel">
+        <div class="panel-title" style="color:${ATK_COLORS[atk]}">${atk}</div>
+        <div id="panel-${i}" class="panel-div"></div>
+      </div>`).join('')}</div>`;
+    ATTACKS.forEach((atk,i)=>renderPanel('panel-'+i,records,atk));
+  } else {
+    const atk=atksToShow[0];
+    area.innerHTML=`<div class="single-wrap">
+      <div class="single-inner">
+        <div class="single-title" style="color:${ATK_COLORS[atk]}">${atk}</div>
+        <div id="single-chart"></div>
+      </div></div>`;
+    renderPanel('single-chart',records,atk);
+  }
+}
+
+/* ══════════════════════════════════════
+   MODAL MANAGEMENT
+══════════════════════════════════════ */
+function openModal(id){
+  document.querySelectorAll('.modal-overlay').forEach(m=>m.classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
+  document.querySelectorAll('.tb-btn').forEach(b=>{
+    b.classList.toggle('active-modal', b.dataset.modal===id);
+  });
+}
+function closeModal(id){
+  document.getElementById(id).classList.add('hidden');
+  document.querySelectorAll('.tb-btn').forEach(b=>b.classList.remove('active-modal'));
+}
+function closeAllModals(){
+  document.querySelectorAll('.modal-overlay').forEach(m=>m.classList.add('hidden'));
+  document.querySelectorAll('.tb-btn').forEach(b=>b.classList.remove('active-modal'));
+}
+
+/* ══════════════════════════════════════
+   RANKING MODAL
+══════════════════════════════════════ */
+function buildRankingHTML(records){
+  const models=[...new Set(records.map(r=>r.model))];
+  const avgEv={};
+  models.forEach(m=>{
+    const pts=records.filter(r=>r.model===m&&r.evasion!=null);
+    avgEv[m]=pts.length?pts.reduce((s,r)=>s+r.evasion,0)/pts.length:null;
+  });
+  const sorted=[...models].filter(m=>avgEv[m]!=null).sort((a,b)=>avgEv[a]-avgEv[b]);
+  const medals=['01','02','03','04'];
+
+  const allEv=records.filter(r=>r.evasion!=null).map(r=>r.evasion);
+  const avgAll=(allEv.reduce((s,v)=>s+v,0)/allEv.length).toFixed(1);
+  const mostDangerous=Object.entries(
+    records.filter(r=>r.evasion!=null).reduce((acc,r)=>{
+      acc[r.attack]=(acc[r.attack]||[]);acc[r.attack].push(r.evasion);return acc;
+    },{})
+  ).map(([k,v])=>({k,avg:v.reduce((s,x)=>s+x,0)/v.length})).sort((a,b)=>b.avg-a.avg)[0];
+
+  document.getElementById('mb-ranking').innerHTML=`<div style="animation:fu .2s ease">
+  <div class="rank-header">Modelos ordenados por evasión media (menor = más robusto)</div>
+  ${sorted.map((m,i)=>{
+    const v=avgEv[m];
+    const barColor=v<20?'var(--g)':v<60?'var(--y)':'var(--r)';
+    const valColor=v<20?'color:var(--g)':v<60?'color:var(--y)':'color:var(--r)';
+    const svg=(MODEL_SVG[MODEL_SYMBOLS[m]||'circle']||MODEL_SVG.circle).replace(/COLOR/g,MODEL_COLORS[m]||'#888');
+    return`<div class="rank-row">
+      <div class="rank-num">${medals[i]||i+1}</div>
+      <div class="rank-sym">${svg}</div>
+      <div class="rank-info">
+        <div class="rank-name" style="color:${MODEL_COLORS[m]}">${m}</div>
+        <div class="rank-bar-track"><div class="rank-bar-fill" style="width:${v}%;background:${barColor}"></div></div>
+      </div>
+      <div class="rank-val" style="${valColor}">${v.toFixed(1)}%</div>
+    </div>`;
+  }).join('')}
+  <div class="divider-lbl">Resumen del dataset</div>
+  <div class="stat-cards">
+    <div class="sc">
+      <div class="sk">Evasión media</div>
+      <div class="sv" style="color:var(--r)">${avgAll}%</div>
+      <div class="sd">sobre todos los ataques</div>
+    </div>
+    <div class="sc">
+      <div class="sk">Ataque más efectivo</div>
+      <div class="sv" style="color:var(--y);font-size:.82rem">${mostDangerous.k}</div>
+      <div class="sd">${mostDangerous.avg.toFixed(1)}% evasión media</div>
+    </div>
+    <div class="sc">
+      <div class="sk">Modelo más robusto</div>
+      <div class="sv" style="color:var(--g);font-size:.82rem">${sorted[0]}</div>
+      <div class="sd">${avgEv[sorted[0]].toFixed(1)}% evasión media</div>
+    </div>
+    <div class="sc">
+      <div class="sk">Total experimentos</div>
+      <div class="sv" style="color:var(--ac2)">${records.length}</div>
+      <div class="sd">ataques evaluados</div>
+    </div>
+  </div>
+  </div>`;
+}
+
+/* ══════════════════════════════════════
+   HEATMAP MODAL
+══════════════════════════════════════ */
+function buildHeatmapHTML(records){
+  const models=[...new Set(records.map(r=>r.model))];
+  const atks=[...new Set(records.map(r=>r.attack))];
+
+  function cellBg(v){
+    if(v==null) return 'rgba(30,41,59,.6)';
+    const t=v/100;
+    return`rgba(${Math.round(244*t+16*(1-t))},${Math.round(63*t+185*(1-t))},${Math.round(94*t+129*(1-t))},0.35)`;
+  }
+  function cellColor(v){
+    if(v==null) return '#475569';
+    return v>=80?'#FB7185':v>=30?'#FCD34D':'#6EE7B7';
+  }
+
+  const rows=models.map(m=>{
+    const cells=atks.map(atk=>{
+      const rec=records.find(x=>x.model===m&&x.attack===atk);
+      const v=rec?rec.evasion:null;
+      return`<td style="background:${cellBg(v)};color:${cellColor(v)};font-weight:${v!=null?'600':'400'}">${v!=null?v.toFixed(1)+'%':'—'}</td>`;
+    }).join('');
+    return`<tr><td style="color:${MODEL_COLORS[m]||'var(--mu2)'};font-weight:600">${m}</td>${cells}</tr>`;
+  }).join('');
+
+  document.getElementById('mb-heatmap').innerHTML=`<div style="animation:fu .2s ease">
+  <div class="heatmap-wrap">
+    <table class="hm">
+      <thead><tr>
+        <th>Modelo</th>
+        ${atks.map(a=>`<th style="color:${ATK_COLORS[a]||'#888'}">${a}</th>`).join('')}
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+  </div>
+  <div class="hm-note" style="margin-top:16px">
+    <span style="color:#6EE7B7">■</span> Verde = modelo robusto (&lt;30% evasión) &nbsp;·&nbsp;
+    <span style="color:#FCD34D">■</span> Amarillo = vulnerabilidad moderada (30–80%) &nbsp;·&nbsp;
+    <span style="color:#FB7185">■</span> Rojo = altamente vulnerable (&gt;80%) &nbsp;·&nbsp;
+    <span style="color:#475569">■</span> — = ataque no aplicable
+  </div>
+  </div>`;
+}
+
+/* ══════════════════════════════════════
+   BASELINE MODAL
+══════════════════════════════════════ */
+function buildBaselineHTML(data){
+  const DS_ORDER=['creditcard','amlworld_sinsmote','amlworld_smote'];
+  const DS_LABELS={
+    creditcard:'Credit Card 2023',
+    amlworld_sinsmote:'AMLworld HI-Small — Sin SMOTE',
+    amlworld_smote:'AMLworld HI-Small — Con SMOTE',
+  };
+  function bestIdx(models,key,higherBetter){
+    let best=null,bi=-1;
+    models.forEach((m,i)=>{const v=m[key];if(v==null)return;if(best==null||(higherBetter?v>best:v<best)){best=v;bi=i;}});
+    return bi;
+  }
+  const COLS=[
+    {key:'model',     label:'Modelo',    fmt:v=>v,               higher:null},
+    {key:'fnr',       label:'FNR (%)',   fmt:v=>v.toFixed(2)+'%',higher:false},
+    {key:'fpr',       label:'FPR (%)',   fmt:v=>v.toFixed(2)+'%',higher:false},
+    {key:'accuracy',  label:'Acc (%)',   fmt:v=>v.toFixed(2)+'%',higher:true},
+    {key:'auc_roc',   label:'AUC-ROC',   fmt:v=>v.toFixed(4),    higher:true},
+    {key:'recall',    label:'Recall (%)',fmt:v=>v.toFixed(2)+'%',higher:true},
+    {key:'precision', label:'Prec. (%)', fmt:v=>v.toFixed(2)+'%',higher:true},
+    {key:'f1',        label:'F1 (%)',    fmt:v=>v.toFixed(2)+'%',higher:true},
+  ];
+  function cellCls(col,i,models){
+    if(col.higher===null) return '';
+    if(i===bestIdx(models,col.key,col.higher)) return ' class="blt-best"';
+    const v=models[i][col.key];
+    if(v==null) return '';
+    if(col.higher) return v>=80?' class="blt-good"':v>=40?' class="blt-warn"':' class="blt-bad"';
+    else           return v<=5?' class="blt-good"':v<=25?' class="blt-warn"':' class="blt-bad"';
+  }
+  const sections=DS_ORDER.filter(k=>data[k]).map(dsKey=>{
+    const models=data[dsKey].models;
+    const thead=COLS.map(c=>`<th>${c.label}</th>`).join('');
+    const tbody=models.map((m,i)=>'<tr>'+COLS.map(c=>{
+      if(c.key==='model') return`<td style="color:${MODEL_COLORS[m.model]||'var(--tx)'}">${m.model}</td>`;
+      const v=m[c.key];
+      return`<td${cellCls(c,i,models)}>${v!=null?c.fmt(v):'—'}</td>`;
+    }).join('')+'</tr>').join('');
+    return`<div class="bl-section">
+      <div class="bl-ds-title">${DS_LABELS[dsKey]}</div>
+      <div class="bl-table-wrap">
+        <table class="blt"><thead><tr>${thead}</tr></thead><tbody>${tbody}</tbody></table>
+      </div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('mb-baseline').innerHTML=`<div style="animation:fu .22s ease">
+    ${sections}
+    <div class="bl-footer">
+      <div class="bl-legend">
+        <div class="bl-leg-item"><div class="bl-leg-dot" style="background:#6EE7B7"></div>Mejor valor del dataset</div>
+        <div class="bl-leg-item"><div class="bl-leg-dot" style="background:#93C5FD"></div>Alto rendimiento</div>
+        <div class="bl-leg-item"><div class="bl-leg-dot" style="background:#FCD34D"></div>Rendimiento moderado</div>
+        <div class="bl-leg-item"><div class="bl-leg-dot" style="background:#FB7185"></div>Rendimiento bajo</div>
+      </div>
+      <div class="bl-note">
+        <strong>FNR</strong> = Falsos Negativos (fraude no detectado) &nbsp;·&nbsp;
+        <strong>FPR</strong> = Falsos Positivos (alarmas falsas) &nbsp;·&nbsp;
+        <strong>Acc</strong> = Exactitud global &nbsp;·&nbsp;
+        <strong>AUC-ROC</strong> = Área bajo curva ROC &nbsp;·&nbsp;
+        <strong>Recall</strong> = Sensibilidad sobre clase fraude &nbsp;·&nbsp;
+        <strong>Prec.</strong> = Precisión &nbsp;·&nbsp;
+        <strong>F1</strong> = Media armónica Precisión–Recall. Umbral = 0.5.
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ══════════════════════════════════════
+   DETAIL MODAL
+══════════════════════════════════════ */
+function buildDetailHTML(){
+  const el=document.getElementById('mb-detail');
+  if(!lastPoint){
+    el.innerHTML=`<div class="empty-modal">
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+      </svg>
+      <h3>Ningún punto seleccionado</h3>
+      <p>Haz clic sobre cualquier marcador en los gráficos para ver las métricas detalladas del experimento.</p>
+    </div>`;
+    return;
+  }
+  const r=lastPoint;
+  const color=MODEL_COLORS[r.model]||'#888';
+  const bl=r.baseline||{};
+  const evC=r.evasion>=80?'red':r.evasion>=30?'yellow':'green';
+  const rcC=r.recall_post>=70?'green':r.recall_post>=20?'yellow':'red';
+  const barC=c=>c==='red'?'var(--r)':c==='yellow'?'var(--y)':'var(--g)';
+  const pct=v=>v!=null?v.toFixed(2)+'%':'—';
+  const num=(v,d=3)=>v!=null?v.toFixed(d):'—';
+
+  el.innerHTML=`<div class="dc">
+    <div class="mh">
+      <div class="mdot" style="background:${color};box-shadow:0 0 10px ${color}50"></div>
+      <div class="mname">${r.model}</div>
+    </div>
+    <div class="abadge ${r.attack}">${r.attack}</div>
+    <div class="dsub">${r.dataset} &nbsp;·&nbsp; ${r.total_fraud} muestras de fraude evaluadas</div>
+
+    <div class="slbl">Métricas post-ataque</div>
+    <div class="mgrid">
+      <div class="mbox"><div class="ml">Evasión</div>
+        <div class="mv ${evC}">${pct(r.evasion)}</div>
+        <div class="bt"><div class="bf" style="width:${r.evasion||0}%;background:${barC(evC)}"></div></div></div>
+      <div class="mbox"><div class="ml">Recall post-ataque</div>
+        <div class="mv ${rcC}">${pct(r.recall_post)}</div>
+        <div class="bt"><div class="bf" style="width:${r.recall_post||0}%;background:${barC(rcC)}"></div></div></div>
+      <div class="mbox"><div class="ml">L0 medio</div><div class="mv">${num(r.l0)}</div></div>
+      <div class="mbox"><div class="ml">ΔFNR</div><div class="mv ${evC}">${num(r.delta_fnr,4)}</div></div>
+    </div>
+
+    <div class="slbl">Matriz de confusión post-ataque</div>
+    <div class="cmgrid">
+      <div class="cmc tp"><div class="ck">TP — detectado</div><div class="cv">${r.cm_after?.TP??'—'}</div></div>
+      <div class="cmc fn"><div class="ck">FN — evadido</div><div class="cv">${r.cm_after?.FN??'—'}</div></div>
+      <div class="cmc fp"><div class="ck">FP — falso positivo</div><div class="cv">${r.cm_after?.FP??'—'}</div></div>
+      <div class="cmc"><div class="ck">TN — correcto</div><div class="cv">${r.cm_after?.TN??'—'}</div></div>
+    </div>
+
+    <div class="slbl">Baseline del modelo</div>
+    <div class="blgrid">
+      <div class="blc"><div class="bk">AUC-ROC</div><div class="bv">${bl.auc_roc??'—'}</div></div>
+      <div class="blc"><div class="bk">Recall</div><div class="bv">${bl.recall!=null?(bl.recall*100).toFixed(1)+'%':'—'}</div></div>
+      <div class="blc"><div class="bk">F1</div><div class="bv">${bl.f1!=null?(bl.f1*100).toFixed(2)+'%':'—'}</div></div>
+      <div class="blc"><div class="bk">Precisión</div><div class="bv">${bl.precision!=null?(bl.precision*100).toFixed(2)+'%':'—'}</div></div>
+    </div>
+  </div>`;
+}
+
+/* ══════════════════════════════════════
+   EVENTS
+══════════════════════════════════════ */
+
+// Dataset pills
+document.querySelectorAll('#ds-btns .pill').forEach(b=>b.addEventListener('click',()=>{
+  currentDS=b.dataset.key;
+  document.querySelectorAll('#ds-btns .pill').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');
+  lastPoint=null;
+  load(currentDS).then(render);
+}));
+
+// Attack pills
+document.querySelectorAll('#atk-btns .pill').forEach(b=>b.addEventListener('click',()=>{
+  currentAtk=b.dataset.atk;
+  document.querySelectorAll('#atk-btns .pill').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');
+  load(currentDS).then(render);
+}));
+
+// Toolbar buttons → open modals with content
+document.querySelectorAll('.tb-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const id=btn.dataset.modal;
+    // toggle: if already open → close
+    if(!document.getElementById(id).classList.contains('hidden')){
+      closeAllModals(); return;
+    }
+    openModal(id);
+    if(id==='m-ranking')  buildRankingHTML(lastRecords);
+    if(id==='m-heatmap')  buildHeatmapHTML(lastRecords);
+    if(id==='m-detail')   buildDetailHTML();
+    if(id==='m-baseline') loadBaselines().then(buildBaselineHTML);
+  });
+});
+
+// Close buttons (× on each modal)
+document.querySelectorAll('.modal-close').forEach(btn=>{
+  btn.addEventListener('click',()=>closeModal(btn.dataset.close));
+});
+
+// Click outside modal box → close
+document.querySelectorAll('.modal-overlay').forEach(ov=>{
+  ov.addEventListener('click',e=>{ if(e.target===ov) closeAllModals(); });
+});
+
+// ESC key
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeAllModals(); });
+
+// Init
+load('creditcard').then(render);
+</script>
+</body>
+</html>

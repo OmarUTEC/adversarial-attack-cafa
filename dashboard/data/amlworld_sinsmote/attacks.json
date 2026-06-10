@@ -1,0 +1,208 @@
+{
+  "dataset": "AMLworld HI-Small (sin SMOTE)",
+  "records": [
+    {
+      "dataset": "AMLworld HI-Small (sin SMOTE)",
+      "attack": "BoundaryAttack",
+      "model": "XGBoost",
+      "evasion": 100.0,
+      "recall_post": 0.0,
+      "l0": 5.81,
+      "delta_fnr": 1.0,
+      "linf": 0.28966,
+      "total_fraud": 369,
+      "cm_before": {
+        "TP": 369,
+        "FP": 0,
+        "FN": 0,
+        "TN": 0
+      },
+      "cm_after": {
+        "TP": 0,
+        "FP": 0,
+        "FN": 369,
+        "TN": 0
+      },
+      "baseline": {
+        "auc_roc": 0.966,
+        "recall": 0.3395,
+        "f1": 0.2032,
+        "precision": 0.2018
+      }
+    },
+    {
+      "dataset": "AMLworld HI-Small (sin SMOTE)",
+      "attack": "BoundaryAttack",
+      "model": "Log. Reg.",
+      "evasion": 100.0,
+      "recall_post": 0.0,
+      "l0": 4.509,
+      "delta_fnr": 1.0,
+      "linf": 0.011193,
+      "total_fraud": 116,
+      "cm_before": {
+        "TP": 116,
+        "FP": 0,
+        "FN": 0,
+        "TN": 0
+      },
+      "cm_after": {
+        "TP": 0,
+        "FP": 0,
+        "FN": 116,
+        "TN": 0
+      },
+      "baseline": {
+        "auc_roc": 0.5672,
+        "recall": 0.1067,
+        "f1": 0.0103,
+        "precision": 0.0052
+      }
+    },
+    {
+      "dataset": "AMLworld HI-Small (sin SMOTE)",
+      "attack": "CaFA",
+      "model": "Log. Reg.",
+      "evasion": 100.0,
+      "recall_post": 0.0,
+      "l0": 3.552,
+      "delta_fnr": 1.0,
+      "linf": 0.01852,
+      "total_fraud": 116,
+      "cm_before": {
+        "TP": 116,
+        "FP": 0,
+        "FN": 0,
+        "TN": 0
+      },
+      "cm_after": {
+        "TP": 0,
+        "FP": 0,
+        "FN": 116,
+        "TN": 0
+      },
+      "baseline": {
+        "auc_roc": 0.5672,
+        "recall": 0.1067,
+        "f1": 0.0103,
+        "precision": 0.0052
+      }
+    },
+    {
+      "dataset": "AMLworld HI-Small (sin SMOTE)",
+      "attack": "HopSkipJump",
+      "model": "XGBoost",
+      "evasion": 2.17,
+      "recall_post": 97.83,
+      "l0": 2.558,
+      "delta_fnr": 0.0217,
+      "linf": 1.1e-05,
+      "total_fraud": 369,
+      "cm_before": {
+        "TP": 369,
+        "FP": 0,
+        "FN": 0,
+        "TN": 0
+      },
+      "cm_after": {
+        "TP": 361,
+        "FP": 0,
+        "FN": 8,
+        "TN": 0
+      },
+      "baseline": {
+        "auc_roc": 0.966,
+        "recall": 0.3395,
+        "f1": 0.2032,
+        "precision": 0.2018
+      }
+    },
+    {
+      "dataset": "AMLworld HI-Small (sin SMOTE)",
+      "attack": "HopSkipJump",
+      "model": "Log. Reg.",
+      "evasion": 5.17,
+      "recall_post": 94.83,
+      "l0": 2.784,
+      "delta_fnr": 0.0517,
+      "linf": 5e-06,
+      "total_fraud": 116,
+      "cm_before": {
+        "TP": 116,
+        "FP": 0,
+        "FN": 0,
+        "TN": 0
+      },
+      "cm_after": {
+        "TP": 110,
+        "FP": 0,
+        "FN": 6,
+        "TN": 0
+      },
+      "baseline": {
+        "auc_roc": 0.5672,
+        "recall": 0.1067,
+        "f1": 0.0103,
+        "precision": 0.0052
+      }
+    },
+    {
+      "dataset": "AMLworld HI-Small (sin SMOTE)",
+      "attack": "SquareAttack",
+      "model": "Log. Reg.",
+      "evasion": 100.0,
+      "recall_post": 0.0,
+      "l0": 6.009,
+      "delta_fnr": 1.0,
+      "linf": 1.1e-05,
+      "total_fraud": 116,
+      "cm_before": {
+        "TP": 116,
+        "FP": 0,
+        "FN": 0,
+        "TN": 0
+      },
+      "cm_after": {
+        "TP": 0,
+        "FP": 0,
+        "FN": 116,
+        "TN": 0
+      },
+      "baseline": {
+        "auc_roc": 0.5672,
+        "recall": 0.1067,
+        "f1": 0.0103,
+        "precision": 0.0052
+      }
+    },
+    {
+      "dataset": "AMLworld HI-Small (sin SMOTE)",
+      "attack": "SquareAttack",
+      "model": "XGBoost",
+      "evasion": 100.0,
+      "recall_post": 0.0,
+      "l0": 6.046,
+      "delta_fnr": 1.0,
+      "linf": 1.1e-05,
+      "total_fraud": 369,
+      "cm_before": {
+        "TP": 369,
+        "FP": 0,
+        "FN": 0,
+        "TN": 0
+      },
+      "cm_after": {
+        "TP": 0,
+        "FP": 0,
+        "FN": 369,
+        "TN": 0
+      },
+      "baseline": {
+        "auc_roc": 0.966,
+        "recall": 0.3395,
+        "f1": 0.2032,
+        "precision": 0.2018
+      }
+    }
+  ]
+}

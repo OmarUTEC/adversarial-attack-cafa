@@ -1,0 +1,5 @@
+# Python build scripts (not needed for deployment)
+build_baselines.py
+build_data.py
+__pycache__/
+*.pyc

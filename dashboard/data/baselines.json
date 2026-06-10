@@ -1,0 +1,197 @@
+{
+  "creditcard": {
+    "label": "Credit Card 2023",
+    "models": [
+      {
+        "model": "XGBoost",
+        "auc_roc": 1.0,
+        "auc_pr": 1.0,
+        "accuracy": 99.98,
+        "recall": 99.97,
+        "precision": 99.99,
+        "f1": 99.98,
+        "fnr": 0.03,
+        "fpr": 0.01,
+        "tp": 56959,
+        "fp": 8,
+        "fn": 17,
+        "tn": 56742
+      },
+      {
+        "model": "MLP",
+        "auc_roc": 1.0,
+        "auc_pr": 1.0,
+        "accuracy": 99.97,
+        "recall": 99.98,
+        "precision": 99.97,
+        "f1": 99.97,
+        "fnr": 0.02,
+        "fpr": 0.03,
+        "tp": 56962,
+        "fp": 17,
+        "fn": 14,
+        "tn": 56733
+      },
+      {
+        "model": "Log. Reg.",
+        "auc_roc": 0.9994,
+        "auc_pr": 0.9993,
+        "accuracy": 99.26,
+        "recall": 99.21,
+        "precision": 99.3,
+        "f1": 99.26,
+        "fnr": 0.79,
+        "fpr": 0.7,
+        "tp": 56528,
+        "fp": 397,
+        "fn": 448,
+        "tn": 56353
+      },
+      {
+        "model": "LSTM-Att.",
+        "auc_roc": 0.8183,
+        "auc_pr": 0.7372,
+        "accuracy": 79.21,
+        "recall": 94.16,
+        "precision": 72.53,
+        "f1": 81.94,
+        "fnr": 5.84,
+        "fpr": 35.81,
+        "tp": 53649,
+        "fp": 20322,
+        "fn": 3327,
+        "tn": 36428
+      }
+    ]
+  },
+  "amlworld_sinsmote": {
+    "label": "AMLworld HI-Small (sin SMOTE)",
+    "models": [
+      {
+        "model": "XGBoost",
+        "auc_roc": 0.966,
+        "auc_pr": 0.1833,
+        "accuracy": 99.72,
+        "recall": 33.95,
+        "precision": 14.5,
+        "f1": 20.32,
+        "fnr": 66.05,
+        "fpr": 0.21,
+        "tp": 369,
+        "fp": 2176,
+        "fn": 718,
+        "tn": 1012406
+      },
+      {
+        "model": "MLP",
+        "auc_roc": 0.9131,
+        "auc_pr": 0.0146,
+        "accuracy": 99.89,
+        "recall": 0.0,
+        "precision": 0.0,
+        "f1": 0.0,
+        "fnr": 100.0,
+        "fpr": 0.0,
+        "tp": 0,
+        "fp": 0,
+        "fn": 1087,
+        "tn": 1014582
+      },
+      {
+        "model": "Log. Reg.",
+        "auc_roc": 0.8172,
+        "auc_pr": 0.006,
+        "accuracy": 97.81,
+        "recall": 10.67,
+        "precision": 0.54,
+        "f1": 1.03,
+        "fnr": 89.33,
+        "fpr": 2.09,
+        "tp": 116,
+        "fp": 21222,
+        "fn": 971,
+        "tn": 993360
+      },
+      {
+        "model": "LSTM-Att.",
+        "auc_roc": 0.6089,
+        "auc_pr": 0.0014,
+        "accuracy": 99.89,
+        "recall": 0.0,
+        "precision": 0.0,
+        "f1": 0.0,
+        "fnr": 100.0,
+        "fpr": 0.0,
+        "tp": 0,
+        "fp": 0,
+        "fn": 1087,
+        "tn": 1014582
+      }
+    ]
+  },
+  "amlworld_smote": {
+    "label": "AMLworld HI-Small (con SMOTE)",
+    "models": [
+      {
+        "model": "XGBoost",
+        "auc_roc": 0.9634,
+        "auc_pr": 0.084,
+        "accuracy": 95.93,
+        "recall": 73.69,
+        "precision": 1.91,
+        "f1": 3.73,
+        "fnr": 26.31,
+        "fpr": 4.05,
+        "tp": 801,
+        "fp": 41100,
+        "fn": 286,
+        "tn": 973482
+      },
+      {
+        "model": "MLP (SMOTE)",
+        "auc_roc": 0.9297,
+        "auc_pr": 0.0226,
+        "accuracy": 90.85,
+        "recall": 81.42,
+        "precision": 0.95,
+        "f1": 1.87,
+        "fnr": 18.58,
+        "fpr": 9.14,
+        "tp": 885,
+        "fp": 92691,
+        "fn": 202,
+        "tn": 921891
+      },
+      {
+        "model": "Log. Reg.",
+        "auc_roc": 0.8533,
+        "auc_pr": 0.0047,
+        "accuracy": 82.97,
+        "recall": 79.94,
+        "precision": 0.5,
+        "f1": 0.99,
+        "fnr": 20.06,
+        "fpr": 17.03,
+        "tp": 869,
+        "fp": 172797,
+        "fn": 218,
+        "tn": 841785
+      },
+      {
+        "model": "LSTM-Att.(SMOTE)",
+        "auc_roc": 0.7048,
+        "auc_pr": 0.0025,
+        "accuracy": 18.01,
+        "recall": 96.04,
+        "precision": 0.13,
+        "f1": 0.25,
+        "fnr": 3.96,
+        "fpr": 82.07,
+        "tp": 1044,
+        "fp": 832707,
+        "fn": 43,
+        "tn": 181875
+      }
+    ]
+  }
+}

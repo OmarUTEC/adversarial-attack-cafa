@@ -1,0 +1,440 @@
+{
+  "dataset": "AMLworld HI-Small (con SMOTE)",
+  "records": [
+    {
+      "dataset": "AMLworld HI-Small (con SMOTE)",
+      "attack": "BoundaryAttack",
+      "model": "Log. Reg.",
+      "evasion": 99.88,
+      "recall_post": 0.12,
+      "l0": 4.755,
+      "delta_fnr": 0.9988,
+      "linf": 0.004398,
+      "total_fraud": 869,
+      "cm_before": {
+        "TP": 869,
+        "FP": 0,
+        "FN": 0,
+        "TN": 0
+      },
+      "cm_after": {
+        "TP": 1,
+        "FP": 0,
+        "FN": 868,
+        "TN": 0
+      },
+      "baseline": {
+        "auc_roc": 0.8436,
+        "recall": 0.7859,
+        "f1": 0.0095,
+        "precision": 0.0048
+      }
+    },
+    {
+      "dataset": "AMLworld HI-Small (con SMOTE)",
+      "attack": "BoundaryAttack",
+      "model": "LSTM-Att.(SMOTE)",
+      "evasion": 0.48,
+      "recall_post": 99.52,
+      "l0": 0.04,
+      "delta_fnr": 0.0048,
+      "linf": 0.002822,
+      "total_fraud": 1044,
+      "cm_before": {
+        "TP": 1044,
+        "FP": 0,
+        "FN": 0,
+        "TN": 0
+      },
+      "cm_after": {
+        "TP": 1039,
+        "FP": 0,
+        "FN": 5,
+        "TN": 0
+      },
+      "baseline": {
+        "auc_roc": 0.7132,
+        "recall": 0.9688,
+        "f1": 0.0025,
+        "precision": 0.0012
+      }
+    },
+    {
+      "dataset": "AMLworld HI-Small (con SMOTE)",
+      "attack": "BoundaryAttack",
+      "model": "MLP (SMOTE)",
+      "evasion": 100.0,
+      "recall_post": 0.0,
+      "l0": 4.529,
+      "delta_fnr": 1.0,
+      "linf": 0.054295,
+      "total_fraud": 885,
+      "cm_before": {
+        "TP": 885,
+        "FP": 0,
+        "FN": 0,
+        "TN": 0
+      },
+      "cm_after": {
+        "TP": 0,
+        "FP": 0,
+        "FN": 885,
+        "TN": 0
+      },
+      "baseline": {
+        "auc_roc": 0.9351,
+        "recall": 0.8234,
+        "f1": 0.0184,
+        "precision": 0.0093
+      }
+    },
+    {
+      "dataset": "AMLworld HI-Small (con SMOTE)",
+      "attack": "BoundaryAttack",
+      "model": "XGBoost",
+      "evasion": 100.0,
+      "recall_post": 0.0,
+      "l0": 5.011,
+      "delta_fnr": 1.0,
+      "linf": 0.131533,
+      "total_fraud": 801,
+      "cm_before": {
+        "TP": 801,
+        "FP": 0,
+        "FN": 0,
+        "TN": 0
+      },
+      "cm_after": {
+        "TP": 0,
+        "FP": 0,
+        "FN": 801,
+        "TN": 0
+      },
+      "baseline": {
+        "auc_roc": 0.9661,
+        "recall": 0.7422,
+        "f1": 0.0366,
+        "precision": 0.0195
+      }
+    },
+    {
+      "dataset": "AMLworld HI-Small (con SMOTE)",
+      "attack": "CaFA",
+      "model": "Log. Reg.",
+      "evasion": 100.0,
+      "recall_post": 0.0,
+      "l0": 3.524,
+      "delta_fnr": 1.0,
+      "linf": 0.022565,
+      "total_fraud": 869,
+      "cm_before": {
+        "TP": 869,
+        "FP": 0,
+        "FN": 0,
+        "TN": 0
+      },
+      "cm_after": {
+        "TP": 0,
+        "FP": 0,
+        "FN": 869,
+        "TN": 0
+      },
+      "baseline": {
+        "auc_roc": 0.8436,
+        "recall": 0.7859,
+        "f1": 0.0095,
+        "precision": 0.0048
+      }
+    },
+    {
+      "dataset": "AMLworld HI-Small (con SMOTE)",
+      "attack": "CaFA",
+      "model": "LSTM-Att.(SMOTE)",
+      "evasion": 68.58,
+      "recall_post": 31.42,
+      "l0": 2.478,
+      "delta_fnr": 0.6858,
+      "linf": 0.004743,
+      "total_fraud": 1044,
+      "cm_before": {
+        "TP": 1044,
+        "FP": 0,
+        "FN": 0,
+        "TN": 0
+      },
+      "cm_after": {
+        "TP": 328,
+        "FP": 0,
+        "FN": 716,
+        "TN": 0
+      },
+      "baseline": {
+        "auc_roc": 0.7132,
+        "recall": 0.9688,
+        "f1": 0.0025,
+        "precision": 0.0012
+      }
+    },
+    {
+      "dataset": "AMLworld HI-Small (con SMOTE)",
+      "attack": "CaFA",
+      "model": "MLP (SMOTE)",
+      "evasion": 98.76,
+      "recall_post": 1.24,
+      "l0": 4.666,
+      "delta_fnr": 0.9876,
+      "linf": 0.023892,
+      "total_fraud": 885,
+      "cm_before": {
+        "TP": 885,
+        "FP": 0,
+        "FN": 0,
+        "TN": 0
+      },
+      "cm_after": {
+        "TP": 11,
+        "FP": 0,
+        "FN": 874,
+        "TN": 0
+      },
+      "baseline": {
+        "auc_roc": 0.9351,
+        "recall": 0.8234,
+        "f1": 0.0184,
+        "precision": 0.0093
+      }
+    },
+    {
+      "dataset": "AMLworld HI-Small (con SMOTE)",
+      "attack": "HopSkipJump",
+      "model": "Log. Reg.",
+      "evasion": 29.57,
+      "recall_post": 70.43,
+      "l0": 5.888,
+      "delta_fnr": 0.2957,
+      "linf": 0.00219,
+      "total_fraud": 869,
+      "cm_before": {
+        "TP": 869,
+        "FP": 0,
+        "FN": 0,
+        "TN": 0
+      },
+      "cm_after": {
+        "TP": 612,
+        "FP": 0,
+        "FN": 257,
+        "TN": 0
+      },
+      "baseline": {
+        "auc_roc": 0.8436,
+        "recall": 0.7859,
+        "f1": 0.0095,
+        "precision": 0.0048
+      }
+    },
+    {
+      "dataset": "AMLworld HI-Small (con SMOTE)",
+      "attack": "HopSkipJump",
+      "model": "LSTM-Att.(SMOTE)",
+      "evasion": 0.0,
+      "recall_post": 100.0,
+      "l0": 0.0,
+      "delta_fnr": 0.0,
+      "linf": 0.0,
+      "total_fraud": 1044,
+      "cm_before": {
+        "TP": 1044,
+        "FP": 0,
+        "FN": 0,
+        "TN": 0
+      },
+      "cm_after": {
+        "TP": 1044,
+        "FP": 0,
+        "FN": 0,
+        "TN": 0
+      },
+      "baseline": {
+        "auc_roc": 0.7132,
+        "recall": 0.9688,
+        "f1": 0.0025,
+        "precision": 0.0012
+      }
+    },
+    {
+      "dataset": "AMLworld HI-Small (con SMOTE)",
+      "attack": "HopSkipJump",
+      "model": "MLP (SMOTE)",
+      "evasion": 95.14,
+      "recall_post": 4.86,
+      "l0": 9.528,
+      "delta_fnr": 0.9514,
+      "linf": 0.842508,
+      "total_fraud": 885,
+      "cm_before": {
+        "TP": 885,
+        "FP": 0,
+        "FN": 0,
+        "TN": 0
+      },
+      "cm_after": {
+        "TP": 43,
+        "FP": 0,
+        "FN": 842,
+        "TN": 0
+      },
+      "baseline": {
+        "auc_roc": 0.9351,
+        "recall": 0.8234,
+        "f1": 0.0184,
+        "precision": 0.0093
+      }
+    },
+    {
+      "dataset": "AMLworld HI-Small (con SMOTE)",
+      "attack": "HopSkipJump",
+      "model": "XGBoost",
+      "evasion": 99.38,
+      "recall_post": 0.62,
+      "l0": 9.923,
+      "delta_fnr": 0.9938,
+      "linf": 1.029044,
+      "total_fraud": 801,
+      "cm_before": {
+        "TP": 801,
+        "FP": 0,
+        "FN": 0,
+        "TN": 0
+      },
+      "cm_after": {
+        "TP": 5,
+        "FP": 0,
+        "FN": 796,
+        "TN": 0
+      },
+      "baseline": {
+        "auc_roc": 0.9661,
+        "recall": 0.7422,
+        "f1": 0.0366,
+        "precision": 0.0195
+      }
+    },
+    {
+      "dataset": "AMLworld HI-Small (con SMOTE)",
+      "attack": "SquareAttack",
+      "model": "Log. Reg.",
+      "evasion": 89.53,
+      "recall_post": 10.47,
+      "l0": 7.267,
+      "delta_fnr": 0.8953,
+      "linf": 1.1e-05,
+      "total_fraud": 869,
+      "cm_before": {
+        "TP": 869,
+        "FP": 0,
+        "FN": 0,
+        "TN": 0
+      },
+      "cm_after": {
+        "TP": 91,
+        "FP": 0,
+        "FN": 778,
+        "TN": 0
+      },
+      "baseline": {
+        "auc_roc": 0.8436,
+        "recall": 0.7859,
+        "f1": 0.0095,
+        "precision": 0.0048
+      }
+    },
+    {
+      "dataset": "AMLworld HI-Small (con SMOTE)",
+      "attack": "SquareAttack",
+      "model": "LSTM-Att.(SMOTE)",
+      "evasion": 0.19,
+      "recall_post": 99.81,
+      "l0": 0.781,
+      "delta_fnr": 0.0019,
+      "linf": 1e-06,
+      "total_fraud": 1044,
+      "cm_before": {
+        "TP": 1044,
+        "FP": 0,
+        "FN": 0,
+        "TN": 0
+      },
+      "cm_after": {
+        "TP": 1042,
+        "FP": 0,
+        "FN": 2,
+        "TN": 0
+      },
+      "baseline": {
+        "auc_roc": 0.7132,
+        "recall": 0.9688,
+        "f1": 0.0025,
+        "precision": 0.0012
+      }
+    },
+    {
+      "dataset": "AMLworld HI-Small (con SMOTE)",
+      "attack": "SquareAttack",
+      "model": "MLP (SMOTE)",
+      "evasion": 100.0,
+      "recall_post": 0.0,
+      "l0": 6.166,
+      "delta_fnr": 1.0,
+      "linf": 1.1e-05,
+      "total_fraud": 885,
+      "cm_before": {
+        "TP": 885,
+        "FP": 0,
+        "FN": 0,
+        "TN": 0
+      },
+      "cm_after": {
+        "TP": 0,
+        "FP": 0,
+        "FN": 885,
+        "TN": 0
+      },
+      "baseline": {
+        "auc_roc": 0.9351,
+        "recall": 0.8234,
+        "f1": 0.0184,
+        "precision": 0.0093
+      }
+    },
+    {
+      "dataset": "AMLworld HI-Small (con SMOTE)",
+      "attack": "SquareAttack",
+      "model": "XGBoost",
+      "evasion": 100.0,
+      "recall_post": 0.0,
+      "l0": 6.582,
+      "delta_fnr": 1.0,
+      "linf": 1.1e-05,
+      "total_fraud": 801,
+      "cm_before": {
+        "TP": 801,
+        "FP": 0,
+        "FN": 0,
+        "TN": 0
+      },
+      "cm_after": {
+        "TP": 0,
+        "FP": 0,
+        "FN": 801,
+        "TN": 0
+      },
+      "baseline": {
+        "auc_roc": 0.9661,
+        "recall": 0.7422,
+        "f1": 0.0366,
+        "precision": 0.0195
+      }
+    }
+  ]
+}

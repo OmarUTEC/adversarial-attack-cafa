@@ -33,6 +33,12 @@ run_attack xgboost hop_skip_jump   trained-models/amlworld_hi-xgboost-smote
 run_attack xgboost boundary_attack trained-models/amlworld_hi-xgboost-smote
 run_attack xgboost square_attack   trained-models/amlworld_hi-xgboost-smote
 
+# ── LSTM-Attention ─────────────────────────────────────────
+run_attack lstm_attention cafa            trained-models/amlworld_hi-lstm_attention-smote.ckpt
+run_attack lstm_attention hop_skip_jump   trained-models/amlworld_hi-lstm_attention-smote.ckpt
+run_attack lstm_attention boundary_attack trained-models/amlworld_hi-lstm_attention-smote.ckpt
+run_attack lstm_attention square_attack   trained-models/amlworld_hi-lstm_attention-smote.ckpt
+
 echo ""
 echo "=========================================="
 echo "TODOS LOS ATAQUES SMOTE COMPLETADOS"
