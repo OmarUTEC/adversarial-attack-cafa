@@ -1,0 +1,8 @@
+{
+  "version": 2,
+  "rewrites": [
+    { "source": "/",              "destination": "/dashboard/index.html" },
+    { "source": "/data/(.*)",     "destination": "/dashboard/data/$1" },
+    { "source": "/(.*)",          "destination": "/dashboard/$1" }
+  ]
+}
