@@ -94,7 +94,7 @@ header::after{content:'';position:absolute;left:0;right:0;top:0;height:1px;
 /* ── MAIN: charts fill all width, floating toolbar on right ── */
 .main{flex:1;position:relative;overflow:hidden;min-height:0;}
 .charts-wrap{width:100%;height:100%;display:flex;flex-direction:column;overflow:hidden;min-height:0;padding:6px 70px 6px 6px;}
-.charts-grid{flex:1;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:4px;min-height:0;}
+.charts-grid{flex:1;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:4px;min-height:0;overflow:hidden;}
 .chart-panel{position:relative;background:rgba(255,255,255,.015);border:1px solid var(--bd);border-radius:10px;overflow:hidden;}
 .panel-title{position:absolute;top:7px;left:50%;transform:translateX(-50%);
   font-size:.74rem;font-weight:700;z-index:10;pointer-events:none;letter-spacing:.01em;}
@@ -103,6 +103,11 @@ header::after{content:'';position:absolute;left:0;right:0;top:0;height:1px;
 .single-inner{width:100%;height:100%;background:rgba(255,255,255,.015);border:1px solid var(--bd);border-radius:10px;overflow:hidden;}
 .single-title{font-size:.82rem;font-weight:700;padding:8px 0 0;text-align:center;}
 #single-chart{width:100%;height:calc(100% - 28px);}
+.sinsmote-note{display:flex;align-items:flex-start;gap:8px;margin-top:6px;padding:9px 12px;
+  background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.22);border-radius:8px;
+  font-size:.75rem;color:#94A3B8;line-height:1.45;flex-shrink:0;}
+.sinsmote-note svg{flex-shrink:0;margin-top:1px;color:#818CF8;}
+.sinsmote-note strong{color:#C7D2FE;}
 
 /* ── FLOATING TOOLBAR ── */
 .toolbar{
@@ -464,16 +469,35 @@ const BASE_LAYOUT={
     range:[-8,118],ticksuffix:'%',
     gridcolor:'rgba(255,255,255,.04)',zerolinecolor:'rgba(255,255,255,.06)',
     tickfont:{size:9,color:'#64748B'},tickcolor:'transparent'},
-  shapes:[{type:'line',x0:0,x1:1,xref:'paper',y0:100,y1:100,
-    line:{color:'rgba(244,63,94,.3)',dash:'dash',width:1.1}}],
+  shapes:[
+    {type:'line',x0:0,x1:1,xref:'paper',y0:100,y1:100,
+      line:{color:'rgba(244,63,94,.3)',dash:'dash',width:1.1}},
+    {type:'rect',x0:0,x1:0.38,xref:'paper',y0:70,y1:118,yref:'y',
+      fillcolor:'rgba(239,68,68,0.055)',
+      line:{color:'rgba(239,68,68,0.22)',width:1,dash:'dot'},
+      layer:'below'},
+  ],
+  annotations:[
+    {x:0.01,y:113,xref:'paper',yref:'y',
+      text:'⚠ Zona de Peligro',showarrow:false,
+      font:{color:'rgba(239,68,68,0.65)',size:8.5,family:'Inter'},
+      align:'left'},
+  ],
 };
 const CFG={responsive:true,displaylogo:false,displayModeBar:false};
 
+const MODEL_SHORT={'XGBoost':'XGB','MLP':'MLP','Log. Reg.':'LR','LSTM-Att.':'LSTM',
+  'MLP (SMOTE)':'MLP+S','LSTM-Att.(SMOTE)':'LSTM+S'};
+
 function makeTrace(model,recs){
   const color=MODEL_COLORS[model]||'#888';
+  const shortName=MODEL_SHORT[model]||model.slice(0,4);
   return{
     x:recs.map(r=>r.l0),y:recs.map(r=>r.evasion),
-    mode:'markers',type:'scatter',name:model,showlegend:false,
+    mode:'markers+text',type:'scatter',name:model,showlegend:false,
+    text:recs.map(()=>shortName),
+    textposition:'top center',
+    textfont:{color,size:8,family:'Inter'},
     marker:{symbol:MODEL_SYMBOLS[model]||'circle',size:14,color,
       line:{color:'rgba(255,255,255,.6)',width:1.5},opacity:.93},
     customdata:recs,
@@ -513,12 +537,18 @@ function render(records){
   const area=document.getElementById('chart-area');
   const atksToShow=currentAtk==='all'?ATTACKS:[currentAtk];
 
+  const sinsmoteNote=currentDS==='amlworld_sinsmote'?`
+    <div class="sinsmote-note">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <span><strong>MLP</strong> y <strong>LSTM-Att.</strong> no aparecen en los ataques porque alcanzaron <strong>FNR = 100%</strong> en baseline — no convergieron sin SMOTE debido al desbalance extremo de clases (~0.01% fraude). Solo <strong>XGBoost</strong> y <strong>Log. Reg.</strong> lograron clasificar suficientemente para ser evaluados bajo ataques adversariales.</span>
+    </div>`:'';
+
   if(atksToShow.length===4){
     area.innerHTML=`<div class="charts-grid">${ATTACKS.map((atk,i)=>
       `<div class="chart-panel">
         <div class="panel-title" style="color:${ATK_COLORS[atk]}">${atk}</div>
         <div id="panel-${i}" class="panel-div"></div>
-      </div>`).join('')}</div>`;
+      </div>`).join('')}</div>${sinsmoteNote}`;
     ATTACKS.forEach((atk,i)=>renderPanel('panel-'+i,records,atk));
   } else {
     const atk=atksToShow[0];
@@ -526,7 +556,7 @@ function render(records){
       <div class="single-inner">
         <div class="single-title" style="color:${ATK_COLORS[atk]}">${atk}</div>
         <div id="single-chart"></div>
-      </div></div>`;
+      </div></div>${sinsmoteNote}`;
     renderPanel('single-chart',records,atk);
   }
 }
