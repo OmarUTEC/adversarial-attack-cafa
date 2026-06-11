@@ -492,32 +492,56 @@ const MODEL_SHORT={'XGBoost':'XGB','MLP':'MLP','Log. Reg.':'LR','LSTM-Att.':'LST
 function makeTrace(model,recs){
   const color=MODEL_COLORS[model]||'#888';
   const shortName=MODEL_SHORT[model]||model.slice(0,4);
-  return{
-    x:recs.map(r=>r.l0),y:recs.map(r=>r.evasion),
-    mode:'markers+text',type:'scatter',name:model,showlegend:false,
-    text:recs.map(()=>shortName),
-    textposition:'top center',
-    textfont:{color,size:8,family:'Inter'},
-    marker:{symbol:MODEL_SYMBOLS[model]||'circle',size:14,color,
-      line:{color:'rgba(255,255,255,.6)',width:1.5},opacity:.93},
-    customdata:recs,
-    hovertext:recs.map(r=>
-      `<b style="font-size:13px">${r.model}</b><br>`+
-      `<span style="color:#64748B;font-size:10px">${r.attack}</span><br><br>`+
-      `Evasión: <b>${r.evasion}%</b><br>`+
-      `Recall post-ataque: <b>${r.recall_post}%</b><br>`+
-      `L0 medio: <b>${r.l0}</b><br>`+
-      `ΔFNR: <b>${r.delta_fnr}</b><br>`+
-      `<span style="color:#64748B;font-size:9px">← clic para ver detalle completo</span>`),
-    hovertemplate:'%{hovertext}<extra></extra>',
-  };
+  const sym=MODEL_SYMBOLS[model]||'circle';
+  // Split into normal and no_attack records
+  const normal=recs.filter(r=>!r.no_attack);
+  const noAtk =recs.filter(r=> r.no_attack);
+  const traces=[];
+  if(normal.length){
+    traces.push({
+      x:normal.map(r=>r.l0),y:normal.map(r=>r.evasion),
+      mode:'markers+text',type:'scatter',name:model,showlegend:false,
+      text:normal.map(()=>shortName),textposition:'top center',
+      textfont:{color,size:8,family:'Inter'},
+      marker:{symbol:sym,size:14,color,line:{color:'rgba(255,255,255,.6)',width:1.5},opacity:.93},
+      customdata:normal,
+      hovertext:normal.map(r=>
+        `<b style="font-size:13px">${r.model}</b><br>`+
+        `<span style="color:#64748B;font-size:10px">${r.attack}</span><br><br>`+
+        `Evasión: <b>${r.evasion}%</b><br>`+
+        `Recall post-ataque: <b>${r.recall_post}%</b><br>`+
+        `L0 medio: <b>${r.l0}</b><br>`+
+        `ΔFNR: <b>${r.delta_fnr}</b><br>`+
+        `<span style="color:#64748B;font-size:9px">← clic para ver detalle completo</span>`),
+      hovertemplate:'%{hovertext}<extra></extra>',
+    });
+  }
+  if(noAtk.length){
+    traces.push({
+      x:noAtk.map(r=>r.l0),y:noAtk.map(r=>r.evasion),
+      mode:'markers+text',type:'scatter',name:model+' (N/A)',showlegend:false,
+      text:noAtk.map(()=>shortName+'✕'),textposition:'top center',
+      textfont:{color:'rgba(150,150,150,.8)',size:8,family:'Inter'},
+      marker:{symbol:sym+'-open',size:14,color:'rgba(150,150,150,.5)',
+        line:{color:'rgba(180,180,180,.6)',width:1.5},opacity:.7},
+      customdata:noAtk,
+      hovertext:noAtk.map(r=>
+        `<b style="font-size:13px">${r.model}</b><br>`+
+        `<span style="color:#64748B;font-size:10px">${r.attack}</span><br><br>`+
+        `<span style="color:#F87171">⚠ Ataque no ejecutado</span><br>`+
+        `<span style="font-size:10px;color:#94A3B8">FNR baseline = 100% — el modelo no detectó<br>ninguna transacción fraudulenta (TP = 0).<br>No hay muestras correctamente clasificadas<br>para perturbar.</span>`),
+      hovertemplate:'%{hovertext}<extra></extra>',
+    });
+  }
+  return traces;
 }
+function makeTraces(model,recs){ return makeTrace(model,recs); }
 
 function renderPanel(divId,records,atk){
   const pts=records.filter(r=>r.attack===atk);
   const byModel={};
   pts.forEach(r=>{(byModel[r.model]=byModel[r.model]||[]).push(r);});
-  const traces=Object.entries(byModel).map(([m,rs])=>makeTrace(m,rs));
+  const traces=Object.entries(byModel).flatMap(([m,rs])=>makeTrace(m,rs));
   Plotly.newPlot(divId,traces,BASE_LAYOUT,CFG);
   document.getElementById(divId).on('plotly_click',ev=>{
     const pt=ev.points[0];
@@ -776,6 +800,30 @@ function buildDetailHTML(){
     return;
   }
   const r=lastPoint;
+  if(r.no_attack){
+    const color=MODEL_COLORS[r.model]||'#888';
+    el.innerHTML=`<div class="dc">
+      <div class="mh"><div class="mdot" style="background:${color};opacity:.4;box-shadow:none"></div><div class="mname">${r.model}</div></div>
+      <div class="abadge ${r.attack}">${r.attack}</div>
+      <div class="dsub">${r.dataset}</div>
+      <div style="margin:24px 0;padding:16px;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);border-radius:10px;text-align:center;">
+        <div style="font-size:1.5rem;margin-bottom:8px">⚠</div>
+        <div style="color:#FCA5A5;font-weight:700;font-size:.95rem;margin-bottom:6px">Ataque no ejecutado</div>
+        <div style="color:#94A3B8;font-size:.82rem;line-height:1.5">
+          El modelo alcanzó <strong style="color:#F87171">FNR = 100%</strong> en baseline — clasificó todas las transacciones como legítimas sin detectar ningún fraude (TP = 0).<br><br>
+          Sin muestras correctamente clasificadas, el ataque adversarial no tiene punto de partida. El modelo ya "falla" completamente antes de cualquier perturbación.<br><br>
+          <strong style="color:#C7D2FE">Esto justifica el uso de SMOTE</strong> para rebalancear las clases y permitir que el modelo aprenda patrones de fraude.
+        </div>
+      </div>
+      <div class="slbl">Métricas baseline (pre-ataque)</div>
+      <div class="mgrid">
+        <div class="mbox"><div class="ml">AUC-ROC</div><div class="mv">${(r.baseline.auc_roc||0).toFixed(4)}</div></div>
+        <div class="mbox"><div class="ml">Recall</div><div class="mv red">0.00%</div></div>
+        <div class="mbox"><div class="ml">FNR</div><div class="mv red">100.00%</div></div>
+      </div>
+    </div>`;
+    return;
+  }
   const color=MODEL_COLORS[r.model]||'#888';
   const bl=r.baseline||{};
   const evC=r.evasion>=80?'red':r.evasion>=30?'yellow':'green';
