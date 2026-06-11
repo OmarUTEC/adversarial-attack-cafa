@@ -472,17 +472,8 @@ const BASE_LAYOUT={
   shapes:[
     {type:'line',x0:0,x1:1,xref:'paper',y0:100,y1:100,
       line:{color:'rgba(244,63,94,.3)',dash:'dash',width:1.1}},
-    {type:'rect',x0:0,x1:0.38,xref:'paper',y0:70,y1:118,yref:'y',
-      fillcolor:'rgba(239,68,68,0.055)',
-      line:{color:'rgba(239,68,68,0.22)',width:1,dash:'dot'},
-      layer:'below'},
   ],
-  annotations:[
-    {x:0.01,y:113,xref:'paper',yref:'y',
-      text:'⚠ Zona de Peligro',showarrow:false,
-      font:{color:'rgba(239,68,68,0.65)',size:8.5,family:'Inter'},
-      align:'left'},
-  ],
+  annotations:[],
 };
 const CFG={responsive:true,displaylogo:false,displayModeBar:false};
 
@@ -537,12 +528,37 @@ function makeTrace(model,recs){
 }
 function makeTraces(model,recs){ return makeTrace(model,recs); }
 
+function medianL0(records){
+  // Median L0 of real (non no_attack) points across the entire dataset
+  const vals=records.filter(r=>!r.no_attack&&r.l0>0).map(r=>r.l0).sort((a,b)=>a-b);
+  if(!vals.length) return 5;
+  return vals[Math.floor(vals.length/2)];
+}
+
 function renderPanel(divId,records,atk){
   const pts=records.filter(r=>r.attack===atk);
   const byModel={};
   pts.forEach(r=>{(byModel[r.model]=byModel[r.model]||[]).push(r);});
   const traces=Object.entries(byModel).flatMap(([m,rs])=>makeTrace(m,rs));
-  Plotly.newPlot(divId,traces,BASE_LAYOUT,CFG);
+
+  // Danger zone: evasion ≥70% AND L0 ≤ median(L0) del dataset
+  const medL0=medianL0(records);
+  const layout=Object.assign({},BASE_LAYOUT,{
+    shapes:[
+      BASE_LAYOUT.shapes[0],
+      {type:'rect',x0:0,x1:medL0,xref:'x',y0:70,y1:118,yref:'y',
+        fillcolor:'rgba(239,68,68,0.055)',
+        line:{color:'rgba(239,68,68,0.22)',width:1,dash:'dot'},
+        layer:'below'},
+    ],
+    annotations:[
+      {x:medL0*0.08+0.05,y:113,xref:'x',yref:'y',
+        text:'⚠ Zona de Peligro',showarrow:false,
+        font:{color:'rgba(239,68,68,0.65)',size:8.5,family:'Inter'},
+        align:'left',xanchor:'left'},
+    ],
+  });
+  Plotly.newPlot(divId,traces,layout,CFG);
   document.getElementById(divId).on('plotly_click',ev=>{
     const pt=ev.points[0];
     if(pt.customdata){
