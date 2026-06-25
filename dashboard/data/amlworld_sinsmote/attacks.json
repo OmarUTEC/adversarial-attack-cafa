@@ -11,9 +11,24 @@
       "delta_fnr": 1.0,
       "linf": 0.28966,
       "total_fraud": 369,
-      "cm_before": {"TP": 369, "FP": 0, "FN": 0, "TN": 0},
-      "cm_after":  {"TP": 0,   "FP": 0, "FN": 369, "TN": 0},
-      "baseline": {"auc_roc": 0.966, "recall": 0.3395, "f1": 0.2032, "precision": 0.2018}
+      "cm_before": {
+        "TP": 369,
+        "FP": 0,
+        "FN": 0,
+        "TN": 0
+      },
+      "cm_after": {
+        "TP": 0,
+        "FP": 0,
+        "FN": 369,
+        "TN": 0
+      },
+      "baseline": {
+        "auc_roc": 0.966,
+        "recall": 0.3395,
+        "f1": 0.2032,
+        "precision": 0.2018
+      }
     },
     {
       "dataset": "AMLworld HI-Small (sin SMOTE)",
@@ -26,9 +41,24 @@
       "linf": 0.0,
       "total_fraud": 0,
       "no_attack": true,
-      "cm_before": {"TP": 0, "FP": 0, "FN": 1087, "TN": 1014582},
-      "cm_after":  {"TP": 0, "FP": 0, "FN": 1087, "TN": 1014582},
-      "baseline": {"auc_roc": 0.9131, "recall": 0.0, "f1": 0.0, "precision": 0.0}
+      "cm_before": {
+        "TP": 0,
+        "FP": 0,
+        "FN": 1087,
+        "TN": 1014582
+      },
+      "cm_after": {
+        "TP": 0,
+        "FP": 0,
+        "FN": 1087,
+        "TN": 1014582
+      },
+      "baseline": {
+        "auc_roc": 0.9131,
+        "recall": 0.0,
+        "f1": 0.0,
+        "precision": 0.0
+      }
     },
     {
       "dataset": "AMLworld HI-Small (sin SMOTE)",
@@ -40,9 +70,24 @@
       "delta_fnr": 1.0,
       "linf": 0.011193,
       "total_fraud": 116,
-      "cm_before": {"TP": 116, "FP": 0, "FN": 0,   "TN": 0},
-      "cm_after":  {"TP": 0,   "FP": 0, "FN": 116,  "TN": 0},
-      "baseline": {"auc_roc": 0.5672, "recall": 0.1067, "f1": 0.0103, "precision": 0.0052}
+      "cm_before": {
+        "TP": 116,
+        "FP": 0,
+        "FN": 0,
+        "TN": 0
+      },
+      "cm_after": {
+        "TP": 0,
+        "FP": 0,
+        "FN": 116,
+        "TN": 0
+      },
+      "baseline": {
+        "auc_roc": 0.5672,
+        "recall": 0.1067,
+        "f1": 0.0103,
+        "precision": 0.0052
+      }
     },
     {
       "dataset": "AMLworld HI-Small (sin SMOTE)",
@@ -55,9 +100,24 @@
       "linf": 0.0,
       "total_fraud": 0,
       "no_attack": true,
-      "cm_before": {"TP": 0, "FP": 0, "FN": 1087, "TN": 1014582},
-      "cm_after":  {"TP": 0, "FP": 0, "FN": 1087, "TN": 1014582},
-      "baseline": {"auc_roc": 0.6089, "recall": 0.0, "f1": 0.0, "precision": 0.0}
+      "cm_before": {
+        "TP": 0,
+        "FP": 0,
+        "FN": 1087,
+        "TN": 1014582
+      },
+      "cm_after": {
+        "TP": 0,
+        "FP": 0,
+        "FN": 1087,
+        "TN": 1014582
+      },
+      "baseline": {
+        "auc_roc": 0.6089,
+        "recall": 0.0,
+        "f1": 0.0,
+        "precision": 0.0
+      }
     },
     {
       "dataset": "AMLworld HI-Small (sin SMOTE)",
@@ -69,9 +129,24 @@
       "delta_fnr": 1.0,
       "linf": 0.01852,
       "total_fraud": 116,
-      "cm_before": {"TP": 116, "FP": 0, "FN": 0,   "TN": 0},
-      "cm_after":  {"TP": 0,   "FP": 0, "FN": 116,  "TN": 0},
-      "baseline": {"auc_roc": 0.5672, "recall": 0.1067, "f1": 0.0103, "precision": 0.0052}
+      "cm_before": {
+        "TP": 116,
+        "FP": 0,
+        "FN": 0,
+        "TN": 0
+      },
+      "cm_after": {
+        "TP": 0,
+        "FP": 0,
+        "FN": 116,
+        "TN": 0
+      },
+      "baseline": {
+        "auc_roc": 0.5672,
+        "recall": 0.1067,
+        "f1": 0.0103,
+        "precision": 0.0052
+      }
     },
     {
       "dataset": "AMLworld HI-Small (sin SMOTE)",
@@ -84,9 +159,24 @@
       "linf": 0.0,
       "total_fraud": 0,
       "no_attack": true,
-      "cm_before": {"TP": 0, "FP": 0, "FN": 1087, "TN": 1014582},
-      "cm_after":  {"TP": 0, "FP": 0, "FN": 1087, "TN": 1014582},
-      "baseline": {"auc_roc": 0.9131, "recall": 0.0, "f1": 0.0, "precision": 0.0}
+      "cm_before": {
+        "TP": 0,
+        "FP": 0,
+        "FN": 1087,
+        "TN": 1014582
+      },
+      "cm_after": {
+        "TP": 0,
+        "FP": 0,
+        "FN": 1087,
+        "TN": 1014582
+      },
+      "baseline": {
+        "auc_roc": 0.9131,
+        "recall": 0.0,
+        "f1": 0.0,
+        "precision": 0.0
+      }
     },
     {
       "dataset": "AMLworld HI-Small (sin SMOTE)",
@@ -99,9 +189,24 @@
       "linf": 0.0,
       "total_fraud": 0,
       "no_attack": true,
-      "cm_before": {"TP": 0, "FP": 0, "FN": 1087, "TN": 1014582},
-      "cm_after":  {"TP": 0, "FP": 0, "FN": 1087, "TN": 1014582},
-      "baseline": {"auc_roc": 0.6089, "recall": 0.0, "f1": 0.0, "precision": 0.0}
+      "cm_before": {
+        "TP": 0,
+        "FP": 0,
+        "FN": 1087,
+        "TN": 1014582
+      },
+      "cm_after": {
+        "TP": 0,
+        "FP": 0,
+        "FN": 1087,
+        "TN": 1014582
+      },
+      "baseline": {
+        "auc_roc": 0.6089,
+        "recall": 0.0,
+        "f1": 0.0,
+        "precision": 0.0
+      }
     },
     {
       "dataset": "AMLworld HI-Small (sin SMOTE)",
@@ -113,9 +218,24 @@
       "delta_fnr": 0.0217,
       "linf": 1.1e-05,
       "total_fraud": 369,
-      "cm_before": {"TP": 369, "FP": 0, "FN": 0,   "TN": 0},
-      "cm_after":  {"TP": 361, "FP": 0, "FN": 8,   "TN": 0},
-      "baseline": {"auc_roc": 0.966, "recall": 0.3395, "f1": 0.2032, "precision": 0.2018}
+      "cm_before": {
+        "TP": 369,
+        "FP": 0,
+        "FN": 0,
+        "TN": 0
+      },
+      "cm_after": {
+        "TP": 361,
+        "FP": 0,
+        "FN": 8,
+        "TN": 0
+      },
+      "baseline": {
+        "auc_roc": 0.966,
+        "recall": 0.3395,
+        "f1": 0.2032,
+        "precision": 0.2018
+      }
     },
     {
       "dataset": "AMLworld HI-Small (sin SMOTE)",
@@ -128,9 +248,24 @@
       "linf": 0.0,
       "total_fraud": 0,
       "no_attack": true,
-      "cm_before": {"TP": 0, "FP": 0, "FN": 1087, "TN": 1014582},
-      "cm_after":  {"TP": 0, "FP": 0, "FN": 1087, "TN": 1014582},
-      "baseline": {"auc_roc": 0.9131, "recall": 0.0, "f1": 0.0, "precision": 0.0}
+      "cm_before": {
+        "TP": 0,
+        "FP": 0,
+        "FN": 1087,
+        "TN": 1014582
+      },
+      "cm_after": {
+        "TP": 0,
+        "FP": 0,
+        "FN": 1087,
+        "TN": 1014582
+      },
+      "baseline": {
+        "auc_roc": 0.9131,
+        "recall": 0.0,
+        "f1": 0.0,
+        "precision": 0.0
+      }
     },
     {
       "dataset": "AMLworld HI-Small (sin SMOTE)",
@@ -142,9 +277,24 @@
       "delta_fnr": 0.0517,
       "linf": 5e-06,
       "total_fraud": 116,
-      "cm_before": {"TP": 116, "FP": 0, "FN": 0,   "TN": 0},
-      "cm_after":  {"TP": 110, "FP": 0, "FN": 6,   "TN": 0},
-      "baseline": {"auc_roc": 0.5672, "recall": 0.1067, "f1": 0.0103, "precision": 0.0052}
+      "cm_before": {
+        "TP": 116,
+        "FP": 0,
+        "FN": 0,
+        "TN": 0
+      },
+      "cm_after": {
+        "TP": 110,
+        "FP": 0,
+        "FN": 6,
+        "TN": 0
+      },
+      "baseline": {
+        "auc_roc": 0.5672,
+        "recall": 0.1067,
+        "f1": 0.0103,
+        "precision": 0.0052
+      }
     },
     {
       "dataset": "AMLworld HI-Small (sin SMOTE)",
@@ -157,9 +307,24 @@
       "linf": 0.0,
       "total_fraud": 0,
       "no_attack": true,
-      "cm_before": {"TP": 0, "FP": 0, "FN": 1087, "TN": 1014582},
-      "cm_after":  {"TP": 0, "FP": 0, "FN": 1087, "TN": 1014582},
-      "baseline": {"auc_roc": 0.6089, "recall": 0.0, "f1": 0.0, "precision": 0.0}
+      "cm_before": {
+        "TP": 0,
+        "FP": 0,
+        "FN": 1087,
+        "TN": 1014582
+      },
+      "cm_after": {
+        "TP": 0,
+        "FP": 0,
+        "FN": 1087,
+        "TN": 1014582
+      },
+      "baseline": {
+        "auc_roc": 0.6089,
+        "recall": 0.0,
+        "f1": 0.0,
+        "precision": 0.0
+      }
     },
     {
       "dataset": "AMLworld HI-Small (sin SMOTE)",
@@ -171,9 +336,24 @@
       "delta_fnr": 1.0,
       "linf": 1.1e-05,
       "total_fraud": 116,
-      "cm_before": {"TP": 116, "FP": 0, "FN": 0,   "TN": 0},
-      "cm_after":  {"TP": 0,   "FP": 0, "FN": 116,  "TN": 0},
-      "baseline": {"auc_roc": 0.5672, "recall": 0.1067, "f1": 0.0103, "precision": 0.0052}
+      "cm_before": {
+        "TP": 116,
+        "FP": 0,
+        "FN": 0,
+        "TN": 0
+      },
+      "cm_after": {
+        "TP": 0,
+        "FP": 0,
+        "FN": 116,
+        "TN": 0
+      },
+      "baseline": {
+        "auc_roc": 0.5672,
+        "recall": 0.1067,
+        "f1": 0.0103,
+        "precision": 0.0052
+      }
     },
     {
       "dataset": "AMLworld HI-Small (sin SMOTE)",
@@ -186,9 +366,24 @@
       "linf": 0.0,
       "total_fraud": 0,
       "no_attack": true,
-      "cm_before": {"TP": 0, "FP": 0, "FN": 1087, "TN": 1014582},
-      "cm_after":  {"TP": 0, "FP": 0, "FN": 1087, "TN": 1014582},
-      "baseline": {"auc_roc": 0.9131, "recall": 0.0, "f1": 0.0, "precision": 0.0}
+      "cm_before": {
+        "TP": 0,
+        "FP": 0,
+        "FN": 1087,
+        "TN": 1014582
+      },
+      "cm_after": {
+        "TP": 0,
+        "FP": 0,
+        "FN": 1087,
+        "TN": 1014582
+      },
+      "baseline": {
+        "auc_roc": 0.9131,
+        "recall": 0.0,
+        "f1": 0.0,
+        "precision": 0.0
+      }
     },
     {
       "dataset": "AMLworld HI-Small (sin SMOTE)",
@@ -200,9 +395,24 @@
       "delta_fnr": 1.0,
       "linf": 1.1e-05,
       "total_fraud": 369,
-      "cm_before": {"TP": 369, "FP": 0, "FN": 0,   "TN": 0},
-      "cm_after":  {"TP": 0,   "FP": 0, "FN": 369,  "TN": 0},
-      "baseline": {"auc_roc": 0.966, "recall": 0.3395, "f1": 0.2032, "precision": 0.2018}
+      "cm_before": {
+        "TP": 369,
+        "FP": 0,
+        "FN": 0,
+        "TN": 0
+      },
+      "cm_after": {
+        "TP": 0,
+        "FP": 0,
+        "FN": 369,
+        "TN": 0
+      },
+      "baseline": {
+        "auc_roc": 0.966,
+        "recall": 0.3395,
+        "f1": 0.2032,
+        "precision": 0.2018
+      }
     },
     {
       "dataset": "AMLworld HI-Small (sin SMOTE)",
@@ -215,9 +425,25 @@
       "linf": 0.0,
       "total_fraud": 0,
       "no_attack": true,
-      "cm_before": {"TP": 0, "FP": 0, "FN": 1087, "TN": 1014582},
-      "cm_after":  {"TP": 0, "FP": 0, "FN": 1087, "TN": 1014582},
-      "baseline": {"auc_roc": 0.6089, "recall": 0.0, "f1": 0.0, "precision": 0.0}
+      "cm_before": {
+        "TP": 0,
+        "FP": 0,
+        "FN": 1087,
+        "TN": 1014582
+      },
+      "cm_after": {
+        "TP": 0,
+        "FP": 0,
+        "FN": 1087,
+        "TN": 1014582
+      },
+      "baseline": {
+        "auc_roc": 0.6089,
+        "recall": 0.0,
+        "f1": 0.0,
+        "precision": 0.0
+      }
     }
-  ]
+  ],
+  "n_features": 41
 }

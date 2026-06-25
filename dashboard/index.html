@@ -436,6 +436,9 @@ async function load(key){
   if(cache[key]) return cache[key];
   const r=await fetch(DATA_FILES[key]);
   const d=await r.json();
+  const nf=d.n_features||1;
+  // pre-compute l0_pct on every record
+  d.records.forEach(rec=>{ rec.l0_pct=rec.l0>0?parseFloat((rec.l0/nf*100).toFixed(2)):0; rec.n_features=nf; });
   cache[key]=d.records;
   return d.records;
 }
@@ -462,7 +465,8 @@ const BASE_LAYOUT={
   font:{color:'#94A3B8',family:'Inter',size:10},
   margin:{t:10,b:42,l:50,r:8},hovermode:'closest',showlegend:false,
   hoverlabel:{bgcolor:'#1E293B',bordercolor:'rgba(255,255,255,.15)',font:{family:'Inter',size:11,color:'#F8FAFC'}},
-  xaxis:{title:{text:'L0',font:{size:9,color:'#64748B'},standoff:3},
+  xaxis:{title:{text:'% Features Modificadas',font:{size:9,color:'#64748B'},standoff:3},
+    ticksuffix:'%',
     gridcolor:'rgba(255,255,255,.04)',zerolinecolor:'rgba(255,255,255,.06)',
     tickfont:{size:9,color:'#64748B'},tickcolor:'transparent'},
   yaxis:{title:{text:'Evasión (%)',font:{size:9,color:'#64748B'},standoff:3},
@@ -490,7 +494,7 @@ function makeTrace(model,recs){
   const traces=[];
   if(normal.length){
     traces.push({
-      x:normal.map(r=>r.l0),y:normal.map(r=>r.evasion),
+      x:normal.map(r=>r.l0_pct),y:normal.map(r=>r.evasion),
       mode:'markers+text',type:'scatter',name:model,showlegend:false,
       text:normal.map(()=>shortName),textposition:'top center',
       textfont:{color,size:8,family:'Inter'},
@@ -501,7 +505,7 @@ function makeTrace(model,recs){
         `<span style="color:#64748B;font-size:10px">${r.attack}</span><br><br>`+
         `Evasión: <b>${r.evasion}%</b><br>`+
         `Recall post-ataque: <b>${r.recall_post}%</b><br>`+
-        `L0 medio: <b>${r.l0}</b><br>`+
+        `Features modificadas: <b>${r.l0_pct}%</b> <span style="color:#64748B;font-size:9px">(L0=${r.l0} / ${r.n_features})</span><br>`+
         `ΔFNR: <b>${r.delta_fnr}</b><br>`+
         `<span style="color:#64748B;font-size:9px">← clic para ver detalle completo</span>`),
       hovertemplate:'%{hovertext}<extra></extra>',
@@ -509,7 +513,7 @@ function makeTrace(model,recs){
   }
   if(noAtk.length){
     traces.push({
-      x:noAtk.map(r=>r.l0),y:noAtk.map(r=>r.evasion),
+      x:noAtk.map(r=>r.l0_pct),y:noAtk.map(r=>r.evasion),
       mode:'markers+text',type:'scatter',name:model+' (N/A)',showlegend:false,
       text:noAtk.map(()=>shortName+'✕'),textposition:'top center',
       textfont:{color:'rgba(150,150,150,.8)',size:8,family:'Inter'},
@@ -528,10 +532,10 @@ function makeTrace(model,recs){
 }
 function makeTraces(model,recs){ return makeTrace(model,recs); }
 
-function medianL0(records){
-  // Median L0 of real (non no_attack) points across the entire dataset
-  const vals=records.filter(r=>!r.no_attack&&r.l0>0).map(r=>r.l0).sort((a,b)=>a-b);
-  if(!vals.length) return 5;
+function medianL0pct(records){
+  // Median of l0_pct (% features modified) across real attack records
+  const vals=records.filter(r=>!r.no_attack&&r.l0_pct>0).map(r=>r.l0_pct).sort((a,b)=>a-b);
+  if(!vals.length) return 10;
   return vals[Math.floor(vals.length/2)];
 }
 
@@ -541,28 +545,33 @@ function renderPanel(divId,records,atk){
   pts.forEach(r=>{(byModel[r.model]=byModel[r.model]||[]).push(r);});
   const traces=Object.entries(byModel).flatMap(([m,rs])=>makeTrace(m,rs));
 
-  // Danger zone: evasion ≥70% AND L0 ≤ median(L0) del dataset
-  const medL0=medianL0(records);
+  // Danger zone: evasion ≥70% AND l0_pct ≤ median(l0_pct) del dataset
+  const medPct=medianL0pct(records);
+  // Dynamic x range: max l0_pct in this panel + 10% padding, min 15%
+  const allPcts=pts.filter(r=>!r.no_attack&&r.l0_pct>0).map(r=>r.l0_pct);
+  const maxPct=allPcts.length?Math.max(...allPcts):100;
+  const xMax=Math.max(15, parseFloat((maxPct*1.15).toFixed(1)));
   const layout=Object.assign({},BASE_LAYOUT,{
+    xaxis:Object.assign({},BASE_LAYOUT.xaxis,{range:[0,xMax]}),
     shapes:[
       BASE_LAYOUT.shapes[0],
-      // Zona de Peligro: toda la banda evasión ≥70% (el modelo ES comprometido)
+      // Zona de Peligro: toda la banda evasión ≥70%
       {type:'rect',x0:0,x1:1,xref:'paper',y0:70,y1:118,yref:'y',
         fillcolor:'rgba(239,68,68,0.045)',
         line:{width:0},layer:'below'},
-      // Sub-zona crítica: evasión ≥70% Y L0 ≤ mediana (ataque eficiente Y efectivo)
-      {type:'rect',x0:0,x1:medL0,xref:'x',y0:70,y1:118,yref:'y',
+      // Sub-zona crítica: evasión ≥70% Y % features ≤ mediana
+      {type:'rect',x0:0,x1:medPct,xref:'x',y0:70,y1:118,yref:'y',
         fillcolor:'rgba(239,68,68,0.07)',
         line:{color:'rgba(239,68,68,0.28)',width:1,dash:'dot'},
         layer:'below'},
     ],
     annotations:[
-      // Etiqueta zona crítica (izquierda)
-      {x:medL0*0.08+0.05,y:113,xref:'x',yref:'y',
+      // Etiqueta zona crítica
+      {x:medPct*0.08+0.05,y:113,xref:'x',yref:'y',
         text:'⚠ Zona Crítica',showarrow:false,
         font:{color:'rgba(239,68,68,0.75)',size:8,family:'Inter'},
         align:'left',xanchor:'left'},
-      // Etiqueta zona de peligro (derecha de la mediana, si hay espacio)
+      // Etiqueta zona de peligro
       {x:1,y:113,xref:'paper',yref:'y',
         text:'Zona de Peligro',showarrow:false,
         font:{color:'rgba(239,68,68,0.45)',size:8,family:'Inter'},
@@ -875,7 +884,8 @@ function buildDetailHTML(){
       <div class="mbox"><div class="ml">Recall post-ataque</div>
         <div class="mv ${rcC}">${pct(r.recall_post)}</div>
         <div class="bt"><div class="bf" style="width:${r.recall_post||0}%;background:${barC(rcC)}"></div></div></div>
-      <div class="mbox"><div class="ml">L0 medio</div><div class="mv">${num(r.l0)}</div></div>
+      <div class="mbox"><div class="ml">Features mod. (%)</div><div class="mv">${num(r.l0_pct,2)}%</div></div>
+      <div class="mbox"><div class="ml">L0 medio (abs.)</div><div class="mv">${num(r.l0)} / ${r.n_features||'?'}</div></div>
       <div class="mbox"><div class="ml">ΔFNR</div><div class="mv ${evC}">${num(r.delta_fnr,4)}</div></div>
     </div>
 
