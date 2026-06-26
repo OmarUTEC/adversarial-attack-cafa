@@ -1,0 +1,228 @@
+\chapter{MARCO METODOLÓGICO}
+
+En este capítulo se describe el método propuesto para evaluar la robustez de los modelos de detección de fraude financiero frente a ataques adversariales. El método comprende cuatro etapas principales: preprocesamiento de datos, entrenamiento de los modelos clasificadores, generación de ejemplos adversariales y evaluación de la robustez mediante métricas especializadas.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Descripción de la Propuesta}
+% ─────────────────────────────────────────────────────────────────────────────
+
+El proceso general del método propuesto se ilustra en la Figura~\ref{fig:framework}, la cual resume la arquitectura modular del framework y el flujo completo desde la carga de datos hasta la evaluación adversarial. El sistema implementa un pipeline en Python que integra las siguientes etapas: primero se realiza el preprocesamiento de los datos tabulares de fraude financiero mediante la clase \texttt{TabularDataset}, que aplica codificación, normalización y división de conjuntos. A continuación se entrenan los cuatro modelos de clasificación —Regresión Logística, MLP, LSTM-Attention y XGBoost— con optimización de hiperparámetros mediante Optuna. Luego se realiza una evaluación \textit{baseline} del modelo sobre el conjunto de prueba. Posteriormente, en la etapa de generación de ataques adversariales, se aplican perturbaciones controladas sobre las muestras de fraude correctamente clasificadas utilizando cuatro técnicas: CaFA, HopSkipJump Attack, Boundary Attack y Square Attack. Finalmente, el framework registra los resultados y evalúa la robustez mediante métricas almacenadas en archivos JSON estructurados y visualizados en un dashboard interactivo.
+
+\begin{figure}[H]
+\centering
+\includegraphics[angle=90, height=1.5\linewidth]{images/framework_propuesta.png}
+\caption{Arquitectura del Framework Propuesto}
+\label{fig:framework}
+\end{figure}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Preprocesamiento de Datos}
+% ─────────────────────────────────────────────────────────────────────────────
+
+El preprocesamiento se aplica de forma uniforme sobre los tres conjuntos de datos experimentales e incluye los siguientes pasos:
+
+\begin{itemize}
+    \item \textbf{Codificación y normalización}: Las variables categóricas se transforman mediante \textit{one-hot encoding}; las variables numéricas continuas se estandarizan ($\mu=0$, $\sigma=1$).
+
+    \item \textbf{División}: Partición 80\,\% entrenamiento / 20\,\% evaluación con semilla fija (\texttt{random\_state=42}).
+
+    \item \textbf{Balanceo de clases}: Para los modelos de redes neuronales se utiliza \textit{class\_weight} en la función de pérdida Cross-Entropy; para XGBoost se emplea \texttt{scale\_pos\_weight}. En la configuración AMLworld con SMOTE se aplica adicionalmente \textit{Synthetic Minority Over-sampling Technique} \cite{chawla2002smote} sobre el conjunto de entrenamiento con \texttt{sampling\_strategy=0.1} (\texttt{k\_neighbors=5}), reduciendo el desbalance original de $\sim$1:993 a 1:10. El sobremuestreo se restringe al 80\,\% de entrenamiento para evitar contaminación del conjunto de prueba.
+\end{itemize}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Descripción del Dataset}
+% ─────────────────────────────────────────────────────────────────────────────
+
+Para la evaluación de los modelos se emplean dos conjuntos de datos de fraude financiero que generan tres configuraciones experimentales distintas, permitiendo analizar el comportamiento de los modelos bajo diferentes condiciones de desbalance de clases y preprocesamiento \cite{HernandezAros2024}.
+
+\begin{itemize}
+    \item \textbf{Credit Card Fraud Dataset (ULB)}: Dataset de transacciones reales con tarjetas de crédito europeas, resultado de una colaboración entre Worldline y el \textit{Machine Learning Group} de la Université Libre de Bruxelles (ULB) \cite{dal2015calibrating}. Las 28 características principales (V1--V28) son componentes obtenidos mediante Análisis de Componentes Principales (PCA) para proteger la identidad de los titulares; se conservan además el monto de la transacción (\texttt{Amount}) y la variable objetivo (\texttt{Class}). La versión utilizada en este trabajo contiene 568{,}630 transacciones con una distribución \textbf{balanceada al 50\,\%} (284{,}315 legítimas y 284{,}315 fraudulentas).
+
+    \item \textbf{AMLworld HI-Small}: Dataset de lavado de dinero (\textit{Anti-Money Laundering}) desarrollado con fines de investigación por IBM \cite{altman2024realistic}. El subconjunto HI-Small (\textit{High Illicit}) contiene 5{,}078{,}345 transacciones financieras, de las cuales 5{,}177 corresponden a operaciones ilícitas (0.10\,\%), configurando un desbalance de clases extremo con una proporción de 1:979 entre transacciones ilícitas y legítimas. Este alto grado de desbalance hace que los modelos basados en redes neuronales tiendan a predecir siempre la clase mayoritaria —alcanzando FNR\,=\,100\,\%— sin detectar ningún fraude, motivando el uso de dos configuraciones experimentales:
+    \begin{itemize}
+        \item \textbf{AMLworld sin SMOTE}: entrenamiento directo sobre los datos originales desbalanceados, utilizando únicamente \textit{class\_weight} o \texttt{scale\_pos\_weight}.
+        \item \textbf{AMLworld con SMOTE}: aplicación de SMOTE \cite{chawla2002smote} sobre el conjunto de entrenamiento (\texttt{sampling\_strategy=0.1}), generando aproximadamente 405{,}853 muestras sintéticas de la clase ilícita y reduciendo el desbalance de 1:979 a 1:10.
+    \end{itemize}
+\end{itemize}
+
+El uso de datasets con distintos grados de desbalance permite analizar el comportamiento de los modelos bajo condiciones que van desde un balance perfecto (Credit Card) hasta uno extremo (AMLworld 1:979), y evaluar el impacto de SMOTE como estrategia de preprocesamiento sobre la robustez adversarial.
+
+\begin{table}[H]
+\centering
+\caption{Características exactas de las configuraciones experimentales}
+\label{tab:datasets}
+\begin{tabular}{lcccc}
+\hline
+\textbf{Configuración} & \textbf{Total} & \textbf{Legítimas} & \textbf{Ilícitas} & \textbf{Ratio} \\
+\hline
+Credit Card (ULB)         & 568{,}630     & 284{,}315     & 284{,}315                    & 1:1   \\
+AMLworld HI-Small         & 5{,}078{,}345 & 5{,}073{,}168 & 5{,}177                      & 1:979 \\
+AMLworld HI-Small (SMOTE) & 4{,}468{,}529$^*$ & 4{,}058{,}534 & 409{,}995$^\dagger$      & 1:10  \\
+\hline
+\multicolumn{5}{l}{\footnotesize $^*$ Conjunto de entrenamiento (80\,\%) tras sobremuestreo SMOTE.} \\
+\multicolumn{5}{l}{\footnotesize $^\dagger$ Incluye 4{,}141 muestras reales + 405{,}854 sintéticas generadas por SMOTE.} \\
+\end{tabular}
+\end{table}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Entrenamiento de los Modelos}
+% ─────────────────────────────────────────────────────────────────────────────
+
+Para la clasificación de las transacciones se entrenan cuatro modelos que representan distintas familias de algoritmos de aprendizaje automático: Regresión Logística, MLP, LSTM-Attention y XGBoost. Esta selección permite comparar clasificadores lineales, redes neuronales profundas, redes recurrentes con atención y métodos de ensamble basados en árboles, cubriendo el espectro de modelos diferenciables y no diferenciables relevante para el análisis de robustez adversarial. Los tres modelos de redes neuronales se implementan con PyTorch y se entrenan mediante PyTorch Lightning, con optimización de hiperparámetros mediante Optuna. XGBoost se entrena con su implementación nativa.
+
+% ── Regresión Logística ──────────────────────────────────────────────────────
+\subsection{Regresión Logística}
+
+El modelo de \textbf{Regresión Logística} consta de una única capa lineal \texttt{Linear(input\_dim, 2)} que toma el vector de características preprocesadas de cada transacción y produce dos valores numéricos (logits), uno por clase. Estos logits son transformados en probabilidades mediante la función Softmax, implícita en la función de pérdida Cross-Entropy. El modelo aprende los pesos $\mathbf{W}$ y el sesgo $\mathbf{b}$ que mejor separan las clases fraudulenta y legítima mediante la optimización:
+
+\[
+f(\mathbf{x}) = \mathbf{W}\mathbf{x} + \mathbf{b}, \qquad \hat{y} = \mathrm{Softmax}(f(\mathbf{x}))
+\]
+
+El modelo se entrena con el optimizador Adam y los hiperparámetros se optimizan mediante Optuna con 50 trials: tasa de aprendizaje \texttt{lr} $\in [10^{-5}, 10^{-1}]$ y \texttt{weight\_decay} $\in [10^{-6}, 10^{-2}]$. Al ser completamente diferenciable, es compatible con ataques de caja blanca y caja negra.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\linewidth]{modelos/regresion_logistica.png}
+\caption{Arquitectura del modelo de Regresión Logística}
+\label{fig:logreg}
+\end{figure}
+
+% ── MLP ──────────────────────────────────────────────────────────────────────
+\subsection{MLP — Perceptrón Multicapa}
+
+El modelo \textbf{MLP} es una red neuronal profunda compuesta por capas completamente conectadas con activaciones ReLU. Inicia con una capa \texttt{BatchNorm1d} que estabiliza el entrenamiento sobre datos tabulares, seguida de $n$ capas ocultas de dimensión $h$ con activación ReLU, y finaliza con una capa \texttt{Linear}$(h \to 2)$ que produce los logits de clasificación. La función de pérdida Cross-Entropy ponderada por \textit{class\_weight} compensa el desbalance de clases. Los hiperparámetros se optimizan con Optuna (100 trials): \texttt{n\_layers} $\in [2, 5]$, \texttt{hidden\_dim} $\in [32, 512]$, \texttt{lr} $\in [10^{-7}, 10^{-1}]$ y \texttt{weight\_decay} $\in [10^{-6}, 10^{-1}]$.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\linewidth]{modelos/mlp.png}
+\caption{Arquitectura del modelo MLP}
+\label{fig:mlp}
+\end{figure}
+
+% ── LSTM-Attention ────────────────────────────────────────────────────────────
+\subsection{LSTM-Attention}
+
+El modelo de \textbf{LSTM-Attention} reorganiza la entrada como una secuencia de pasos temporales y la procesa mediante $n$ capas LSTM apiladas de dimensión oculta $h$. Sobre las salidas $\{\mathbf{h}_t\}$ de la LSTM se aplica un mecanismo de \textbf{atención aditiva}: una capa \texttt{Linear}$(h,1)$ seguida de $\tanh$ y Softmax calcula los pesos $\alpha_t$, que ponderan las salidas para obtener un vector de contexto $\mathbf{c} = \sum_t \alpha_t \mathbf{h}_t$ que resume las características más relevantes de la transacción. Finalmente, una capa Dropout seguida de \texttt{Linear}$(h, 2)$ produce los logits de clasificación. Los hiperparámetros se optimizan con Optuna (50 trials): \texttt{n\_lstm\_layers} $\in [1, 4]$, \texttt{hidden\_dim} $\in [32, 256]$, \texttt{dropout} $\in [0.0, 0.5]$, \texttt{lr} $\in [10^{-5}, 10^{-2}]$.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\linewidth]{modelos/lstm-attention.png}
+\caption{Arquitectura del modelo LSTM-Attention}
+\label{fig:lstm}
+\end{figure}
+
+% ── XGBoost ──────────────────────────────────────────────────────────────────
+\subsection{XGBoost}
+
+\textbf{XGBoost} \cite{chen2016xgboost} es un ensamble de $K$ árboles de decisión construidos secuencialmente mediante \textit{gradient boosting}: cada árbol nuevo corrige los errores residuales del anterior, y la predicción final combina la suma de todos los árboles $f_k(\mathbf{x})$ pasada por la función sigmoide. El parámetro \texttt{scale\_pos\_weight} compensa el desbalance de clases. Los hiperparámetros se optimizan con Optuna TPE Sampler (30 trials): \texttt{n\_estimators} $\in [100, 600]$, \texttt{max\_depth} $\in [3, 10]$, \texttt{learning\_rate} $\in [0.01, 0.3]$, \texttt{subsample} $\in [0.5, 1.0]$.
+
+A diferencia de los modelos de redes neuronales, XGBoost \textbf{no es diferenciable} respecto a las entradas, ya que sus decisiones son funciones escalón discontinuas. Por esta razón no es compatible con ataques de caja blanca como CaFA, y solo puede evaluarse con ataques de caja negra (HopSkipJump, Boundary Attack, Square Attack).
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\linewidth]{modelos/xgboost.png}
+\caption{Arquitectura del modelo XGBoost}
+\label{fig:xgboost}
+\end{figure}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Evaluación de la Robustez Previa al Ataque Adversarial}
+% ─────────────────────────────────────────────────────────────────────────────
+
+Previo a cualquier ataque, cada modelo es evaluado sobre el conjunto de prueba para establecer su rendimiento \textit{baseline}. Las métricas registradas son: \textbf{FNR}, \textbf{FPR}, \textbf{Precisión}, \textbf{Recall}, \textbf{F1-Score} y \textbf{AUC-ROC}. Esta evaluación sirve como referencia para cuantificar la degradación introducida por los ataques en etapas posteriores.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Generación de Ejemplos Adversariales}
+% ─────────────────────────────────────────────────────────────────────────────
+
+El modelo es sometido a cuatro tipos de ataques adversariales para evaluar su capacidad de resistencia ante ejemplos manipulados. Todos los ataques operan sobre las muestras de fraude correctamente clasificadas por el modelo (verdaderos positivos del conjunto de prueba) e intentan generar perturbaciones $\boldsymbol{\delta}$ mínimas sobre las características de la transacción para que el modelo la clasifique como legítima:
+
+\[
+\mathcal{M}(\mathbf{x} + \boldsymbol{\delta}) \neq \mathcal{M}(\mathbf{x}), \qquad \|\boldsymbol{\delta}\|_0 \text{ minimizado}
+\]
+
+Los ataques implementados se dividen en dos paradigmas:
+
+\begin{itemize}
+    \item \textbf{CaFA} (\textit{Cost-aware Feasible Attacks}) \cite{cafa2025}: Ataque de \textbf{caja blanca} que utiliza el gradiente de la función de predicción respecto a las entradas ($\partial f(\mathbf{x})/\partial \mathbf{x}$) para identificar y perturbar las características más influyentes, minimizando la norma L\textsubscript{0}. Requiere que el modelo sea diferenciable, por lo que no es aplicable a XGBoost.
+
+    \item \textbf{HopSkipJump Attack (HSJ)} \cite{chen2020hopskipjumpattack}: Ataque de \textbf{caja negra} que estima la dirección del gradiente en la frontera de decisión mediante consultas binarias al modelo, sin acceso a sus parámetros internos. Aplicable a todos los modelos, incluido XGBoost.
+
+    \item \textbf{Boundary Attack} \cite{brendel2018decision}: Ataque de \textbf{caja negra} que parte de un ejemplo adversarial inicial y lo refina iterativamente moviéndose a lo largo de la frontera de decisión del modelo, reduciendo progresivamente la perturbación necesaria para mantener la evasión.
+
+    \item \textbf{Square Attack} \cite{andriushchenko2020square}: Ataque de \textbf{caja negra} basado en búsqueda aleatoria con perturbaciones estructuradas. Explora el espacio de perturbaciones aplicando cambios en regiones seleccionadas, alcanzando alta tasa de éxito con un número reducido de consultas al modelo.
+\end{itemize}
+
+La Tabla~\ref{tab:ataques_compat} resume la compatibilidad de cada ataque con los modelos evaluados.
+
+\begin{table}[H]
+\centering
+\caption{Compatibilidad de ataques adversariales por modelo}
+\label{tab:ataques_compat}
+\begin{tabular}{lcccc}
+\hline
+\textbf{Modelo} & \textbf{CaFA} & \textbf{HopSkipJump} & \textbf{Boundary} & \textbf{Square} \\
+\hline
+Regresión Logística & \checkmark & \checkmark & \checkmark & \checkmark \\
+MLP                 & \checkmark & \checkmark & \checkmark & \checkmark \\
+LSTM-Att.\          & \checkmark & \checkmark & \checkmark & \checkmark \\
+XGBoost             & $\times$   & \checkmark & \checkmark & \checkmark \\
+\hline
+\multicolumn{5}{l}{\footnotesize \checkmark\,=\,compatible \quad $\times$\,=\,incompatible (modelo no diferenciable)} \\
+\end{tabular}
+\end{table}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Evaluación de la Robustez Posterior al Ataque Adversarial}
+% ─────────────────────────────────────────────────────────────────────────────
+
+Luego de generar los ejemplos adversariales, se realiza una evaluación de la robustez del modelo utilizando las instancias perturbadas. El objetivo es observar cuánto se degrada el desempeño del modelo cuando se le presentan ejemplos adversariales, comparando los resultados con la evaluación baseline. Las métricas utilizadas en esta etapa incluyen:
+
+\begin{itemize}
+    \item \textbf{Tasa de Evasión} (\textit{Evasion Rate}): proporción de muestras de fraude originalmente detectadas que, tras la perturbación, son clasificadas como legítimas. Un valor del 100\% indica que el ataque logró evadir completamente la detección:
+    \[
+    \mathrm{Evasión} = \frac{TP_{\text{antes}} - TP_{\text{después}}}{TP_{\text{antes}}} \times 100\%
+    \]
+
+    \item \textbf{Norma L\textsubscript{0} media}: número promedio de características modificadas en los ejemplos adversariales generados exitosamente. Un L\textsubscript{0} bajo indica un ataque más eficiente y difícil de detectar por controles de negocio, ya que la transacción mantiene alta similitud con el original \cite{cartella2021adversarial}.
+
+    \item \textbf{Recall post-ataque}: Recall del modelo sobre el conjunto de ejemplos adversariales. Equivale a $1 - \mathrm{Evasión}$ y cuantifica cuántos fraudes el modelo aún detecta tras el ataque.
+
+    \item \textbf{Variación del FNR} ($\Delta$FNR): diferencia entre el FNR posterior y anterior al ataque, expresando la tasa de fraudes adicionales que escapan al detector por efecto del ataque:
+    \[
+    \Delta\mathrm{FNR} = \mathrm{FNR}_{\text{post}} - \mathrm{FNR}_{\text{baseline}}
+    \]
+\end{itemize}
+
+Para el análisis comparativo de la robustez, se define el concepto de \textbf{Zona de Peligro} en el espacio bidimensional Evasión~(\%) $\times$ L\textsubscript{0}. Se distinguen dos regiones:
+
+\begin{itemize}
+    \item \textbf{Zona de Peligro}: región donde la tasa de evasión supera el \textbf{70\%}, independientemente del L\textsubscript{0}. Un ataque en esta zona indica que el modelo queda operacionalmente comprometido.
+    \item \textbf{Zona Crítica}: intersección entre la Zona de Peligro y la región con L\textsubscript{0} inferior a la mediana del dataset. Los ataques en esta sub-zona son simultáneamente efectivos y eficientes, siendo los más amenazantes en escenarios reales donde el atacante tiene restricciones sobre cuántas características puede alterar \cite{cartella2023adversarial}.
+\end{itemize}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Proyección de los Ejemplos Adversariales sobre el Espacio de Características Válidas}
+% ─────────────────────────────────────────────────────────────────────────────
+
+En algunos casos, las perturbaciones generadas durante el ataque pueden producir instancias con valores de características fuera de los rangos permitidos o incoherentes con la naturaleza de los datos financieros originales. Para garantizar la viabilidad de los ejemplos adversariales, los ataques implementados respetan restricciones de dominio durante la generación de las perturbaciones.
+
+\subsection{Proyección de los Ejemplos Adversariales}
+
+El proceso de proyección consiste en ajustar los ejemplos adversariales generados para que cumplan con las restricciones del espacio de características válido del dataset. Esto se logra proyectando los valores perturbados dentro de los rangos observados en los datos originales de entrenamiento, asegurando que todas las características de las instancias modificadas se mantengan dentro de los límites preestablecidos. Este paso es crucial para garantizar que los ejemplos adversariales sean operacionalmente realizables, es decir, que un defraudador real podría ejecutar la transacción modificada sin generar inconsistencias detectables por otros controles del sistema financiero.
+
+\subsection{Evaluación Posterior a la Proyección}
+
+Una vez aplicada la proyección, se evalúa si los ejemplos adversariales mantienen su capacidad de evasión tras ser corregidos dentro del espacio válido. Esta evaluación permite verificar si el proceso de proyección ha preservado la efectividad del ataque, es decir, si el modelo sigue clasificando los ejemplos perturbados como legítimos aun cuando sus características son plausibles dentro del dominio financiero. Las métricas utilizadas son las mismas de la evaluación post-ataque (tasa de evasión, L\textsubscript{0}, $\Delta$FNR), con el objetivo adicional de verificar la \textbf{viabilidad del ataque}: capacidad de ser realista sin violar las restricciones del dominio.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Diseño de la Experimentación}
+% ─────────────────────────────────────────────────────────────────────────────
+
+Para el entrenamiento y evaluación de los modelos de detección de fraude se utilizan las tres configuraciones de datasets descritas anteriormente. En todos los casos, el conjunto de datos se divide en un \textbf{80\% para entrenamiento} y un \textbf{20\% para evaluación}, con semilla aleatoria fija (\texttt{random\_seed = 42}), manteniendo un subconjunto independiente para medir el rendimiento general de los modelos sobre datos no vistos durante el entrenamiento.
+
+El diseño experimental contempla \textbf{3 configuraciones} de dataset $\times$ \textbf{4 modelos} $\times$ \textbf{4 ataques}, resultando en hasta 48 combinaciones de experimentos. No todas las combinaciones son ejecutables: el ataque CaFA no aplica a XGBoost por no ser diferenciable, y los modelos que alcanzan FNR\,=\,100\% en AMLworld sin SMOTE (MLP y LSTM-Att.) no poseen muestras correctamente clasificadas sobre las cuales ejecutar los ataques. Esta configuración permite evaluar de forma sistemática la robustez de cada modelo frente a distintos tipos de ataques, en escenarios de desbalance moderado y extremo, con y sin balanceo de clases mediante SMOTE.
+
+\vspace{1em}
+En este capítulo se presentó el método utilizado para evaluar los modelos de detección de fraude y su comportamiento frente a ataques adversariales. Se describió el flujo general del proceso, desde el preprocesamiento de los datos hasta el entrenamiento de los cuatro modelos clasificadores, la generación de los ataques adversariales y la definición de la Zona de Peligro para el análisis de robustez. Esta metodología permite analizar de manera clara y consistente la vulnerabilidad de los modelos evaluados en el siguiente capítulo.

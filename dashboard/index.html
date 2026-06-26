@@ -260,10 +260,10 @@ table.blt tbody tr:last-child{border-bottom:none;}
 table.blt tbody tr:hover td{background:rgba(255,255,255,.025);}
 table.blt td{padding:9px 14px;text-align:right;font-family:'JetBrains Mono';font-size:.76rem;white-space:nowrap;color:var(--mu2);}
 table.blt td:first-child{text-align:left;padding-left:16px;font-family:'Inter';font-size:.76rem;font-weight:600;}
-.blt-best{color:#6EE7B7 !important;font-weight:700;}
-.blt-good{color:#93C5FD !important;}
-.blt-warn{color:#FCD34D !important;}
-.blt-bad{color:#FB7185 !important;}
+.blt-best{color:var(--tx) !important;font-weight:700;}
+.blt-good{color:var(--tx) !important;}
+.blt-warn{color:var(--tx) !important;}
+.blt-bad{color:var(--tx) !important;}
 .bl-footer{margin-top:20px;display:flex;flex-direction:column;gap:10px;}
 .bl-legend{display:flex;flex-wrap:wrap;gap:10px;}
 .bl-leg-item{display:flex;align-items:center;gap:5px;font-size:.66rem;color:var(--mu);}
@@ -786,7 +786,7 @@ function buildBaselineHTML(data){
     const models=data[dsKey].models;
     const thead=COLS.map(c=>`<th>${c.label}</th>`).join('');
     const tbody=models.map((m,i)=>'<tr>'+COLS.map(c=>{
-      if(c.key==='model') return`<td style="color:${MODEL_COLORS[m.model]||'var(--tx)'}">${m.model}</td>`;
+      if(c.key==='model') return`<td>${m.model}</td>`;
       const v=m[c.key];
       return`<td${cellCls(c,i,models)}>${v!=null?c.fmt(v):'—'}</td>`;
     }).join('')+'</tr>').join('');
@@ -802,10 +802,7 @@ function buildBaselineHTML(data){
     ${sections}
     <div class="bl-footer">
       <div class="bl-legend">
-        <div class="bl-leg-item"><div class="bl-leg-dot" style="background:#6EE7B7"></div>Mejor valor del dataset</div>
-        <div class="bl-leg-item"><div class="bl-leg-dot" style="background:#93C5FD"></div>Alto rendimiento</div>
-        <div class="bl-leg-item"><div class="bl-leg-dot" style="background:#FCD34D"></div>Rendimiento moderado</div>
-        <div class="bl-leg-item"><div class="bl-leg-dot" style="background:#FB7185"></div>Rendimiento bajo</div>
+        <div class="bl-leg-item"><strong style="color:var(--tx)">Negrita</strong>&nbsp;= mejor valor del dataset</div>
       </div>
       <div class="bl-note">
         <strong>FNR</strong> = Falsos Negativos (fraude no detectado) &nbsp;·&nbsp;

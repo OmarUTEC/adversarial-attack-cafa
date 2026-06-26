@@ -1,0 +1,211 @@
+\chapter{RESULTADOS}
+
+En este capítulo se presentan los resultados obtenidos durante la evaluación experimental de cuatro modelos de detección de fraude financiero frente a cuatro tipos de ataques adversariales, sobre tres configuraciones de datos. Los experimentos siguen el diseño descrito en el capítulo anterior: partición 80/20, optimización de hiperparámetros con Optuna, y evaluación sobre las muestras de fraude correctamente clasificadas en la etapa \textit{baseline}.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Evaluación Baseline de los Modelos}
+% ─────────────────────────────────────────────────────────────────────────────
+
+Antes de aplicar los ataques adversariales, cada modelo fue evaluado sobre el conjunto de prueba para establecer su rendimiento en condiciones normales. La Tabla~\ref{tab:baseline} resume las métricas más relevantes por configuración de dataset.
+
+\begin{table}[H]
+\centering
+\caption{Métricas baseline de los modelos por configuración de dataset}
+\label{tab:baseline}
+\resizebox{\textwidth}{!}{
+\begin{tabular}{llcccc}
+\hline
+\textbf{Dataset} & \textbf{Modelo} & \textbf{AUC-ROC} & \textbf{FNR (\%)} & \textbf{Recall (\%)} & \textbf{F1 (\%)} \\
+\hline
+\multirow{4}{*}{Credit Card (ULB)}
+  & XGBoost        & 1.0000 & 0.03  & 99.97 & 99.98 \\
+  & MLP            & 1.0000 & 0.02  & 99.98 & 99.97 \\
+  & Log. Reg.      & 0.9994 & 0.79  & 99.21 & 99.26 \\
+  & LSTM-Att.      & 0.8183 & 5.84  & 94.16 & 81.94 \\
+\hline
+\multirow{4}{*}{AMLworld sin SMOTE}
+  & XGBoost        & 0.9660 & 66.05 & 33.95 & 20.32 \\
+  & Log. Reg.      & 0.8172 & 89.33 & 10.67 &  1.03 \\
+  & MLP            & 0.9131 & \textbf{100.00} & 0.00 & 0.00 \\
+  & LSTM-Att.      & 0.6089 & \textbf{100.00} & 0.00 & 0.00 \\
+\hline
+\multirow{4}{*}{AMLworld con SMOTE}
+  & LSTM-Att.(S)   & 0.7048 &  3.96 & 96.04 &  0.25 \\
+  & MLP (S)        & 0.9297 & 18.58 & 81.42 &  1.87 \\
+  & Log. Reg.      & 0.8533 & 20.06 & 79.94 &  0.99 \\
+  & XGBoost        & 0.9634 & 26.31 & 73.69 &  3.73 \\
+\hline
+\end{tabular}
+}
+\end{table}
+
+En Credit Card, MLP y XGBoost alcanzan AUC-ROC\,=\,1.000 con FNR inferior al 0.1\,\%, lo que refleja un dataset perfectamente balanceado con patrones bien definidos. LSTM-Att. presenta el FNR más alto (5.84\,\%), posiblemente por su mayor complejidad ante datos tabulares sin estructura temporal explícita.
+
+En AMLworld sin SMOTE, el desbalance extremo (1:979) impide que MLP y LSTM-Att. aprendan los patrones de fraude, alcanzando FNR\,=\,100\,\%. Estos modelos quedan excluidos de la evaluación adversarial en esta configuración por no tener verdaderos positivos disponibles para perturbar. XGBoost es el único modelo que logra detectar fraude de forma relevante (Recall\,=\,33.95\,\%).
+
+Con SMOTE, todos los modelos recuperan capacidad de detección. LSTM-Att.(S) obtiene el mejor Recall (96.04\,\%) aunque con F1 muy bajo (0.25\,\%), indicando alta tasa de falsas alarmas — consecuencia del umbral de decisión no optimizado ante el desbalance residual del conjunto de prueba.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Resultados por Dataset}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\subsection{Credit Card (ULB)}
+
+La Tabla~\ref{tab:cc_results} presenta la tasa de evasión y la norma L\textsubscript{0} media —en valor absoluto y como porcentaje de las 29 features del dataset— para cada combinación modelo-ataque.
+
+\begin{table}[H]
+\centering
+\caption{Resultados adversariales — Credit Card (ULB, 29 features)}
+\label{tab:cc_results}
+\resizebox{\textwidth}{!}{
+\begin{tabular}{llcccc}
+\hline
+\textbf{Modelo} & \textbf{Ataque} & \textbf{Evasión (\%)} & \textbf{L\textsubscript{0} medio} & \textbf{\% Features mod.} & \textbf{Zona de Peligro} \\
+\hline
+Log. Reg.  & CaFA           &  78.5 &  9.62 & 33.2\% & \checkmark \\
+Log. Reg.  & HopSkipJump    &  99.2 & 29.82 & 102.8\% & \checkmark \\
+Log. Reg.  & BoundaryAttack &  48.0 & 14.13 &  48.7\% & --- \\
+Log. Reg.  & SquareAttack   & 100.0 & 15.58 &  53.7\% & \checkmark \\
+\hline
+MLP        & CaFA           &  52.9 & 11.94 &  41.2\% & --- \\
+MLP        & HopSkipJump    &  99.8 & 29.86 & 103.0\% & \checkmark \\
+MLP        & BoundaryAttack &  48.0 & 14.32 &  49.4\% & --- \\
+MLP        & SquareAttack   & 100.0 & 11.92 &  41.1\% & \checkmark \\
+\hline
+LSTM-Att.  & CaFA           &  23.7 &  0.60 &   2.1\% & --- \\
+LSTM-Att.  & HopSkipJump    &  77.9 & 29.98 & 103.4\% & \checkmark \\
+LSTM-Att.  & BoundaryAttack &  52.0 & 20.95 &  72.2\% & --- \\
+LSTM-Att.  & SquareAttack   &  22.6 &  0.41 &   1.4\% & --- \\
+\hline
+XGBoost    & HopSkipJump    & 100.0 & 29.97 & 103.3\% & \checkmark \\
+XGBoost    & BoundaryAttack & 100.0 & 29.85 & 102.9\% & \checkmark \\
+XGBoost    & SquareAttack   &  50.3 & 18.91 &  65.2\% & --- \\
+\hline
+\end{tabular}
+}
+\end{table}
+
+HopSkipJump y SquareAttack muestran las tasas de evasión más altas contra los modelos lineales. En HopSkipJump, los tres modelos susceptibles —Log. Reg., MLP y XGBoost— alcanzan evasión superior al 99\,\%, aunque con un costo elevado: L\textsubscript{0}\,$\approx$\,30, lo que equivale a modificar prácticamente todas las features. CaFA destaca por lograr una evasión del 78.5\,\% sobre Regresión Logística modificando solo el 33.2\,\% de las features, posicionándolo en la Zona Crítica con el menor impacto estructural.
+
+LSTM-Att. presenta la mayor robustez frente a CaFA (23.7\,\%) y SquareAttack (22.6\,\%), con L\textsubscript{0} inferior a 1, lo que indica que estos ataques no encuentran perturbaciones efectivas con pocos cambios. Sin embargo, HopSkipJump logra una evasión del 77.9\,\% al modificar prácticamente todas las features, revelando que la frontera de decisión de LSTM-Att. sí es explotable con suficientes modificaciones.
+
+\subsection{AMLworld HI-Small sin SMOTE}
+
+Debido al desbalance extremo (1:979), MLP y LSTM-Att. alcanzaron FNR\,=\,100\,\% en baseline y fueron excluidos de la evaluación adversarial. La Tabla~\ref{tab:aml_nosmote} presenta los resultados para los dos modelos evaluables sobre las 41 features post-encoding.
+
+\begin{table}[H]
+\centering
+\caption{Resultados adversariales — AMLworld sin SMOTE (41 features)}
+\label{tab:aml_nosmote}
+\resizebox{\textwidth}{!}{
+\begin{tabular}{llcccc}
+\hline
+\textbf{Modelo} & \textbf{Ataque} & \textbf{Evasión (\%)} & \textbf{L\textsubscript{0} medio} & \textbf{\% Features mod.} & \textbf{Zona de Peligro} \\
+\hline
+Log. Reg. & CaFA           & 100.0 & 3.55 &  8.7\% & \checkmark \\
+Log. Reg. & HopSkipJump    &   5.2 & 2.78 &  6.8\% & --- \\
+Log. Reg. & BoundaryAttack & 100.0 & 4.51 & 11.0\% & \checkmark \\
+Log. Reg. & SquareAttack   & 100.0 & 6.01 & 14.7\% & \checkmark \\
+\hline
+XGBoost   & HopSkipJump    &   2.2 & 2.56 &  6.2\% & --- \\
+XGBoost   & BoundaryAttack & 100.0 & 5.81 & 14.2\% & \checkmark \\
+XGBoost   & SquareAttack   & 100.0 & 6.05 & 14.7\% & \checkmark \\
+\hline
+\end{tabular}
+}
+\end{table}
+
+CaFA, BoundaryAttack y SquareAttack logran evasión del 100\,\% modificando entre el 8.7\,\% y el 14.7\,\% de las features — todos en Zona Crítica. Esto indica que los modelos entrenados sin balanceo de clases son altamente vulnerables ante perturbaciones muy pequeñas.
+
+HopSkipJump es la excepción notable: logra únicamente el 5.2\,\% de evasión contra Log. Reg. y el 2.2\,\% contra XGBoost. Este comportamiento sugiere que la frontera de decisión en AMLworld sin SMOTE es difícil de explotar mediante estimación de gradiente en la frontera, posiblemente porque el fuerte desbalance genera una frontera muy asimétrica que el algoritmo HSJ no logra aproximar con sus consultas binarias.
+
+\subsection{AMLworld HI-Small con SMOTE}
+
+La Tabla~\ref{tab:aml_smote} presenta los resultados completos con los cuatro modelos disponibles gracias al rebalanceo de clases mediante SMOTE.
+
+\begin{table}[H]
+\centering
+\caption{Resultados adversariales — AMLworld con SMOTE (41 features)}
+\label{tab:aml_smote}
+\resizebox{\textwidth}{!}{
+\begin{tabular}{llcccc}
+\hline
+\textbf{Modelo} & \textbf{Ataque} & \textbf{Evasión (\%)} & \textbf{L\textsubscript{0} medio} & \textbf{\% Features mod.} & \textbf{Zona de Peligro} \\
+\hline
+Log. Reg.     & CaFA           & 100.0 &  3.52 &  8.6\% & \checkmark \\
+Log. Reg.     & HopSkipJump    &  29.6 &  5.89 & 14.4\% & --- \\
+Log. Reg.     & BoundaryAttack &  99.9 &  4.75 & 11.6\% & \checkmark \\
+Log. Reg.     & SquareAttack   &  89.5 &  7.27 & 17.7\% & \checkmark \\
+\hline
+MLP (S)       & CaFA           &  98.8 &  4.67 & 11.4\% & \checkmark \\
+MLP (S)       & HopSkipJump    &  95.1 &  9.53 & 23.2\% & \checkmark \\
+MLP (S)       & BoundaryAttack & 100.0 &  4.53 & 11.0\% & \checkmark \\
+MLP (S)       & SquareAttack   & 100.0 &  6.17 & 15.0\% & \checkmark \\
+\hline
+LSTM-Att.(S)  & CaFA           &  68.6 &  2.48 &  6.0\% & --- \\
+LSTM-Att.(S)  & HopSkipJump    &   0.0 &  0.00 &  0.0\% & --- \\
+LSTM-Att.(S)  & BoundaryAttack &   0.5 &  0.04 &  0.1\% & --- \\
+LSTM-Att.(S)  & SquareAttack   &   0.2 &  0.78 &  1.9\% & --- \\
+\hline
+XGBoost       & CaFA           &  --- &  --- &  --- & --- \\
+XGBoost       & HopSkipJump    &  99.4 &  9.92 & 24.2\% & \checkmark \\
+XGBoost       & BoundaryAttack & 100.0 &  5.01 & 12.2\% & \checkmark \\
+XGBoost       & SquareAttack   & 100.0 &  6.58 & 16.1\% & \checkmark \\
+\hline
+\multicolumn{6}{l}{\footnotesize (S)\,=\,entrenado con SMOTE. XGBoost no es compatible con CaFA (modelo no diferenciable).}
+\end{tabular}
+}
+\end{table}
+
+El resultado más destacado es la robustez excepcional de \textbf{LSTM-Att.(S)}: resiste prácticamente todos los ataques de caja negra (HopSkipJump: 0.0\,\%, BoundaryAttack: 0.5\,\%, SquareAttack: 0.2\,\%). Solo CaFA logra una evasión cercana al umbral de peligro (68.6\,\%), y aun así no lo supera. Esto indica que la arquitectura recurrente con atención, combinada con SMOTE, desarrolla una frontera de decisión especialmente difícil de explotar por búsqueda en la frontera o perturbaciones aleatorias.
+
+En contraste, MLP (S) es el modelo más vulnerable: los cuatro ataques logran evasión superior al 95\,\% con L\textsubscript{0} inferior al 24\,\% de las features. Log. Reg. y XGBoost también muestran alta vulnerabilidad en tres de los cuatro ataques evaluados.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Análisis de la Zona de Peligro}
+% ─────────────────────────────────────────────────────────────────────────────
+
+La Zona de Peligro agrupa los resultados donde la evasión supera el 70\,\%, indicando que el modelo queda operacionalmente comprometido. La Zona Crítica es el subconjunto donde, adicionalmente, el porcentaje de features modificadas es inferior a la mediana del dataset, identificando ataques simultáneamente efectivos y eficientes. La Tabla~\ref{tab:zona_peligro} consolida cuántas combinaciones modelo-ataque caen en cada zona por dataset.
+
+\begin{table}[H]
+\centering
+\caption{Combinaciones en Zona de Peligro y Zona Crítica por dataset}
+\label{tab:zona_peligro}
+\begin{tabular}{lccc}
+\hline
+\textbf{Dataset} & \textbf{Total evaluados} & \textbf{Zona de Peligro} & \textbf{Zona Crítica} \\
+\hline
+Credit Card (ULB)        & 15 &  9 (60\,\%) &  3 (20\,\%) \\
+AMLworld sin SMOTE       &  7 &  5 (71\,\%) &  5 (71\,\%) \\
+AMLworld con SMOTE       & 15 & 11 (73\,\%) & 10 (67\,\%) \\
+\hline
+\end{tabular}
+\end{table}
+
+AMLworld destaca como el escenario más crítico: en la configuración con SMOTE, el 73\,\% de las combinaciones superan el umbral de evasión y el 67\,\% caen en la Zona Crítica —es decir, la mayoría de los ataques exitosos lo logran modificando menos features que la mediana del dataset. Sin SMOTE el panorama es igualmente preocupante: todos los ataques que lograron superar el umbral de peligro lo hicieron dentro de la Zona Crítica.
+
+En Credit Card, la Zona Crítica es menos frecuente (20\,\%) porque los ataques exitosos generalmente requieren modificar una fracción mayor de las 29 features PCA. La excepción es CaFA sobre Log. Reg. (33.2\,\% de features), que es el ataque más eficiente sobre este dataset.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Comparación entre Ataques}
+% ─────────────────────────────────────────────────────────────────────────────
+
+La Tabla~\ref{tab:atk_comparison} resume el comportamiento promedio de cada ataque sobre todos los modelos y datasets evaluados.
+
+\begin{table}[H]
+\centering
+\caption{Comparación de ataques: evasión media y porcentaje de features modificadas}
+\label{tab:atk_comparison}
+\begin{tabular}{lcccc}
+\hline
+\textbf{Ataque} & \textbf{Tipo} & \textbf{Evasión media (\%)} & \textbf{\% Features med.} & \textbf{En Zona Peligro} \\
+\hline
+CaFA           & Caja blanca &  74.1 & 16.4\% &  6/9  \\
+HopSkipJump    & Caja negra  &  60.6 & 42.7\% &  6/11 \\
+BoundaryAttack & Caja negra  &  80.7 & 34.9\% &  9/11 \\
+SquareAttack   & Caja negra  &  72.8 & 27.5\% &  8/11 \\
+\hline
+\end{tabular}
+\end{table}
+
+BoundaryAttack presenta la mayor evasión media (80.7\,\%) siendo el ataque de caja negra más consistentemente efectivo a lo largo de los experimentos. CaFA es el más eficiente en términos de features modificadas (16.4\,\%), confirmando su diseño orientado a minimizar L\textsubscript{0}. HopSkipJump muestra la mayor variabilidad: altamente efectivo en Credit Card pero casi ineficaz en AMLworld sin SMOTE, lo que lo convierte en el ataque menos predecible de los evaluados.
